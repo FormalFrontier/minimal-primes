@@ -1,0 +1,50 @@
+{
+  "analyzed_source_revision": "4910cb2e42997cc6ebc4445a6607cf972c93a61b",
+  "api_sha256": "73dec75bc7e7180555e526fa2e8f834cd0bfd7b156b089fe17770e6f1a5dd849",
+  "docgen_revision": "97d4ecdfc8e09e7f511724c25e303d448de6a3db",
+  "format": 1,
+  "generator": "scripts/generate_api.py",
+  "inputs": {
+    "MinimalPrimes.lean": "8f4a32212773f6471a098764111777bc3fce8a81c05170d02040f16456ee4c7e",
+    "MinimalPrimes/IrreducibleComponents.lean": "8cda89090463ba733999ff147103c820184ffa0137049c8f1058a8f6912544c0",
+    "MinimalPrimes/Principal.lean": "70a76b7f36cde178342a8f4e0aeca15de70c02b349057a161449b92c3365470f",
+    "MinimalPrimesTest/Audit.lean": "c6183cad174770acace2a5b60acbccb56a5a29e3f8be71fc179a90c4c9887f21",
+    "MinimalPrimesTest/LeafClient.lean": "e01979b10599dfa83b14aa9dec6063df790d7d230ca724d180e6ff5cbfc93453",
+    "MinimalPrimesTest/ReadmeComponents.lean": "e49b14d57639077a461925005b32799f168210ca8952b36802deb7e1f8e95994",
+    "MinimalPrimesTest/ReadmeGeneric.lean": "cc4a80b067cd9dac239c9ec3dfab24a6f16bae76299e37c538220fbdcb74b81b",
+    "MinimalPrimesTest/ReadmeInteger.lean": "3956447c3231e308eb0d8920d8b36b1a68ea6b7811bf3658ca70176668731e0d",
+    "MinimalPrimesTest/ReadmeNormalization.lean": "786c63981382df1e455af4407fa46202d7faf27ccc3962b67a2a6be96bf87fbc",
+    "lake-manifest.json": "c27ff8bcf685764c186aa0a602e77017676837fdd1b101c2309db4960c83a8da",
+    "lakefile.toml": "06708896f4a9dca5f594bd3cb109db0bcc40bac1b163c67740f9ae23fdef49cd",
+    "lean-toolchain": "8190e75a201741065fe508b28955dd64dd72d090babe5f70ce6848879d68ae88"
+  },
+  "modules": [
+    "MinimalPrimes.Principal",
+    "MinimalPrimes.IrreducibleComponents",
+    "MinimalPrimes",
+    "MinimalPrimesTest.Audit",
+    "MinimalPrimesTest.LeafClient",
+    "MinimalPrimesTest.ReadmeNormalization",
+    "MinimalPrimesTest.ReadmeGeneric",
+    "MinimalPrimesTest.ReadmeInteger",
+    "MinimalPrimesTest.ReadmeComponents"
+  ],
+  "native_record_sha256": {
+    "MinimalPrimes": "80194268c9c7454dbfae9e178d9c50cc499f7a5d9340adfd6e53b0c914db803e",
+    "MinimalPrimes.IrreducibleComponents": "122049a2266a20ccefd9b01a3b6ae6878a3463fb9f5402e84d509b10ec739ce7",
+    "MinimalPrimes.Principal": "8523b549e027a44b6583cdb4e646fedc615b738c1712898bb5a86683025b3f34",
+    "MinimalPrimesTest.Audit": "07e8f31be8094236a16d34584ee07e728dfc6caaae3839b6e29180955a3f0792",
+    "MinimalPrimesTest.LeafClient": "12311e2f846a72c01b254e36a9db1a4539e365e2effb205bc249bea5afe594ae",
+    "MinimalPrimesTest.ReadmeComponents": "ae13393e895ca26114f3a55ef10ecbdd831f2feb662fd899542231c6bdeeab37",
+    "MinimalPrimesTest.ReadmeGeneric": "efa2f4ea0b71beb1c3cac40b730cca8e86d94ea4c8499efa720e67f761736fe9",
+    "MinimalPrimesTest.ReadmeInteger": "64635ff48c09f7a9fb12d307fc23bdf75a2243ea0a78a6352b150fd102876c19",
+    "MinimalPrimesTest.ReadmeNormalization": "e16e60b8e2f1237353229b07e3f495136b6d218382a6c932443d5395a4d08b20"
+  },
+  "proof_certification": false,
+  "public_declarations": [
+    "Ideal.minimalPrimes_span_singleton_eq_normalizedFactors",
+    "Ideal.normalizedFactorsEquivMinimalPrimes",
+    "Ideal.normalizedFactorsEquivMinimalPrimes_apply",
+    "Ideal.normalizedFactorsEquivIrreducibleComponents"
+  ]
+}

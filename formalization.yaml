@@ -1,0 +1,106 @@
+version: "v0.4"
+
+project:
+  name: Minimal primes over principal ideals in commutative UFDs
+  description: >-
+    Classifies minimal primes over nonzero principal ideals by normalized
+    irreducible factors, with equivalences to minimal primes and order-dual
+    irreducible components of the prime-spectrum zero-locus subspace.
+  authors: [Formal Frontier Agents]
+  responsible_maintainers: [Atlas]
+  license: Apache-2.0
+
+repository:
+  role: substantive-development
+
+sources:
+  - title: Formal Frontier scratch development of Exercise 3.7.H
+    authors: [Formal Frontier Agents]
+    id: >-
+      source-vakil-foag commit 120f6b5ffb37ce56ec9c6110d882063a98f0282c,
+      VakilResearch/Exercise37H.lean
+    type: project-created Lean research precursor
+    location: VakilResearch/Exercise37H.lean
+    relationship: adapts
+    note: >-
+      Actual adapted Lean proof expression; the precursor chose normalization
+      locally and assumed a domain. Atlas authored that source research;
+      Formalization Worker A contributed the reusable classification and
+      caller-normalization repair. The reusable API takes the caller's
+      normalization and does not add a separate domain hypothesis. Inherited
+      provenance identifies precursor SHA256
+      b32d3d29674854957e97fa35b27d4c508cc32d2efb18ee2a91b7d1e54a423c2d.
+  - title: Foundations of Algebraic Geometry
+    authors: [Ravi Vakil]
+    type: book
+    location: Exercise 3.7.H (October 21, 2025 draft)
+    relationship: background
+    note: >-
+      Mathematical motivation only, not a contributor to this Lean development;
+      no source text or assets are redistributed here. Earlier original-source
+      inspection belongs to the source research record, not a coverage claim here.
+
+automation:
+  methods:
+    - method: agent
+      framework: Formal Frontier Hive Tasks with Lean and Lake
+      tool_setup: AI-assisted Lean formalization and independent Task review
+  notes: >-
+    Original project contribution 344bec2324351fa93fa7091a9a03e079cd7078e7;
+    caller-normalization repair b6e0d6211eb50fd684706785044cf8a7f415d182;
+    subsequent module/test/attribution and standalone documentation changes
+    received independent agent review and owner acceptance. Atlas assembled
+    the named examples and native generated documentation using a recipe
+    adapted from Anchor's original ideal-completion documentation tooling.
+    No model identity, costs or human review are claimed.
+
+status:
+  scope: >-
+    Nonzero principal ideals in arbitrary-universe commutative UFDs with the
+    caller-supplied NormalizationMonoid; repeated factors count as one value.
+    This does not classify arbitrary ideals or supply a homeomorphism.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: [propext, Classical.choice, Quot.sound]
+  main_results:
+    - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
+      file: MinimalPrimes/Principal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.normalizedFactorsEquivMinimalPrimes
+      file: MinimalPrimes/Principal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.normalizedFactorsEquivMinimalPrimes_apply
+      file: MinimalPrimes/Principal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.normalizedFactorsEquivIrreducibleComponents
+      file: MinimalPrimes/IrreducibleComponents.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+
+fidelity:
+  divergences: >-
+    Generalizes the original scratch proof by retaining caller normalization
+    and removing its redundant extra domain assumption. The geometric result
+    is an Equiv into order-dual irreducible components of a zero-locus subspace.
+
+review:
+  status: agent-reviewed mathematical development
+  notes: >-
+    Mathematical development, normalization repair, and module/test changes
+    received prior independent reviews and owner acceptance. The earlier
+    standalone documentation and metadata were also accepted. These historical
+    reviews do not certify later artifacts. Exact assembly review, findings,
+    acceptance and publication state are recorded separately for each commit
+    and tree. Schema validity is not review or release acceptance.
+
+acknowledgements: >-
+  Builds on pinned mathlib under Apache-2.0. Original source research by Atlas;
+  reusable classification, caller-normalization repair and earlier module/test
+  and documentation contributions by Formalization Worker A. Formal Frontier
+  Agents provided independent reviews. Atlas added named examples and the
+  documentation assembly; the adapter preserves credit to Anchor's original
+  ideal-completion recipe in docs/README.md. Detailed source coverage is
+  maintained outside this reusable library.
