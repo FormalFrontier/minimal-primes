@@ -14,22 +14,19 @@ repository:
   role: substantive-development
 
 sources:
-  - title: Formal Frontier scratch development of Exercise 3.7.H
+  - title: Formal Frontier Lean precursor for Exercise 3.7.H
     authors: [Formal Frontier Agents]
-    id: >-
-      source-vakil-foag commit 120f6b5ffb37ce56ec9c6110d882063a98f0282c,
-      VakilResearch/Exercise37H.lean
+    id: Formal Frontier Exercise 3.7.H research precursor
     type: project-created Lean research precursor
-    location: VakilResearch/Exercise37H.lean
+    location: Internal source research record
     relationship: adapts
     note: >-
-      Actual adapted Lean proof expression; the precursor chose normalization
-      locally and assumed a domain. Atlas authored that source research;
-      Formalization Worker A contributed the reusable classification and
-      caller-normalization repair. The reusable API takes the caller's
-      normalization and does not add a separate domain hypothesis. Inherited
-      provenance identifies precursor SHA256
-      b32d3d29674854957e97fa35b27d4c508cc32d2efb18ee2a91b7d1e54a423c2d.
+      Atlas authored the adapted Lean proof expression; its precursor chose
+      normalization locally and assumed a domain. Subsequent Formal Frontier AI agents
+      contributed the reusable classification and caller-normalization repair.
+      This API takes the caller's normalization without a separate domain
+      hypothesis. The exact precursor mapping is preserved in the private
+      source and publication-readiness research records.
   - title: Foundations of Algebraic Geometry
     authors: [Ravi Vakil]
     type: book
@@ -46,13 +43,13 @@ automation:
       framework: Formal Frontier Hive Tasks with Lean and Lake
       tool_setup: AI-assisted Lean formalization and independent Task review
   notes: >-
-    Original project contribution 344bec2324351fa93fa7091a9a03e079cd7078e7;
-    caller-normalization repair b6e0d6211eb50fd684706785044cf8a7f415d182;
-    subsequent module/test/attribution and standalone documentation changes
-    received independent agent review and owner acceptance. Atlas assembled
-    the named examples and native generated documentation using a recipe
-    adapted from Anchor's original ideal-completion documentation tooling.
-    No model identity, costs or human review are claimed.
+    Formal Frontier AI agents developed the reusable classification and repaired
+    its caller-normalization interface. Earlier mathematical, module/test and
+    standalone documentation changes received independent agent review and
+    owner acceptance; these do not approve later artifacts. Atlas assembled
+    named examples and native documentation, adapting through Integral Closure
+    a recipe from Anchor's original Ideal Completion tooling. No model identity,
+    costs or human review are claimed.
 
 status:
   scope: >-
@@ -99,7 +96,7 @@ review:
 acknowledgements: >-
   Builds on pinned mathlib under Apache-2.0. Original source research by Atlas;
   reusable classification, caller-normalization repair and earlier module/test
-  and documentation contributions by Formalization Worker A. Formal Frontier
+  and documentation contributions by Formal Frontier AI agents. Formal Frontier
   Agents provided independent reviews. Atlas added named examples and the
   documentation assembly; the adapter preserves credit to Anchor's original
   ideal-completion recipe in docs/README.md. Detailed source coverage is
