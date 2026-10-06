@@ -3,14 +3,23 @@
 This historical snapshot covers four normalized-factor declarations in two
 mathematical leaves, three production modules (including the root import) and six
 test/example modules: nine modules in all. It is **not** the complete API of the
-current library, which has five public declarations in three mathematical leaves,
-four production modules (including the root import) and seven test modules:
-eleven modules in all. The additional theorem
+current library, which has eleven public declarations in four mathematical leaves,
+five production modules (including the root import) and eight test modules:
+thirteen modules in all. The principal-quotient theorem
 [`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
 equates the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with the
 minimal primes above `(f)` for every `f : R` under `[CommRing R]` and
 `[UniqueFactorizationMonoid R]`, including `f = 0` and subsingleton rings.
-Import `MinimalPrimes` to re-export all three current mathematical leaves.
+The [scalar-restriction leaf](../MinimalPrimes/AssociatedRestrictScalars.lean)
+provides colon contraction for compatible scalar actions with a commutative-semiring
+source and semiring target. Over commutative semirings, associated primes contract
+along any compatible algebra map and reflect along a surjective one. The
+[principal-quotient leaf](../MinimalPrimes/AssociatedPrincipal.lean) also characterizes
+quotient-spectrum points under the same ring hypotheses, for every `f`: being associated
+over the quotient ring and being the exact annihilator of an element are each
+equivalent to minimality of the forward ideal comap above `(f)`. The exact-annihilator
+criterion is separate from the radical-of-annihilator associated-prime criterion.
+Import `MinimalPrimes` to re-export all four current mathematical leaves.
 
 The four signatures below are native doc-gen4 display signatures from the
 historical inputs, with all displayed implicit arguments retained, not
@@ -104,7 +113,7 @@ structure with `toEquiv`; the inverse is noncomputable.
 
 The following historical root-module docstring describes the original two-leaf
 aggregate, not the current root import, which also re-exports
-`MinimalPrimes.AssociatedPrincipal`.
+`MinimalPrimes.AssociatedPrincipal` and `MinimalPrimes.AssociatedRestrictScalars`.
 
 ## Module `MinimalPrimes`
 

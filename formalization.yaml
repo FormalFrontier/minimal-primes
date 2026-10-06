@@ -6,7 +6,9 @@ project:
     Classifies minimal primes over nonzero principal ideals by normalized
     irreducible factors and relates them to order-dual irreducible components.
     For every generator, identifies the associated primes of its principal
-    quotient with the minimal primes over its principal ideal.
+    quotient with the minimal primes over its principal ideal, and characterizes
+    quotient-spectrum points by associated primes and exact annihilators.
+    Associated primes also transport along compatible algebra maps.
   authors: [Formal Frontier Agents]
   responsible_maintainers: [Atlas]
   license: Apache-2.0
@@ -42,7 +44,8 @@ sources:
     relationship: background
     note: >-
       Exact-annihilator examples motivate the principal-quotient comparison;
-      the theorem instead uses mathlib's radical-of-annihilator associated primes.
+      both the radical-of-annihilator associated-prime criterion and a separate
+      exact quotient-ring annihilator criterion are proved here.
 
 automation:
   methods:
@@ -51,7 +54,8 @@ automation:
       tool_setup: AI-assisted Lean formalization, examples and documentation
   notes: >-
     Formal Frontier AI agents developed the reusable classification, its
-    caller-normalization interface and the principal-quotient comparison.
+    caller-normalization interface, principal-quotient comparisons and scalar
+    transport.
     Atlas assembled named examples and adapted the native documentation recipe
     through Integral Closure from Anchor's original Ideal Completion tooling.
 
@@ -60,7 +64,13 @@ status:
     In arbitrary-universe commutative UFDs, associated primes of the principal
     quotient equal minimal primes over the principal ideal for every generator,
     including zero and subsingleton cases, without normalization, nonzero,
-    domain or Noetherian premises. The normalized-factor classification and
+    domain or Noetherian premises. A quotient-spectrum point is associated
+    over the quotient ring, or has an exact singleton quotient-ring annihilator,
+    exactly when its forward comap image is minimal over that ideal; both
+    criteria cover every generator. For compatible actions over commutative
+    semirings, associated primes contract along any algebra map and reflect
+    along a surjective one; colon contraction allows a semiring target and no
+    surjectivity. The normalized-factor classification and
     factor/component equivalences require a nonzero generator and the caller's
     NormalizationMonoid; repeated factors count as one value. The geometric
     result is an Equiv into order-dual components of the zero-locus subspace,
@@ -89,23 +99,49 @@ status:
       file: MinimalPrimes/AssociatedPrincipal.lean
       sorry_count: 0
       axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.colon_quotient_mk_mul_eq_span_singleton
+      file: MinimalPrimes/AssociatedPrincipal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.isAssociatedPrime_quotient_iff_minimalPrimes
+      file: MinimalPrimes/AssociatedPrincipal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Ideal.exists_colon_quotient_iff_minimalPrimes
+      file: MinimalPrimes/AssociatedPrincipal.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: Submodule.colon_restrictScalars
+      file: MinimalPrimes/AssociatedRestrictScalars.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: IsAssociatedPrime.comap_algebraMap
+      file: MinimalPrimes/AssociatedRestrictScalars.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+    - declaration: IsAssociatedPrime.comap_algebraMap_iff
+      file: MinimalPrimes/AssociatedRestrictScalars.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
 
 fidelity:
   divergences: >-
     Generalizes the original scratch proof by retaining caller normalization
     and removing its redundant extra domain assumption. The geometric result
     is an Equiv into order-dual irreducible components of a zero-locus subspace.
-    The principal-quotient comparison applies to every generator without caller
-    normalization; mathlib's associated primes use radicals of annihilators,
-    not an exact-prime-annihilator classification.
+    The principal-quotient comparisons apply to every generator without caller
+    normalization. Mathlib's associated primes use radicals of annihilators;
+    the separate exact-annihilator criterion is specific to these principal
+    quotients, not a generic radical-equals-annihilator principle.
 
 review:
-  status: independent review pending
+  status: agent-reviewed mathematical development
 
 acknowledgements: >-
   Builds on pinned mathlib under Apache-2.0. Original source research by Atlas;
-  reusable classification, caller-normalization repair, associated-prime
-  comparison, and module/test and documentation contributions by Formal Frontier
+  reusable classification, caller-normalization repair, associated-prime and
+  exact-annihilator comparisons, scalar transport, and module/test and
+  documentation contributions by Formal Frontier
   AI agents. Atlas added named examples and the documentation assembly; the
   adapter preserves credit to Anchor's original ideal-completion recipe in
   docs/README.md. Detailed source coverage is maintained outside this reusable

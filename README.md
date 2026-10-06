@@ -27,6 +27,14 @@ commutative rings with unique factorization.
   with `(Ideal.span {f}).minimalPrimes` for every `f : R` under `[CommRing R]`
   and `[UniqueFactorizationMonoid R]`. It requires no normalization, nonzero or
   Noetherian hypothesis and includes the zero ring.
+- **Scalar restriction and quotient points.** The
+  [scalar-restriction leaf](MinimalPrimes/AssociatedRestrictScalars.lean) contracts
+  arbitrary submodule colon ideals over compatible scalar actions; associated
+  primes contract without surjectivity and reflect along a surjective algebra
+  map. The [quotient leaf](MinimalPrimes/AssociatedPrincipal.lean) identifies
+  associated primes of the *quotient ring* at spectrum points with minimal
+  primes over `(f)` via forward ideal comap, and gives the same criterion for
+  an *exact* singleton annihilator in that quotient ring, for every `f`.
 
 The four normalized-factor results work at arbitrary universe levels with
 `[CommRing R]`, `[UniqueFactorizationMonoid R]`, the caller's
@@ -80,13 +88,16 @@ it does not assert an instance-independent equality between factor subtypes.
 Import `MinimalPrimes.Principal` for the classification, factor equivalence and
 its `@[simp]` forward-map lemma. Import `MinimalPrimes.IrreducibleComponents` for
 the equivalence with the components of the prime-spectrum zero locus. Import
-`MinimalPrimes.AssociatedPrincipal` for the principal-quotient comparison;
-`MinimalPrimes` re-exports all three production leaves. The component equivalence
-has an order-dual codomain, as required by the underlying topology API. The tests
-live in `MinimalPrimesTest.Audit` (aggregate and boundary cases),
-`MinimalPrimesTest.LeafClient` (direct algebraic import), and
-`MinimalPrimesTest.AssociatedPrincipal` (quotient and zero-ring examples); they
-are not API modules.
+`MinimalPrimes.AssociatedRestrictScalars` for colon contraction and associated-
+prime transport. Import `MinimalPrimes.AssociatedPrincipal` for the base-ring and
+quotient-spectrum comparisons and exact annihilators; `MinimalPrimes` re-exports
+all four production leaves. The component equivalence has an order-dual codomain,
+as required by the underlying topology API. The tests live in
+`MinimalPrimesTest.Audit` (aggregate and boundary cases),
+`MinimalPrimesTest.LeafClient` (direct algebraic import),
+`MinimalPrimesTest.AssociatedRestrictScalars` (including a nonsurjective
+diagonal), and `MinimalPrimesTest.AssociatedPrincipal` (quotient and zero-ring
+examples); they are not API modules.
 No assertion here identifies differently normalized literal factor subtypes.
 
 This repository is organized around reusable mathematics rather than any one
@@ -97,16 +108,15 @@ remain in their source repositories.
 
 The [historical native API reference](docs/API.md) preserves display signatures
 for the four normalized-factor declarations and docstrings from nine originally
-analyzed modules; it is not the complete five-declaration, eleven-module API of
-this checkout. The added
-[`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](MinimalPrimes/AssociatedPrincipal.lean)
-applies to every `f : R` under `[CommRing R] [UniqueFactorizationMonoid R]`,
-including zero and subsingleton rings, but is not in that historical snapshot.
+analyzed modules; it is not the complete eleven-declaration, thirteen-module API
+of this checkout. The added associated-prime, scalar-restriction and exact-
+annihilator results below are not in that historical snapshot.
 The [historical input manifest](docs/api-manifest.json) and
 [reproduction instructions](docs/README.md) identify the original analyzed
 source, pins and documentation tool, not a generation from the expanded library.
 
-The public declarations, all in namespace `Ideal`, are:
+The principal and quotient declarations are in namespace `Ideal`; scalar
+restriction uses namespaces `Submodule` and `IsAssociatedPrime`:
 
 | Declaration | Canonical import | Result |
 | --- | --- | --- |
@@ -115,6 +125,12 @@ The public declarations, all in namespace `Ideal`, are:
 | `normalizedFactorsEquivMinimalPrimes_apply` | `MinimalPrimes.Principal` | `@[simp]` forward-map equality, definitional (`rfl`) despite the noncomputable inverse. |
 | `normalizedFactorsEquivIrreducibleComponents` | `MinimalPrimes.IrreducibleComponents` | Equivalence from normalized factor values to the **order-dual** irreducible components of the zero-locus subspace in `PrimeSpectrum R`. |
 | `associatedPrimes_quotient_span_singleton_eq_minimalPrimes` | `MinimalPrimes.AssociatedPrincipal` | Associated primes of `R ⧸ (f)` as an `R`-module equal the minimal primes over `(f)` for every generator in a commutative ring with unique factorization. |
+| `colon_quotient_mk_mul_eq_span_singleton` | `MinimalPrimes.AssociatedPrincipal` | Over a cancel-multiplication-by-nonzero commutative ring, the `R`-annihilator of `[witness]` modulo `(factor * witness)` equals `(factor)` when `witness ≠ 0`. |
+| `isAssociatedPrime_quotient_iff_minimalPrimes` | `MinimalPrimes.AssociatedPrincipal` | A quotient-spectrum point is radical-associated over the quotient ring iff its forward comap image is minimal over `(f)`, for every `f` in a commutative UFD. |
+| `exists_colon_quotient_iff_minimalPrimes` | `MinimalPrimes.AssociatedPrincipal` | The same all-generator criterion for an exact singleton annihilator over the quotient ring. |
+| `Submodule.colon_restrictScalars` | `MinimalPrimes.AssociatedRestrictScalars` | Contracts the colon ideal of any submodule and set under a compatible algebra and module tower, with commutative source and semiring target; no surjectivity is needed. |
+| `IsAssociatedPrime.comap_algebraMap` | `MinimalPrimes.AssociatedRestrictScalars` | Contracts radical-associated primes along an algebra map of commutative semirings without surjectivity. |
+| `IsAssociatedPrime.comap_algebraMap_iff` | `MinimalPrimes.AssociatedRestrictScalars` | Reflects radical-associated primes when that algebra map is surjective; the converse is not valid for arbitrary maps. |
 
 The classification does not count repeated factors. Both equivalences are
 noncomputable; no topological homeomorphism or arbitrary-ideal classification is
@@ -238,8 +254,10 @@ Completion recipe. Formal Frontier agents produced
 the Lean code, tests and documentation with AI assistance. Atlas maintains the library.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
-Exercise 3.7.H, is mathematical motivation, not Lean authorship, endorsement or
-evidence of source coverage. No source text or assets are redistributed here.
+Exercise 3.7.H, and *The Rising Sea*, Exercise 6.6.F, are mathematical
+motivation, not Lean authorship, endorsement or evidence of source coverage.
+Mathlib supplies the factorization, colon, associated-prime, radical/comap and
+spectrum-correspondence APIs used here. No source text or assets are redistributed here.
 The original project code is available under Apache License 2.0 (see `LICENSE`),
 with `Authors: Formal Frontier Agents`. Lean, mathlib and doc-gen4 are separately
 credited tools and infrastructure, not original project implementations.
@@ -254,19 +272,19 @@ before any build with:
 lake exe cache get
 ```
 
-Build both default library targets, including all eleven production, test and
+Build both default library targets, including all thirteen production, test and
 README-example modules:
 
 ```sh
 lake build MinimalPrimes MinimalPrimesTest
 ```
 
-For focused checks, the same eleven modules can be built explicitly (the commands
+For focused checks, the same thirteen modules can be built explicitly (the commands
 below are optional and may overlap the default build):
 
 ```sh
-lake build MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPrimes.AssociatedPrincipal MinimalPrimes
-lake build MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient MinimalPrimesTest.AssociatedPrincipal
+lake build MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPrimes.AssociatedRestrictScalars MinimalPrimes.AssociatedPrincipal MinimalPrimes
+lake build MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient MinimalPrimesTest.AssociatedRestrictScalars MinimalPrimesTest.AssociatedPrincipal
 lake build MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents
 ```
 
