@@ -89,8 +89,3 @@ private noncomputable def integer_components {f : ℤ} (hf : f ≠ 0) :
   Ideal.normalizedFactorsEquivIrreducibleComponents hf
 
 end IntegerDownstream
-
-#print axioms Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
-#print axioms Ideal.normalizedFactorsEquivMinimalPrimes
-#print axioms Ideal.normalizedFactorsEquivMinimalPrimes_apply
-#print axioms Ideal.normalizedFactorsEquivIrreducibleComponents

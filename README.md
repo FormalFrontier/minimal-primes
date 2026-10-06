@@ -1,7 +1,8 @@
 # Minimal primes
 
-Reusable Lean theory of minimal prime ideals and irreducible components over
-nonzero principal ideals in commutative unique factorization domains.
+Reusable Lean theory of minimal primes over principal ideals, associated primes
+of principal quotients, and irreducible components of principal zero loci in
+commutative rings with unique factorization.
 
 ## Headline results
 
@@ -20,9 +21,16 @@ nonzero principal ideals in commutative unique factorization domains.
   components of the zero-locus subspace `V((f))` in `PrimeSpectrum R`. This is an
   `Equiv`, not an order-equivalence, a homeomorphism or a classification of
   arbitrary ideals.
+- **Associated primes of a principal quotient.** The
+  [principal-quotient comparison](MinimalPrimes/AssociatedPrincipal.lean) identifies
+  `associatedPrimes R (R ⧸ Ideal.span {f})`, using base-ring `R`-module scalars,
+  with `(Ideal.span {f}).minimalPrimes` for every `f : R` under `[CommRing R]`
+  and `[UniqueFactorizationMonoid R]`. It requires no normalization, nonzero or
+  Noetherian hypothesis and includes the zero ring.
 
-All four results work at arbitrary universe levels with `[CommRing R]`,
-`[UniqueFactorizationMonoid R]`, the caller's `[NormalizationMonoid R]`, and
+The four normalized-factor results work at arbitrary universe levels with
+`[CommRing R]`, `[UniqueFactorizationMonoid R]`, the caller's
+`[NormalizationMonoid R]`, and
 `f ≠ 0`; they do not add a separate `[IsDomain R]` assumption. They build on
 mathlib's factorization, ideal, spectrum and component correspondence, while
 the principal-ideal classification and factor interfaces are project results.
@@ -36,8 +44,9 @@ normalized value only once.
 
 ## Normalization and imports
 
-The public declarations explicitly require the caller's `[NormalizationMonoid
-R]`, in addition to `[CommRing R] [UniqueFactorizationMonoid R]`. Thus their
+The normalized-factor declarations explicitly require the caller's
+`[NormalizationMonoid R]`, in addition to `[CommRing R]` and
+`[UniqueFactorizationMonoid R]`. Thus their
 `normalizedFactors` types use the same normalization data as the caller. Standard
 concrete types such as `ℤ` export an instance already. A generic development, or
 a type such as `MvPolynomial` that does not export a global normalization choice,
@@ -70,11 +79,14 @@ it does not assert an instance-independent equality between factor subtypes.
 
 Import `MinimalPrimes.Principal` for the classification, factor equivalence and
 its `@[simp]` forward-map lemma. Import `MinimalPrimes.IrreducibleComponents` for
-the equivalence with the components of the prime-spectrum zero locus; importing
-`MinimalPrimes` re-exports both. The latter equivalence has an order-dual
-codomain, as required by the underlying topology API. The tests live in
-`MinimalPrimesTest.Audit` (aggregate and boundary cases) and
-`MinimalPrimesTest.LeafClient` (direct algebraic import); they are not API modules.
+the equivalence with the components of the prime-spectrum zero locus. Import
+`MinimalPrimes.AssociatedPrincipal` for the principal-quotient comparison;
+`MinimalPrimes` re-exports all three production leaves. The component equivalence
+has an order-dual codomain, as required by the underlying topology API. The tests
+live in `MinimalPrimesTest.Audit` (aggregate and boundary cases),
+`MinimalPrimesTest.LeafClient` (direct algebraic import), and
+`MinimalPrimesTest.AssociatedPrincipal` (quotient and zero-ring examples); they
+are not API modules.
 No assertion here identifies differently normalized literal factor subtypes.
 
 This repository is organized around reusable mathematics rather than any one
@@ -83,12 +95,18 @@ remain in their source repositories.
 
 ## Public API and examples
 
-The [generated API reference](docs/API.md) includes all four public declarations,
-their complete native display signatures and all nine module docstrings. Its
-[input manifest](docs/api-manifest.json) and [reproduction instructions](docs/README.md)
-identify the exact analyzed source, dependency pins and separate documentation tool.
+The [historical native API reference](docs/API.md) preserves display signatures
+for the four normalized-factor declarations and docstrings from nine originally
+analyzed modules; it is not the complete five-declaration, eleven-module API of
+this checkout. The added
+[`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](MinimalPrimes/AssociatedPrincipal.lean)
+applies to every `f : R` under `[CommRing R] [UniqueFactorizationMonoid R]`,
+including zero and subsingleton rings, but is not in that historical snapshot.
+The [historical input manifest](docs/api-manifest.json) and
+[reproduction instructions](docs/README.md) identify the original analyzed
+source, pins and documentation tool, not a generation from the expanded library.
 
-The four public declarations, all in namespace `Ideal`, are:
+The public declarations, all in namespace `Ideal`, are:
 
 | Declaration | Canonical import | Result |
 | --- | --- | --- |
@@ -96,6 +114,7 @@ The four public declarations, all in namespace `Ideal`, are:
 | `normalizedFactorsEquivMinimalPrimes` | `MinimalPrimes.Principal` | Equivalence from `{p // p ∈ normalizedFactors f}` to `(span {f}).minimalPrimes`; its forward map is `p ↦ span {p.1}`. |
 | `normalizedFactorsEquivMinimalPrimes_apply` | `MinimalPrimes.Principal` | `@[simp]` forward-map equality, definitional (`rfl`) despite the noncomputable inverse. |
 | `normalizedFactorsEquivIrreducibleComponents` | `MinimalPrimes.IrreducibleComponents` | Equivalence from normalized factor values to the **order-dual** irreducible components of the zero-locus subspace in `PrimeSpectrum R`. |
+| `associatedPrimes_quotient_span_singleton_eq_minimalPrimes` | `MinimalPrimes.AssociatedPrincipal` | Associated primes of `R ⧸ (f)` as an `R`-module equal the minimal primes over `(f)` for every generator in a commutative ring with unique factorization. |
 
 The classification does not count repeated factors. Both equivalences are
 noncomputable; no topological homeomorphism or arbitrary-ideal classification is
@@ -215,10 +234,8 @@ and assumed a domain. Subsequent Formal Frontier AI agents developed the reusabl
 classification and later repaired it to use the caller's normalization without
 an extra domain premise; Atlas assembled the named examples. Atlas adapted the
 documentation assembly through Integral Closure from Anchor's original Ideal
-Completion recipe. Those recipes were unreviewed when reused; prior approval
-of one artifact does not accept a later artifact. Formal Frontier agents produced
-the Lean code, tests and documentation with AI assistance and independent
-review. Atlas maintains the library.
+Completion recipe. Formal Frontier agents produced
+the Lean code, tests and documentation with AI assistance. Atlas maintains the library.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
 Exercise 3.7.H, is mathematical motivation, not Lean authorship, endorsement or
@@ -237,41 +254,46 @@ before any build with:
 lake exe cache get
 ```
 
-Build both default library targets, including all nine production, test and
-README-example modules, with warnings treated as errors:
+Build both default library targets, including all eleven production, test and
+README-example modules:
 
 ```sh
-lake build --wfail
+lake build MinimalPrimes MinimalPrimesTest
 ```
 
-For focused checks, the same nine modules can be built explicitly (the commands
+For focused checks, the same eleven modules can be built explicitly (the commands
 below are optional and may overlap the default build):
 
 ```sh
-lake build --wfail MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPrimes
-lake build --wfail MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient
-lake build --wfail MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents
+lake build MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPrimes.AssociatedPrincipal MinimalPrimes
+lake build MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient MinimalPrimesTest.AssociatedPrincipal
+lake build MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents
 ```
+
+The prescribed linters report nonfatal "The current module only contains private
+declarations" warnings in `MinimalPrimesTest/{Audit,LeafClient,ReadmeComponents,
+ReadmeGeneric,ReadmeInteger,ReadmeNormalization}.lean`. These modules retain
+private test clients; the full build and axiom audit include them without `--wfail`.
 
 The four Lean fences above are exact copies of their named source modules and are
 included by the default test-library glob. Their stored declarations, including
 local instances and Equiv-valued definitions, are part of the full proof audit.
 
-The audit file includes stored private generic and integer tests, unit/repeated/zero
-boundaries, and four historical public `#print axioms` checks. A complete integrity
-audit must also load and check the private tests, generated declarations, and proof
-fields in the pinned full artifacts; those four prints alone are insufficient.
+The audit file retains stored private generic and integer tests and
+unit/repeated/zero boundaries; it has no `#print axioms` commands. The complete
+standard-axiom audit loads the compiled private module parts and checks transitive
+axioms of stored private clients and generated declarations, including proof-field
+declarations. It does not independently replay stored proof bodies.
 Transitive axioms must be restricted to `propext`, `Classical.choice`, and
-`Quot.sound`. Build checks do not themselves constitute independent review or a
-release approval. Generated documentation, metadata accuracy, rights and proposed
-public history require separate release review.
+`Quot.sound`.
 The project contains no admissions, custom axioms, unsafe declarations, warning
 suppressions, placeholders, or generated build output.
 
 ### Initial build baseline
 
-In a Linux Hive container with a 23 GiB memory limit and two Lean threads, the
-nine sequential clean production/example module builds took 40.1 seconds in total
+In a Linux Hive container with a 23 GiB memory limit and two Lean threads,
+an earlier set of nine sequential clean production/example module builds took
+40.1 seconds in total
 after fetching the matching mathlib cache. The largest recorded child maximum
 resident set among cache/build/fresh-source commands was approximately 1.35 GiB.
 These are observed command measurements, not total container peaks or portable

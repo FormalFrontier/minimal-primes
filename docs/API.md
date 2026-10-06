@@ -1,14 +1,25 @@
-# Generated API reference
+# Historical native API reference
 
-Complete public API of minimal-primes: four declarations in two mathematical leaves.
-Import `MinimalPrimes` for both leaves. Six test modules contain private checked
-clients and README examples, not additional public API.
+This historical snapshot covers four normalized-factor declarations in two
+mathematical leaves, three production modules (including the root import) and six
+test/example modules: nine modules in all. It is **not** the complete API of the
+current library, which has five public declarations in three mathematical leaves,
+four production modules (including the root import) and seven test modules:
+eleven modules in all. The additional theorem
+[`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
+equates the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with the
+minimal primes above `(f)` for every `f : R` under `[CommRing R]` and
+`[UniqueFactorizationMonoid R]`, including `f = 0` and subsingleton rings.
+Import `MinimalPrimes` to re-export all three current mathematical leaves.
 
-Signatures below are native doc-gen4 display signatures with all displayed implicit
-arguments retained, not declarations with proof bodies. Short names use the source
-namespace and imports; universe parameters are arbitrary. Module documentation
-is extracted verbatim from the exact source. All source links are relative to this
-checkout. See [generation and provenance](README.md), [exact input manifest](api-manifest.json)
+The four signatures below are native doc-gen4 display signatures from the
+historical inputs, with all displayed implicit arguments retained, not
+declarations with proof bodies. Short names use the source namespace and
+imports; universe parameters are arbitrary. Historical module documentation
+is preserved verbatim; source links navigate this checkout. This page's scope
+and navigation text was edited manually, so the `api_sha256` in the
+[exact input manifest](api-manifest.json) identifies the original generated
+Markdown output, **not** this edited file. See [reproduction and provenance](README.md)
 and the [mathematical overview](../README.md).
 
 ## Module `MinimalPrimes.Principal`
@@ -90,6 +101,10 @@ mathlib's `minimalPrimes.equivIrreducibleComponents` and forgets its order
 structure with `toEquiv`; the inverse is noncomputable.
 
 [Source](../MinimalPrimes/IrreducibleComponents.lean#L32) (line 32).
+
+The following historical root-module docstring describes the original two-leaf
+aggregate, not the current root import, which also re-exports
+`MinimalPrimes.AssociatedPrincipal`.
 
 ## Module `MinimalPrimes`
 
