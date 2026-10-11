@@ -1,7 +1,8 @@
 # Minimal primes
 
-Reusable Lean theory of minimal primes over principal ideals, associated primes
-of principal quotients, and irreducible components of principal zero loci in
+Reusable Lean theory of minimal primes over principal ideals and irreducible
+components of principal zero loci in commutative semirings with unique
+factorization, together with associated primes of principal quotients in
 commutative rings with unique factorization.
 
 ## Headline results
@@ -36,10 +37,10 @@ commutative rings with unique factorization.
   primes over `(f)` via forward ideal comap, and gives the same criterion for
   an *exact* singleton annihilator in that quotient ring, for every `f`.
 
-The four normalized-factor results work at arbitrary universe levels with
-`[CommRing R]`, `[UniqueFactorizationMonoid R]`, the caller's
-`[NormalizationMonoid R]`, and
-`f ≠ 0`; they do not add a separate `[IsDomain R]` assumption. They build on
+The principal-ideal normalized-factor results and the component equivalence work
+at arbitrary universe levels with `[CommSemiring R]`, `[UniqueFactorizationMonoid R]`,
+the caller's `[NormalizationMonoid R]`, and `f ≠ 0`. None adds a separate
+`[IsDomain R]` assumption. They build on
 mathlib's factorization, ideal, spectrum and component correspondence, while
 the principal-ideal classification and factor interfaces are project results.
 
@@ -53,8 +54,8 @@ normalized value only once.
 ## Normalization and imports
 
 The normalized-factor declarations explicitly require the caller's
-`[NormalizationMonoid R]`, in addition to `[CommRing R]` and
-`[UniqueFactorizationMonoid R]`. Thus their
+`[NormalizationMonoid R]` and `[UniqueFactorizationMonoid R]`. The principal-ideal
+and component APIs need `[CommSemiring R]`. Thus their
 `normalizedFactors` types use the same normalization data as the caller. Standard
 concrete types such as `ℤ` export an instance already. A generic development, or
 a type such as `MvPolynomial` that does not export a global normalization choice,
@@ -108,7 +109,7 @@ remain in their source repositories.
 
 The [historical native API reference](docs/API.md) preserves display signatures
 for the four normalized-factor declarations and docstrings from nine originally
-analyzed modules; it is not the complete eleven-declaration, thirteen-module API
+analyzed modules; it is not the complete eleven-declaration, fourteen-module API
 of this checkout. The added associated-prime, scalar-restriction and exact-
 annihilator results below are not in that historical snapshot.
 The [historical input manifest](docs/api-manifest.json) and
@@ -161,7 +162,7 @@ noncomputable local instance readmeGenericNormalization (M : Type*) [CommMonoidW
     [UniqueFactorizationMonoid M] : StrongNormalizationMonoid M :=
   UniqueFactorizationMonoid.strongNormalizationMonoid
 
-variable {R : Type u} [CommRing R] [UniqueFactorizationMonoid R]
+variable {R : Type u} [CommSemiring R] [UniqueFactorizationMonoid R]
 
 private theorem readme_classification {f : R} (hf : f ≠ 0) :
     (Ideal.span {f}).minimalPrimes =
@@ -177,6 +178,12 @@ private theorem readme_forwardMap {f : R} (hf : f ≠ 0)
     (Ideal.normalizedFactorsEquivMinimalPrimes hf p).1 = Ideal.span {p.1} := by
   simp
 ```
+
+For a concrete semiring that is not a ring,
+[`MinimalPrimesTest/NatSix.lean`](MinimalPrimesTest/NatSix.lean) classifies the
+minimal primes over `(6)` in `ℕ` as exactly `span {2}` and `span {3}`. It checks
+that these are distinct proper prime ideals and that the factor equivalence sends
+`2` to `span {2}`. Here `6` is nonzero, nonunit and nonprime.
 
 For ordinary integers, use the exported normalization instance; there is no
 local override in this separate client:
@@ -241,17 +248,11 @@ private def readme_integerComponents {f : ℤ} (hf : f ≠ 0) :
   Ideal.normalizedFactorsEquivIrreducibleComponents hf
 ```
 
-Responsible maintainer: Atlas.
-
 ## Provenance and credits
 
-Atlas's original Lean precursor for the mathematics chose normalization locally
-and assumed a domain. Subsequent Formal Frontier AI agents developed the reusable
-classification and later repaired it to use the caller's normalization without
-an extra domain premise; Atlas assembled the named examples. Atlas adapted the
-documentation assembly through Integral Closure from Anchor's original Ideal
-Completion recipe. Formal Frontier agents produced
-the Lean code, tests and documentation with AI assistance. Atlas maintains the library.
+This library builds on Mathlib and prior Formal Frontier formalizations of
+principal-ideal and associated-prime results. AI agents developed the Lean code
+and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
 Exercise 3.7.H, and *The Rising Sea*, Exercise 6.6.F, are mathematical
@@ -272,25 +273,25 @@ before any build with:
 lake exe cache get
 ```
 
-Build both default library targets, including all thirteen production, test and
+Build both default library targets, including all fourteen production, test and
 README-example modules:
 
 ```sh
 lake build MinimalPrimes MinimalPrimesTest
 ```
 
-For focused checks, the same thirteen modules can be built explicitly (the commands
+For focused checks, the same fourteen modules can be built explicitly (the commands
 below are optional and may overlap the default build):
 
 ```sh
 lake build MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPrimes.AssociatedRestrictScalars MinimalPrimes.AssociatedPrincipal MinimalPrimes
 lake build MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient MinimalPrimesTest.AssociatedRestrictScalars MinimalPrimesTest.AssociatedPrincipal
-lake build MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents
+lake build MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents MinimalPrimesTest.NatSix
 ```
 
 The prescribed linters report nonfatal "The current module only contains private
 declarations" warnings in `MinimalPrimesTest/{Audit,LeafClient,ReadmeComponents,
-ReadmeGeneric,ReadmeInteger,ReadmeNormalization}.lean`. These modules retain
+ReadmeGeneric,ReadmeInteger,ReadmeNormalization,NatSix}.lean`. These modules retain
 private test clients; the full build and axiom audit include them without `--wfail`.
 
 The four Lean fences above are exact copies of their named source modules and are

@@ -8,7 +8,7 @@ public import MinimalPrimes.Principal
 public import Mathlib.RingTheory.Spectrum.Prime.Topology
 
 /-!
-# Irreducible components of a principal zero locus in a UFD
+# Irreducible components of a principal zero locus in a unique-factorization semiring
 
 This file composes the normalized-factor/minimal-prime equivalence with mathlib's
 minimal-prime/irreducible-component correspondence for the zero-locus subspace
@@ -26,7 +26,7 @@ universe u
 
 namespace Ideal
 
-variable {R : Type u} [CommRing R] [UniqueFactorizationMonoid R]
+variable {R : Type u} [CommSemiring R] [UniqueFactorizationMonoid R]
   [NormalizationMonoid R]
 
 /-- The normalized factor values of a nonzero element are equivalent to the

@@ -17,7 +17,7 @@ noncomputable local instance readmeGenericNormalization (M : Type*) [CommMonoidW
     [UniqueFactorizationMonoid M] : StrongNormalizationMonoid M :=
   UniqueFactorizationMonoid.strongNormalizationMonoid
 
-variable {R : Type u} [CommRing R] [UniqueFactorizationMonoid R]
+variable {R : Type u} [CommSemiring R] [UniqueFactorizationMonoid R]
 
 private theorem readme_classification {f : R} (hf : f ≠ 0) :
     (Ideal.span {f}).minimalPrimes =
