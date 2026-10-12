@@ -3,9 +3,14 @@
 [API.md](API.md) retains a historical native reference for four normalized-factor
 declarations in two mathematical leaves, three production modules (including the
 root import) and six private test/example modules: nine analyzed modules total.
-It is **not** the complete API of this checkout: the current library has fourteen
-public declarations in six mathematical leaves, seven production modules and
-eleven test modules (eighteen total). Its principal-quotient theorem
+It is **not** the complete API of this checkout. The
+[current overview](../README.md), [public API table](../README.md#public-api-and-examples)
+and [build instructions](../README.md#build-and-audit) describe the current
+declarations, imports and build targets. The current normalized-factor
+classification and component equivalence use `[CommSemiring R]`,
+`[UniqueFactorizationMonoid R]`, the caller's `[NormalizationMonoid R]` and
+`f ≠ 0`, generalizing beyond the historical ring/UFD statements.
+The principal-quotient theorem
 [`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
 identifies the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with
 the minimal primes over `(f)` for every `f : R` under `[CommRing R]` and
@@ -21,12 +26,21 @@ The [order leaf](../MinimalPrimes/Order/FiniteHeightChain.lean) and
 [prime-chain leaf](../MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) give
 well-founded lower intervals from finite ambient height and stabilization of
 antitone prime chains from finite initial height, with a common tail/infimum index.
-Their statements and stored clients are linked from the [current overview](../README.md);
-they are not among the historical native signatures.
+The [principal-prime height leaf](../MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean)
+bounds `(Ideal.span {p}).height` by one under `[CommRing R]`, `[WfDvdMonoid R]`
+and `Prime p`, without a domain, Noetherian or global finite-dimension hypothesis.
+It gives height one when also `p ∈ nonZeroDivisors R`, with a domain corollary
+under `[IsDomain R]`. The [private regularity client](../MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeRegularity.lean)
+verifies well-founded strict divisibility in `ZMod 4`: `2` is a prime zero divisor
+and `(2)` is nonzero, proper and prime with height zero, so regularity is essential
+for the equality. This client adds no production instance or public API.
+These current results are not among the historical native signatures.
+See the [current overview](../README.md) for the current API and other examples.
 The historical reference retains native displayed signatures, including implicit
 assumptions, and the original project docstrings. Source links navigate the
-files shipped in this checkout, but the preserved historical root docstring
-does not describe the expanded current root import.
+files shipped in this checkout; retained anchor coordinates refer to the historical
+inputs, not current line positions or byte identity. The preserved historical
+root docstring does not describe the expanded current root import.
 The reference is not an interactive dependency website and bundles no JavaScript,
 fonts, remote styles, mathematical source PDF or external documentation text.
 
@@ -37,17 +51,20 @@ inputs by full revision and SHA256 in [api-manifest.json](api-manifest.json).
 The manifest's `api_sha256` identifies the **original generated Markdown**,
 not the current `API.md`: its scope and navigation framing was edited by hand
 while preserving all historical native signatures, module sections, docstrings
-and source anchors. Five original-project Lean file headers normalized after the
-analysis have different **whole-file** hashes in this checkout. All five still
-have a four-line header and `module` at line 5, but only the two historical
-mathematical leaves and the direct-import test leaf have identical bytes from
-`module` onward. The root now imports the new leaf and has an expanded docstring;
-the aggregate test module also changed beyond its header. The preserved
-historical root docstring is not the current root's docstring.
-The old signatures and their leaf-source anchors remain navigable, but the old
-input hashes do **not** describe the current source files. This editorial change
-neither regenerates native output nor extends the historical manifest to the new
-theorem and modules.
+and source anchors. The current source is not merely a header-edited copy of the
+historical inputs. Both original mathematical leaves now have semiring module
+descriptions and `[CommSemiring R]` declarations, whereas the preserved historical
+text describes UFDs and displays `[CommRing R]` signatures. This difference is
+visible in this checkout alone; it is not a comparison with the original source
+objects or a verification of their hashes. Current mathematical bodies and
+declarations have evolved, and the root import and collection of private clients
+have expanded.
+The preserved historical root docstring is not the current root's docstring.
+The old signatures and source-anchor coordinates are retained as historical data;
+relative links navigate current files without asserting matching line positions
+or byte identity. The old whole-file input hashes do **not** identify the current
+source files. This editorial change neither regenerates native output nor extends
+the historical manifest to the current theories and modules.
 
 For exact reproduction of the *original* analyzed inputs, use a **separate**
 checkout of the already official, privately published GitHub `main` commit
@@ -62,7 +79,7 @@ git clone https://github.com/FormalFrontier/minimal-primes.git /tmp/minimal-prim
 git -C /tmp/minimal-primes-original checkout --detach ecbfde70a2a8b4b93098c5b31b3fc033b98fbbb2
 ```
 
-The header-edited development checkout is **not** that original input checkout.
+This expanded current checkout is **not** that original input checkout.
 Binding a *new* native reference to changed source/pins requires new native
 generation and affected verification; this historical reference is not a new
 generation. Its current framing and relative source links are hand-edited and
@@ -78,8 +95,8 @@ hashes, nine native-record hashes, module/public inventories, tool revision and
 output hash. Its source inputs must also equal the release's own committed files.
 A present wrong object, stale input, altered native record or uncommitted manifest
 is refused. This exact committed-input fallback applies to the original official
-checkout above; it does **not** make the five changed-header files in the current
-development tree match the original inputs. This is source/output binding, not
+checkout above; it does **not** make the changed current source bodies and
+declarations match the original inputs. This is source/output binding, not
 native-run attestation or a claim that the old development revision is available
 at GitHub; it also does not identify the manually edited current `API.md` as the
 original generated output.
@@ -90,7 +107,7 @@ and Lean `v4.34.0-rc2`, in a separate checkout using `lake build doc-gen4`.
 This core-only tool must not change this library's mathematical dependencies.
 First fetch the original checkout's matching mathlib cache and build its nine
 modules using that checkout's root README. The [current root README](../README.md)
-instead describes the expanded eighteen-module build.
+instead describes the current production and test build targets.
 
 Use the following historical native commands in the separate original checkout's
 pinned Lake environment.

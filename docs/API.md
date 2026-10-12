@@ -3,9 +3,13 @@
 This historical snapshot covers four normalized-factor declarations in two
 mathematical leaves, three production modules (including the root import) and six
 test/example modules: nine modules in all. It is **not** the complete API of the
-current library, which has fourteen public declarations in six mathematical leaves,
-seven production modules (including the root import) and eleven test modules:
-eighteen modules in all. The principal-quotient theorem
+current library. See the [current overview](../README.md),
+[public API table](../README.md#public-api-and-examples) and
+[build instructions](../README.md#build-and-audit) for the current declarations,
+imports and build targets. The current normalized-factor classification and
+component equivalence have been generalized beyond the historical ring/UFD
+statements to `[CommSemiring R]`, with `[UniqueFactorizationMonoid R]`, the caller's
+`[NormalizationMonoid R]` and `f ≠ 0`. The principal-quotient theorem
 [`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
 equates the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with the
 minimal primes above `(f)` for every `f : R` under `[CommRing R]` and
@@ -32,15 +36,29 @@ the all-index ideal infimum, without a UFD, domain, global dimension,
 ambient well-foundedness, Noetherian, Artinian or nontriviality premise.
 See the [order clients](../MinimalPrimesTest/Order/FiniteHeightChain.lean) and
 [ring clients](../MinimalPrimesTest/RingTheory/Ideal/FiniteHeightChain.lean).
+The [principal-prime height leaf](../MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean)
+proves that under `[CommRing R]` and `[WfDvdMonoid R]`, `Prime p` implies
+`(Ideal.span {p}).height ≤ 1`. The height equals one when also
+`p ∈ nonZeroDivisors R`; `[IsDomain R]` supplies regularity for the domain
+corollary. The upper bound needs no domain, Noetherian or global finite-dimension
+assumption. The [private regularity client](../MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeRegularity.lean)
+verifies well-founded strict divisibility in `ZMod 4`, where `2` is a prime
+zero divisor and `(2)` is a nonzero proper prime ideal of height zero.
+Thus regularity cannot be dropped from the height-one equality. This client
+provides private verification, not a production instance or public API.
 These results are navigation additions, not native signatures from the historical
-snapshot below. Import `MinimalPrimes` to re-export all six current mathematical leaves.
+snapshot below. Import `MinimalPrimes` to re-export all current mathematical leaves.
 
 The four signatures below are native doc-gen4 display signatures from the
 historical inputs, with all displayed implicit arguments retained, not
 declarations with proof bodies. Short names use the source namespace and
 imports; universe parameters are arbitrary. Historical module documentation
-is preserved verbatim; source links navigate this checkout. This page's scope
-and navigation text was edited manually, so the `api_sha256` in the
+is preserved verbatim, including its original ring hypotheses. Current source
+bodies and declarations have evolved beyond header edits, including the two
+original mathematical leaves. Source links navigate this checkout; their retained
+line coordinates belong to the historical inputs, not an attestation of current
+line positions or byte identity. This page's scope and navigation text was edited
+manually, so the `api_sha256` in the
 [exact input manifest](api-manifest.json) identifies the original generated
 Markdown output, **not** this edited file. See [reproduction and provenance](README.md)
 and the [mathematical overview](../README.md).
@@ -128,8 +146,9 @@ structure with `toEquiv`; the inverse is noncomputable.
 The following historical root-module docstring describes the original two-leaf
 aggregate, not the current root import, which also re-exports
 `MinimalPrimes.AssociatedPrincipal`, `MinimalPrimes.AssociatedRestrictScalars`,
-`MinimalPrimes.Order.FiniteHeightChain` and
-`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`.
+`MinimalPrimes.Order.FiniteHeightChain`,
+`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` and
+`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`.
 
 ## Module `MinimalPrimes`
 
