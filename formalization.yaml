@@ -9,7 +9,11 @@ project:
     For principal quotients in commutative rings with unique factorization, identifies
     associated primes with minimal primes over the principal ideal for every generator,
     and characterizes quotient-spectrum points by associated primes and exact annihilators.
-    Associated primes also transport along compatible algebra maps.
+    Associated primes also transport along compatible algebra maps. Finite ambient
+    initial height gives well-founded lower intervals in preorders and stabilization
+    of antitone prime chains over commutative semirings, with an ideal interface over
+    commutative rings using only initial FiniteHeight and primeness at every index.
+    Both chain interfaces identify the all-index ideal infimum at the same tail index.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
@@ -29,6 +33,14 @@ sources:
     note: >-
       Exact-annihilator examples motivate the principal-quotient comparison.
       No source text or assets are redistributed here.
+
+related_formalizations:
+  - id: https://github.com/leanprover-community/mathlib4
+    relationship: builds-on
+    note: >-
+      Uses Mathlib's factorization, ideal, associated-prime and spectrum APIs,
+      ambient order height, strict-monotone well-foundedness transport, the antitone
+      chain condition and ideal finite-height instances.
 
 automation:
   methods:
@@ -54,13 +66,41 @@ status:
     of the zero-locus subspace, not a homeomorphism or a classification of arbitrary
     ideals. Mathlib's associated primes use radicals of annihilators; the separate
     exact-annihilator criterion is specific to these principal quotients, not a
-    generic radical-equals-annihilator principle.
+    generic radical-equals-annihilator principle. In any preorder, finite ambient
+    height of x gives a well-founded strict order on its lower interval. An antitone
+    natural-number sequence of spectrum points over a commutative semiring stabilizes
+    when its initial point has finite ambient order height. The commutative-ring ideal
+    interface requires every term prime and only an initial Ideal.FiniteHeight instance;
+    initial primeness excludes that class's unit-ideal exception. Both interfaces give
+    one common index for tail constancy and for the all-index ideal infimum. They add
+    no UFD, domain, global finite-dimension, ambient well-foundedness, Noetherian,
+    Artinian or nontriviality premise. The relevant height is on the prime spectrum,
+    not Order.height on the full ideal lattice. The infinite-variable height-one
+    genuine-drop argument in the examples is a mathematical sketch, not a Lean-checked
+    theorem.
   sorry_count: 0
+  main_results:
+    - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
+      file: MinimalPrimes/Principal.lean
+    - declaration: Ideal.normalizedFactorsEquivMinimalPrimes
+      file: MinimalPrimes/Principal.lean
+    - declaration: Ideal.normalizedFactorsEquivIrreducibleComponents
+      file: MinimalPrimes/IrreducibleComponents.lean
+    - declaration: Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes
+      file: MinimalPrimes/AssociatedPrincipal.lean
+    - declaration: IsAssociatedPrime.comap_algebraMap_iff
+      file: MinimalPrimes/AssociatedRestrictScalars.lean
+    - declaration: Order.wellFoundedLT_Iic_of_height_lt_top
+      file: MinimalPrimes/Order/FiniteHeightChain.lean
+    - declaration: PrimeSpectrum.exists_stable_of_antitone_of_height_lt_top
+      file: MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean
+    - declaration: Ideal.exists_stable_of_antitone_of_finiteHeight
+      file: MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean
 
 review:
   status: reviewed
 
 acknowledgements: >-
   Builds on Mathlib (Apache-2.0) and prior Formal Frontier formalizations of
-  principal-ideal and associated-prime results. AI agents developed the Lean
-  code and examples.
+  principal-ideal, associated-prime and finite-height prime-chain results.
+  AI agents developed the Lean code and examples.

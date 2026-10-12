@@ -3,9 +3,9 @@
 This historical snapshot covers four normalized-factor declarations in two
 mathematical leaves, three production modules (including the root import) and six
 test/example modules: nine modules in all. It is **not** the complete API of the
-current library, which has eleven public declarations in four mathematical leaves,
-five production modules (including the root import) and eight test modules:
-thirteen modules in all. The principal-quotient theorem
+current library, which has fourteen public declarations in six mathematical leaves,
+seven production modules (including the root import) and eleven test modules:
+eighteen modules in all. The principal-quotient theorem
 [`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
 equates the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with the
 minimal primes above `(f)` for every `f : R` under `[CommRing R]` and
@@ -19,7 +19,21 @@ quotient-spectrum points under the same ring hypotheses, for every `f`: being as
 over the quotient ring and being the exact annihilator of an element are each
 equivalent to minimality of the forward ideal comap above `(f)`. The exact-annihilator
 criterion is separate from the radical-of-annihilator associated-prime criterion.
-Import `MinimalPrimes` to re-export all four current mathematical leaves.
+The [order leaf](../MinimalPrimes/Order/FiniteHeightChain.lean) adds
+`Order.wellFoundedLT_Iic_of_height_lt_top`: finite ambient height of an element of
+a preorder gives a well-founded strict order on its lower interval. The
+[prime-chain leaf](../MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) adds
+`PrimeSpectrum.exists_stable_of_antitone_of_height_lt_top` over commutative
+semirings, and `Ideal.exists_stable_of_antitone_of_finiteHeight` over commutative
+rings. The former assumes finite initial ambient spectrum height; the latter
+requires every term prime and only initial `Ideal.FiniteHeight`, whose unit-ideal
+exception primeness excludes. Both give a common index for tail constancy and
+the all-index ideal infimum, without a UFD, domain, global dimension,
+ambient well-foundedness, Noetherian, Artinian or nontriviality premise.
+See the [order clients](../MinimalPrimesTest/Order/FiniteHeightChain.lean) and
+[ring clients](../MinimalPrimesTest/RingTheory/Ideal/FiniteHeightChain.lean).
+These results are navigation additions, not native signatures from the historical
+snapshot below. Import `MinimalPrimes` to re-export all six current mathematical leaves.
 
 The four signatures below are native doc-gen4 display signatures from the
 historical inputs, with all displayed implicit arguments retained, not
@@ -113,7 +127,9 @@ structure with `toEquiv`; the inverse is noncomputable.
 
 The following historical root-module docstring describes the original two-leaf
 aggregate, not the current root import, which also re-exports
-`MinimalPrimes.AssociatedPrincipal` and `MinimalPrimes.AssociatedRestrictScalars`.
+`MinimalPrimes.AssociatedPrincipal`, `MinimalPrimes.AssociatedRestrictScalars`,
+`MinimalPrimes.Order.FiniteHeightChain` and
+`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`.
 
 ## Module `MinimalPrimes`
 

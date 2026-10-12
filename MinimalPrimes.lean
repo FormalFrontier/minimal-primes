@@ -8,6 +8,8 @@ public import MinimalPrimes.IrreducibleComponents
 public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
+public import MinimalPrimes.Order.FiniteHeightChain
+public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 
 /-!
 # Minimal primes
@@ -17,5 +19,8 @@ equivalence, the associated-prime comparison for principal quotients, and the
 equivalence with order-dual irreducible components of the prime-spectrum zero-locus
 subspace. The scalar-restriction leaf supplies colon contraction and associated-
 prime transport, and the principal-quotient leaf relates quotient-spectrum points
-to minimal primes and exact annihilators. Import a leaf directly for a smaller API.
+to minimal primes and exact annihilators. The finite-height leaves give well-founded
+lower intervals in preorders and stabilization of antitone prime chains with their
+all-index ideal infimum at a common index, using only finite initial height.
+Import a leaf directly for a smaller API.
 -/

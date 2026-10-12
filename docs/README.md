@@ -3,9 +3,9 @@
 [API.md](API.md) retains a historical native reference for four normalized-factor
 declarations in two mathematical leaves, three production modules (including the
 root import) and six private test/example modules: nine analyzed modules total.
-It is **not** the complete API of this checkout: the current library has eleven
-public declarations in four mathematical leaves, five production modules and
-nine test modules (fourteen total). Its principal-quotient theorem
+It is **not** the complete API of this checkout: the current library has fourteen
+public declarations in six mathematical leaves, seven production modules and
+eleven test modules (eighteen total). Its principal-quotient theorem
 [`Ideal.associatedPrimes_quotient_span_singleton_eq_minimalPrimes`](../MinimalPrimes/AssociatedPrincipal.lean)
 identifies the associated primes of `R ⧸ Ideal.span {f}` as an `R`-module with
 the minimal primes over `(f)` for every `f : R` under `[CommRing R]` and
@@ -17,6 +17,12 @@ requires it. The [principal-quotient leaf](../MinimalPrimes/AssociatedPrincipal.
 also gives quotient-spectrum criteria under the same ring hypotheses for every generator:
 association over the quotient ring and, separately, being the exact annihilator of
 an element are each equivalent to minimality of the forward ideal comap above `(f)`.
+The [order leaf](../MinimalPrimes/Order/FiniteHeightChain.lean) and
+[prime-chain leaf](../MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) give
+well-founded lower intervals from finite ambient height and stabilization of
+antitone prime chains from finite initial height, with a common tail/infimum index.
+Their statements and stored clients are linked from the [current overview](../README.md);
+they are not among the historical native signatures.
 The historical reference retains native displayed signatures, including implicit
 assumptions, and the original project docstrings. Source links navigate the
 files shipped in this checkout, but the preserved historical root docstring
@@ -84,7 +90,7 @@ and Lean `v4.34.0-rc2`, in a separate checkout using `lake build doc-gen4`.
 This core-only tool must not change this library's mathematical dependencies.
 First fetch the original checkout's matching mathlib cache and build its nine
 modules using that checkout's root README. The [current root README](../README.md)
-instead describes the expanded fourteen-module build.
+instead describes the expanded eighteen-module build.
 
 Use the following historical native commands in the separate original checkout's
 pinned Lake environment.
