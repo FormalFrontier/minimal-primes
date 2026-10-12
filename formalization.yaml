@@ -9,8 +9,10 @@ project:
     For principal quotients in commutative rings with unique factorization, identifies
     associated primes with minimal primes over the principal ideal for every generator,
     and characterizes quotient-spectrum points by associated primes and exact annihilators.
-    Associated primes also transport along compatible algebra maps. Finite ambient
-    initial height gives well-founded lower intervals in preorders and stabilization
+    Associated primes also transport along compatible algebra maps. In commutative
+    rings with well-founded DvdNotUnit, prime generators give principal ideals of height
+    at most one, with height one for non-zero-divisors and for prime elements in domains.
+    Finite ambient initial height gives well-founded lower intervals in preorders and stabilization
     of antitone prime chains over commutative semirings, with an ideal interface over
     commutative rings using only initial FiniteHeight and primeness at every index.
     Both chain interfaces identify the all-index ideal infimum at the same tail index.
@@ -39,8 +41,9 @@ related_formalizations:
     relationship: builds-on
     note: >-
       Uses Mathlib's factorization, ideal, associated-prime and spectrum APIs,
-      ambient order height, strict-monotone well-foundedness transport, the antitone
-      chain condition and ideal finite-height instances.
+      maximal-power factorization, prime-ideal height criterion and regular-element
+      height lower bound, ambient order height, strict-monotone well-foundedness
+      transport, the antitone chain condition and ideal finite-height instances.
 
 automation:
   methods:
@@ -75,9 +78,23 @@ status:
     one common index for tail constancy and for the all-index ideal infimum. They add
     no UFD, domain, global finite-dimension, ambient well-foundedness, Noetherian,
     Artinian or nontriviality premise. The relevant height is on the prime spectrum,
-    not Order.height on the full ideal lattice. The infinite-variable height-one
-    genuine-drop argument in the examples is a mathematical sketch, not a Lean-checked
-    theorem.
+    not Order.height on the full ideal lattice. For a prime element p in a commutative
+    ring with WfDvdMonoid, the ideal span {p} has height at most one. If p belongs to
+    nonZeroDivisors R, that height is one; this includes every prime element in a
+    commutative domain with WfDvdMonoid. The upper bound requires no domain, UFM,
+    Noetherian or separate nontriviality premise and does not apply to arbitrary
+    principal ideals. WfDvdMonoid is well-foundedness of DvdNotUnit, equivalent to
+    ACCP for principal ideals in domains, not merely irreducible factorization.
+    For any field K, the infinite-variable polynomial examples in
+    MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeHeight.lean instantiate all three
+    principal-prime height results at X₀, derive initial FiniteHeight from height one,
+    and apply the ideal chain interface to a sequence staying at (X₀) through any
+    index d and genuinely dropping to zero at d+1. The interface supplies one common
+    index for tail constancy and the all-index infimum. The ambient ring has infinite
+    Krull dimension. The separate infinite-variable argument in the finite-height
+    ring client's module documentation remains a mathematical sketch. No
+    negative-Noetherianity certificate is included in the principal-prime client;
+    infinite Krull dimension alone does not establish non-Noetherianity.
   sorry_count: 0
   main_results:
     - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
@@ -90,6 +107,12 @@ status:
       file: MinimalPrimes/AssociatedPrincipal.lean
     - declaration: IsAssociatedPrime.comap_algebraMap_iff
       file: MinimalPrimes/AssociatedRestrictScalars.lean
+    - declaration: Ideal.height_span_singleton_le_one_of_prime
+      file: MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean
+    - declaration: Ideal.height_span_singleton_eq_one_of_prime_of_mem_nonZeroDivisors
+      file: MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean
+    - declaration: Ideal.height_span_singleton_eq_one_of_prime
+      file: MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean
     - declaration: Order.wellFoundedLT_Iic_of_height_lt_top
       file: MinimalPrimes/Order/FiniteHeightChain.lean
     - declaration: PrimeSpectrum.exists_stable_of_antitone_of_height_lt_top
@@ -102,5 +125,7 @@ review:
 
 acknowledgements: >-
   Builds on Mathlib (Apache-2.0) and prior Formal Frontier formalizations of
-  principal-ideal, associated-prime and finite-height prime-chain results.
+  principal-ideal, associated-prime and finite-height prime-chain results. The
+  principal-prime height proofs use Mathlib's maximal-power factorization,
+  prime-ideal height criterion and regular-element height lower bound.
   AI agents developed the Lean code and examples.

@@ -6,6 +6,9 @@ irreducible components of principal zero loci in commutative semirings with uniq
 factorization, and compares associated primes of principal quotients in commutative
 rings with unique factorization. Independently of factorization, finite initial
 height gives well-founded lower intervals and stabilization of descending prime chains.
+For prime generators in commutative rings with well-founded strict divisibility,
+the library bounds the height of the principal ideal by one, with equality for
+regular generators and in domains.
 
 ## Headline results
 
@@ -38,6 +41,17 @@ height gives well-founded lower intervals and stabilization of descending prime 
   associated primes of the *quotient ring* at spectrum points with minimal
   primes over `(f)` via forward ideal comap, and gives the same criterion for
   an *exact* singleton annihilator in that quotient ring, for every `f`.
+- **Height of a principal prime ideal.** The
+  [principal-prime height leaf](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean)
+  gives `Ideal.height_span_singleton_le_one_of_prime`: under `[CommRing R]`,
+  `[WfDvdMonoid R]` and `Prime p`, the ideal `span {p}` has height at most one.
+  `Ideal.height_span_singleton_eq_one_of_prime_of_mem_nonZeroDivisors` gives
+  height one when also `p ∈ nonZeroDivisors R`.
+  `Ideal.height_span_singleton_eq_one_of_prime` specializes this equality to
+  `[IsDomain R]`, using the prime element's nonzero property for regularity.
+  The upper bound needs no domain, UFM, Noetherian or separate nontriviality
+  hypothesis. These statements concern prime generators, not arbitrary
+  principal ideals.
 - **Descending prime chains at finite initial height.** The
   [order leaf](MinimalPrimes/Order/FiniteHeightChain.lean) proves
   `Order.wellFoundedLT_Iic_of_height_lt_top`: in a **preorder**, finite ambient
@@ -64,8 +78,18 @@ the caller's `[NormalizationMonoid R]`, and `f ≠ 0`. None adds a separate
 mathlib's factorization, ideal, spectrum and component correspondence, while
 the principal-ideal classification and factor interfaces are project results.
 
-The nonzero hypothesis is essential. The normalized factor multiset of zero is
-empty, whereas the zero ideal of a domain is its unique minimal prime. Nonzero
+The height results instead use `[WfDvdMonoid R]`, Mathlib's well-foundedness
+class for `DvdNotUnit`. In domains this is equivalent to the ascending chain
+condition for principal ideals; it is stronger than merely having irreducible
+factorizations. The proofs use maximal-power factorization, not unique
+factorization or the assertion that irreducible elements are prime. Mathlib's
+Noetherian principal-ideal height bound is a separate theorem for arbitrary
+nonunit generators; the results here require a prime generator and make no
+Noetherian assumption.
+
+The nonzero hypothesis in the normalized-factor classification is essential.
+The normalized factor multiset of zero is empty, whereas the zero ideal of a
+domain is its unique minimal prime. Nonzero
 units have no normalized factors and generate the unit ideal, so both sides of
 the classification are empty. Repeated factors appear with multiplicity in
 `normalizedFactors`, but the set equality and factor subtype identify each
@@ -114,9 +138,11 @@ prime transport. Import `MinimalPrimes.AssociatedPrincipal` for the base-ring an
 quotient-spectrum comparisons and exact annihilators. Import
 `MinimalPrimes.Order.FiniteHeightChain` for the preorder lower-interval theorem,
 or `MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` for both prime-chain
-interfaces; the latter re-exports the order leaf. `MinimalPrimes` re-exports
-all six production leaves. The component equivalence has an order-dual codomain,
-as required by the underlying topology API. The tests live in
+interfaces; the latter re-exports the order leaf. Import
+`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` for the principal-prime
+height bound and equalities. `MinimalPrimes` re-exports all seven production
+leaves. The component equivalence has an order-dual codomain, as required by the
+underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
 `MinimalPrimesTest.LeafClient` (direct algebraic import),
 `MinimalPrimesTest.AssociatedRestrictScalars` (including a nonsurjective
@@ -135,17 +161,16 @@ remain in their source repositories.
 
 The [historical native API reference](docs/API.md) preserves display signatures
 for the four normalized-factor declarations and docstrings from nine originally
-analyzed modules; it is not the complete fourteen-declaration, eighteen-module
-library of this checkout (seven production modules and eleven test modules).
-The added associated-prime, scalar-restriction, exact-annihilator and finite-height
-results below are not in that historical snapshot.
+analyzed modules; it is not the complete API of this checkout.
+The added associated-prime, scalar-restriction, exact-annihilator, principal-prime
+height and finite-height results below are not in that historical snapshot.
 The [historical input manifest](docs/api-manifest.json) and
 [reproduction instructions](docs/README.md) identify the original analyzed
 source, pins and documentation tool, not a generation from the expanded library.
 
 The principal and quotient declarations are in namespace `Ideal`; scalar
-restriction uses namespaces `Submodule` and `IsAssociatedPrime`. Finite-height
-results use `Order`, `PrimeSpectrum` and `Ideal`:
+restriction uses namespaces `Submodule` and `IsAssociatedPrime`. Principal-prime
+height results use `Ideal`; finite-height results use `Order`, `PrimeSpectrum` and `Ideal`:
 
 | Declaration | Canonical import | Result |
 | --- | --- | --- |
@@ -160,6 +185,9 @@ results use `Order`, `PrimeSpectrum` and `Ideal`:
 | `Submodule.colon_restrictScalars` | `MinimalPrimes.AssociatedRestrictScalars` | Contracts the colon ideal of any submodule and set under a compatible algebra and module tower, with commutative source and semiring target; no surjectivity is needed. |
 | `IsAssociatedPrime.comap_algebraMap` | `MinimalPrimes.AssociatedRestrictScalars` | Contracts radical-associated primes along an algebra map of commutative semirings without surjectivity. |
 | `IsAssociatedPrime.comap_algebraMap_iff` | `MinimalPrimes.AssociatedRestrictScalars` | Reflects radical-associated primes when that algebra map is surjective; the converse is not valid for arbitrary maps. |
+| [`Ideal.height_span_singleton_le_one_of_prime`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` | A prime element in a commutative ring with `WfDvdMonoid` generates an ideal of height at most one. |
+| [`Ideal.height_span_singleton_eq_one_of_prime_of_mem_nonZeroDivisors`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` | The principal-prime height is one when the generator also belongs to `nonZeroDivisors R`. |
+| [`Ideal.height_span_singleton_eq_one_of_prime`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` | In a commutative domain with `WfDvdMonoid`, a prime element generates an ideal of height one. |
 | [`Order.wellFoundedLT_Iic_of_height_lt_top`](MinimalPrimes/Order/FiniteHeightChain.lean) | `MinimalPrimes.Order.FiniteHeightChain` | Finite ambient height of `x` in a preorder gives `WellFoundedLT (Set.Iic x)`. |
 | [`PrimeSpectrum.exists_stable_of_antitone_of_height_lt_top`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | `MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` | An antitone spectrum sequence over a commutative semiring with finite initial ambient height has a constant tail and all-index ideal infimum at one common index. |
 | [`Ideal.exists_stable_of_antitone_of_finiteHeight`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | `MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` | An antitone ideal sequence over a commutative ring, with every term prime and only initial `FiniteHeight`, has a constant tail and all-index infimum at one common index. |
@@ -172,9 +200,16 @@ Primeness at every index is essential. The ring clients include a delayed
 one, and a private Noetherian client using Mathlib's existing finite-height
 instance, rather than another production wrapper. The order clients use `ℕ ⊕ ℤ`
 with infinite ambient dimension and a non-well-founded ambient strict order.
-The stronger infinite-variable height-one genuine-drop argument in the ring
-client's module documentation is a mathematical sketch, **not a Lean-checked
-example**; its stored infinite-variable boundary concerns the height-zero bottom prime.
+The [infinite-variable principal-prime client](MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeHeight.lean)
+uses all three principal-prime height results on `(X₀)` in `K[X₀, X₁, ...]`
+for any field `K`. It derives initial `FiniteHeight` from height one and applies
+the ideal chain interface to a sequence that stays at `(X₀)` through any index
+`d` and genuinely drops to zero at `d+1`. The interface supplies one common
+index for tail constancy and the all-index infimum, while the ambient ring has
+infinite Krull dimension. The separate argument in the finite-height ring
+client's module documentation remains a mathematical sketch. The principal-prime
+client proves no negative-Noetherianity certificate; infinite Krull dimension
+alone does not establish non-Noetherianity.
 
 The classification does not count repeated factors. Both equivalences are
 noncomputable; no topological homeomorphism or arbitrary-ideal classification is
@@ -294,7 +329,9 @@ private def readme_integerComponents {f : ℤ} (hf : f ≠ 0) :
 ## Provenance and credits
 
 This library builds on Mathlib and prior Formal Frontier formalizations of
-principal-ideal, associated-prime and finite-height prime-chain results. AI agents
+principal-ideal, associated-prime and finite-height prime-chain results. The
+principal-prime height proofs use Mathlib's maximal-power factorization,
+prime-ideal height criterion and regular-element height lower bound. AI agents
 developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
@@ -318,14 +355,14 @@ before any build with:
 lake exe cache get
 ```
 
-Build both default library targets, including all eighteen production, test and
+Build both default library targets, including the production, test and
 README-example modules:
 
 ```sh
 lake build MinimalPrimes MinimalPrimesTest
 ```
 
-For focused checks, the same eighteen modules can be built explicitly (the commands
+For focused checks, individual modules can be built explicitly (the commands
 below are optional and may overlap the default build):
 
 ```sh
@@ -333,6 +370,7 @@ lake build MinimalPrimes.Principal MinimalPrimes.IrreducibleComponents MinimalPr
 lake build MinimalPrimesTest.Audit MinimalPrimesTest.LeafClient MinimalPrimesTest.AssociatedRestrictScalars MinimalPrimesTest.AssociatedPrincipal
 lake build MinimalPrimesTest.ReadmeNormalization MinimalPrimesTest.ReadmeGeneric MinimalPrimesTest.ReadmeInteger MinimalPrimesTest.ReadmeComponents MinimalPrimesTest.NatSix
 lake build MinimalPrimes.Order.FiniteHeightChain MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
+lake build MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 lake build MinimalPrimesTest.Order.FiniteHeightChain MinimalPrimesTest.RingTheory.Ideal.FiniteHeightChain
 ```
 

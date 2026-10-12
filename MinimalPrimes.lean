@@ -10,6 +10,7 @@ public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
 public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
+public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 
 /-!
 # Minimal primes
@@ -22,5 +23,7 @@ prime transport, and the principal-quotient leaf relates quotient-spectrum point
 to minimal primes and exact annihilators. The finite-height leaves give well-founded
 lower intervals in preorders and stabilization of antitone prime chains with their
 all-index ideal infimum at a common index, using only finite initial height.
+The principal-prime height leaf bounds height by one under well-founded strict divisibility,
+with height one for regular prime generators and, in particular, prime elements in domains.
 Import a leaf directly for a smaller API.
 -/
