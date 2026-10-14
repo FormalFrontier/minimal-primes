@@ -12,6 +12,17 @@ regular generators and in domains.
 
 ## Headline results
 
+- **Principal prime witnesses and contraction.** The
+  [principal-ideal leaf](MinimalPrimes/Principal.lean) proves that a proper
+  principal ideal avoids at least one of two relatively prime elements, without
+  requiring unique factorization or primeness. In a commutative semiring with
+  unique factorization, every nonunit, including zero, belongs to a principal
+  prime ideal, with the same disjunctive avoidance. These witnesses need no
+  normalization or nonzero hypothesis. Contraction along a homomorphism from
+  any semiring gives a prime two-sided source ideal; source principality and
+  simultaneous avoidance are not asserted. The
+  [examples](MinimalPrimesTest/PrincipalPrimeWitness.lean) include natural numbers,
+  field zero, and a noninjective projection from a semiring with zero divisors.
 - **Minimal primes of a principal ideal.** The
   [classification](docs/API.md#idealminimalprimes_span_singleton_eq_normalizedfactors)
   identifies the minimal primes over `(f)` for `f ≠ 0` with the principal ideals

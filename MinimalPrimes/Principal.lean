@@ -5,23 +5,33 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.RingTheory.Ideal.MinimalPrime.Basic
+public import Mathlib.RingTheory.PrincipalIdealDomain
 public import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
 
 /-!
-# Minimal primes over a principal ideal in a semiring with unique factorization
+# Principal prime ideals and minimal primes in semirings with unique factorization
 
 This file classifies the minimal primes over a nonzero principal ideal in a
 commutative semiring with unique factorization. The classification uses membership in
 the multiset of normalized factors, and therefore deliberately forgets factor
 multiplicity. The caller supplies a `NormalizationMonoid` instance, so the factors
-in the results use the caller's chosen normalized representatives. All results
+in the results use the caller's chosen normalized representatives. The classification results
 assume the element is nonzero; units have no factors or minimal primes above
 their principal ideal.
+
+Independently of normalization, every nonunit belongs to a principal prime ideal.
+This includes zero, whose witness is bottom. Any proper principal ideal avoids at
+least one of two relatively prime elements; this avoidance does not require unique
+factorization or primeness. Contracting a target witness along a homomorphism from
+an arbitrary semiring gives a prime two-sided source ideal, not necessarily a
+principal ideal. Avoidance is disjunctive, not simultaneous.
 
 ## References
 
 * Mathlib's minimal-prime and normalized-factor APIs provide the underlying
   definitions and factorization results.
+* The witness constructions use Mathlib's principal-generator, irreducible-factor,
+  singleton-span, prime-bottom, and ideal-comap APIs.
 * Ravi Vakil, *The Rising Sea: Foundations of Algebraic Geometry* (October 21,
   2025 draft), Exercise 3.7.H, provides the ring-theoretic motivation. The
   classification here also applies to commutative semirings.
@@ -33,9 +43,85 @@ noncomputable section
 
 open UniqueFactorizationMonoid
 
-universe u
+universe u v
 
 namespace Ideal
+
+section PrincipalPrimeWitness
+
+section CommSemiring
+
+variable {A : Type u} {B : Type v} [Semiring A] [CommSemiring B]
+
+/-- A proper principal ideal cannot contain both of two relatively prime elements.
+This statement does not require unique factorization or primality of the ideal. -/
+theorem not_mem_or_not_mem_of_isPrincipal_of_isRelPrime
+    (Q : Ideal B) [Q.IsPrincipal] (hQ : Q ≠ ⊤) {a b : B}
+    (hab : IsRelPrime a b) : a ∉ Q ∨ b ∉ Q := by
+  classical
+  by_cases ha : a ∈ Q
+  · right
+    intro hb
+    have hunit : IsUnit (Submodule.IsPrincipal.generator Q) := hab
+      ((Submodule.IsPrincipal.mem_iff_generator_dvd Q).mp ha)
+      ((Submodule.IsPrincipal.mem_iff_generator_dvd Q).mp hb)
+    apply hQ
+    rw [← Ideal.span_singleton_generator Q]
+    exact Ideal.span_singleton_eq_top.mpr hunit
+  · exact Or.inl ha
+
+variable [UniqueFactorizationMonoid B]
+
+/-- Every nonunit belongs to some principal prime ideal, including when the nonunit is zero.
+No explicit domain, nontriviality, normalization, or nonzero hypothesis is imposed. -/
+theorem exists_mem_principal_prime_of_not_isUnit {r : B} (hr : ¬ IsUnit r) :
+    ∃ Q : Ideal B, Q.IsPrime ∧ Q.IsPrincipal ∧ r ∈ Q := by
+  classical
+  -- A nonunit distinguishes the semiring from the subsingleton case.
+  let : Nontrivial B := ⟨⟨r, 1, by
+    intro h
+    apply hr
+    rw [h]
+    exact isUnit_one⟩⟩
+  by_cases hr0 : r = 0
+  · refine ⟨⊥, inferInstance, inferInstance, ?_⟩
+    simpa only [hr0] using (Ideal.zero_mem (⊥ : Ideal B))
+  · obtain ⟨p, hp, hpr⟩ := WfDvdMonoid.exists_irreducible_factor hr hr0
+    exact ⟨Ideal.span {p}, Ideal.isPrime_span_singleton_of_prime
+      (UniqueFactorizationMonoid.irreducible_iff_prime.mp hp), inferInstance,
+      Ideal.mem_span_singleton.mpr hpr⟩
+
+/-- A principal prime ideal containing a nonunit avoids at least one of two relatively prime
+ elements. The avoidance is disjunctive, not simultaneous. -/
+theorem exists_mem_principal_prime_of_isRelPrime {a b r : B}
+    (hab : IsRelPrime a b) (hr : ¬ IsUnit r) :
+    ∃ Q : Ideal B, Q.IsPrime ∧ Q.IsPrincipal ∧ r ∈ Q ∧ (a ∉ Q ∨ b ∉ Q) := by
+  obtain ⟨Q, hprime, hprincipal, hrQ⟩ := exists_mem_principal_prime_of_not_isUnit hr
+  let : Q.IsPrincipal := hprincipal
+  exact ⟨Q, hprime, hprincipal, hrQ,
+    not_mem_or_not_mem_of_isPrincipal_of_isRelPrime Q hprime.ne_top hab⟩
+
+end CommSemiring
+
+/-- Contract a principal prime target witness along an arbitrary unital semiring homomorphism.
+The source witness is the displayed `Q.comap φ`, a completely prime two-sided ideal, not an
+unspecified left-prime ideal. No source principality, maximality, domain, injectivity, nonzero,
+or simultaneous-avoidance assertion is made. -/
+theorem exists_comap_principal_prime_of_isRelPrime
+    {A : Type u} {B : Type v} [Semiring A] [CommSemiring B]
+    [UniqueFactorizationMonoid B] (φ : A →+* B) {a b r : A}
+    (hab : IsRelPrime (φ a) (φ b)) (hr : ¬ IsUnit (φ r)) :
+    ∃ Q : Ideal B, Q.IsPrime ∧ Q.IsPrincipal ∧
+      (Q.comap φ).IsPrime ∧ (Q.comap φ).IsTwoSided ∧
+      r ∈ Q.comap φ ∧ (a ∉ Q.comap φ ∨ b ∉ Q.comap φ) := by
+  obtain ⟨Q, hprime, hprincipal, hrQ, havoid⟩ :=
+    exists_mem_principal_prime_of_isRelPrime hab hr
+  let : Q.IsPrime := hprime
+  refine ⟨Q, hprime, hprincipal, inferInstance, inferInstance, ?_, ?_⟩
+  · exact Ideal.mem_comap.mpr hrQ
+  · simpa only [Ideal.mem_comap] using havoid
+
+end PrincipalPrimeWitness
 
 variable {R : Type u} [CommSemiring R] [UniqueFactorizationMonoid R]
   [NormalizationMonoid R]
