@@ -18,4 +18,5 @@ name = "MinimalPrimes"
 
 [[lean_lib]]
 name = "MinimalPrimesTest"
-globs = ["MinimalPrimesTest.+"]
+roots = ["MinimalPrimesTest", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]
+globs = ["MinimalPrimesTest.+", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]

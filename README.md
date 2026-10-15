@@ -10,6 +10,32 @@ For prime generators in commutative rings with well-founded strict divisibility,
 the library bounds the height of the principal ideal by one, with equality for
 regular generators and in domains.
 
+## Integral homomorphisms and dimension
+
+The [integral-homomorphism leaf](MinimalPrimes/RingTheory/KrullDimension/Integral.lean)
+implements `RingHom.IsIntegral.ringKrullDim_eq`: an injective integral map
+`f : A →+* B` of commutative rings preserves `ringKrullDim`,
+without a domain, Noetherianity, nontriviality, or finite-dimension assumption.
+The two rings may lie in independent universes. Dimension takes values in
+`WithBot ℕ∞`: the zero ring has dimension bottom, and infinite dimension
+is included.
+
+The upper bound `RingHom.IsIntegral.ringKrullDim_le` needs only integrality:
+incomparability makes contraction strictly monotone on prime spectra.
+For the reverse inequality, lying-over and Mathlib's going-up chain-lifting
+lemma lift each finite strict prime chain without changing its length.
+Taking the defining supremum of chain lengths covers infinite dimension and
+also the empty spectrum: the supremum of no chains is bottom. No equality
+of individual prime heights or going-down hypothesis is used.
+
+The models give the nonsurjective diagonal `ZMod 4 →+* ZMod 4 × ZMod 4`,
+with nonzero square-zero elements in both rings; the empty-spectrum boundary;
+ring equivalences between independent universe lifts; and the infinite
+dimension of `MvPolynomial ℕ ℚ`. Mathlib supplies the product-integrality
+witness, ring-equivalence dimension invariance, and polynomial dimension formula.
+The proper-diagonal dimension equality is a client of the public general theorem;
+the existing model proofs and boundary controls remain separate Mathlib arguments.
+
 ## Headline results
 
 - **Principal prime witnesses and contraction.** The
@@ -151,7 +177,9 @@ quotient-spectrum comparisons and exact annihilators. Import
 or `MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` for both prime-chain
 interfaces; the latter re-exports the order leaf. Import
 `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` for the principal-prime
-height bound and equalities. `MinimalPrimes` re-exports all seven production
+height bound and equalities. Import
+`MinimalPrimes.RingTheory.KrullDimension.Integral` for integral-homomorphism
+dimension bounds and equality. `MinimalPrimes` re-exports all eight production
 leaves. The component equivalence has an order-dual codomain, as required by the
 underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
@@ -342,7 +370,10 @@ private def readme_integerComponents {f : ℤ} (hf : f ≠ 0) :
 This library builds on Mathlib and prior Formal Frontier formalizations of
 principal-ideal, associated-prime and finite-height prime-chain results. The
 principal-prime height proofs use Mathlib's maximal-power factorization,
-prime-ideal height criterion and regular-element height lower bound. AI agents
+prime-ideal height criterion and regular-element height lower bound.
+The integral-dimension proof uses Mathlib's incomparability, lying-over and
+going-up finite-chain lifting. Its supremum argument also follows the approach
+in Formal Frontier's finite-subset capture dimension bound. AI agents
 developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
@@ -366,11 +397,11 @@ before any build with:
 lake exe cache get
 ```
 
-Build both default library targets, including the production, test and
+Build the default library targets, including the production, test and
 README-example modules:
 
 ```sh
-lake build MinimalPrimes MinimalPrimesTest
+lake build
 ```
 
 For focused checks, individual modules can be built explicitly (the commands
@@ -401,8 +432,8 @@ axioms of stored private clients and generated declarations, including proof-fie
 declarations. It does not independently replay stored proof bodies.
 Transitive axioms must be restricted to `propext`, `Classical.choice`, and
 `Quot.sound`.
-The project contains no admissions, custom axioms, unsafe declarations, warning
-suppressions, placeholders, or generated build output.
+The production library and completed examples contain no admissions or custom
+axioms.
 
 ### Initial build baseline
 
