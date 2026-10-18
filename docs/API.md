@@ -46,6 +46,32 @@ verifies well-founded strict divisibility in `ZMod 4`, where `2` is a prime
 zero divisor and `(2)` is a nonzero proper prime ideal of height zero.
 Thus regularity cannot be dropped from the height-one equality. This client
 provides private verification, not a production instance or public API.
+The [integral-dimension leaf](../MinimalPrimes/RingTheory/KrullDimension/Integral.lean)
+compares arbitrary commutative rings in independent universes, with dimension in
+`WithBot ℕ∞`. In addition to `RingHom.IsIntegral.ringKrullDim_le` and the
+injective-map equality `RingHom.IsIntegral.ringKrullDim_eq`, its kernel-quotient
+statement has the form
+
+```lean
+theorem RingHom.IsIntegral.ringKrullDim_eq_quotient_ker
+    {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    {f : R →+* S} (hf : f.IsIntegral) :
+    ringKrullDim S = ringKrullDim (R ⧸ RingHom.ker f)
+```
+
+The faithful-algebra statement uses the caller's algebra structure:
+
+```lean
+theorem Algebra.IsIntegral.ringKrullDim_eq
+    (R : Type u) (S : Type v) [CommRing R] [CommRing S]
+    [Algebra R S] [Algebra.IsIntegral R S] [FaithfulSMul R S] :
+    ringKrullDim R = ringKrullDim S
+```
+
+These forms include bottom for zero rings and top for infinite dimension.
+See the [integer-diagonal clients](../MinimalPrimesTest/RingTheory/KrullDimension/Integral.lean)
+for independent integrality, faithfulness and positive-dimension calculations on
+`ℤ →+* ℤ × ℤ`, and the total-quotient boundary.
 These results are navigation additions, not native signatures from the historical
 snapshot below. Import `MinimalPrimes` to re-export all current mathematical leaves.
 

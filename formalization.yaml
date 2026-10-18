@@ -16,6 +16,12 @@ project:
     of antitone prime chains over commutative semirings, with an ideal interface over
     commutative rings using only initial FiniteHeight and primeness at every index.
     Both chain interfaces identify the all-index ideal infimum at the same tail index.
+    For integral homomorphisms of arbitrary commutative rings in independent universes,
+    bounds target Krull dimension by source dimension, with equality for injective maps.
+    Without injectivity, the target has the dimension of the source modulo the kernel.
+    A faithful integral algebra has the dimension of its base ring for its given algebra
+    structure. These results use the full WithBot ℕ∞ dimension, including zero rings
+    and infinite dimension.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
@@ -95,6 +101,12 @@ status:
     ring client's module documentation remains a mathematical sketch. No
     negative-Noetherianity certificate is included in the principal-prime client;
     infinite Krull dimension alone does not establish non-Noetherianity.
+    For an integral homomorphism f : R →+* S of commutative rings in independent
+    universes, ringKrullDim S ≤ ringKrullDim R, with equality when f is injective.
+    Without injectivity, ringKrullDim S = ringKrullDim (R ⧸ RingHom.ker f).
+    A given Algebra R S that is integral and faithful gives
+    ringKrullDim R = ringKrullDim S. These statements use the full WithBot ℕ∞
+    codomain, including bottom for the zero ring and top for infinite dimension.
   sorry_count: 0
   main_results:
     - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
@@ -119,6 +131,14 @@ status:
       file: MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean
     - declaration: Ideal.exists_stable_of_antitone_of_finiteHeight
       file: MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean
+    - declaration: RingHom.IsIntegral.ringKrullDim_le
+      file: MinimalPrimes/RingTheory/KrullDimension/Integral.lean
+    - declaration: RingHom.IsIntegral.ringKrullDim_eq
+      file: MinimalPrimes/RingTheory/KrullDimension/Integral.lean
+    - declaration: RingHom.IsIntegral.ringKrullDim_eq_quotient_ker
+      file: MinimalPrimes/RingTheory/KrullDimension/Integral.lean
+    - declaration: Algebra.IsIntegral.ringKrullDim_eq
+      file: MinimalPrimes/RingTheory/KrullDimension/Integral.lean
 
 review:
   status: reviewed
