@@ -12,6 +12,7 @@ public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
+public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 
 /-!
@@ -27,6 +28,8 @@ lower intervals in preorders and stabilization of antitone prime chains with the
 all-index ideal infimum at a common index, using only finite initial height.
 The principal-prime height leaf bounds height by one under well-founded strict divisibility,
 with height one for regular prime generators and, in particular, prime elements in domains.
+The minimal-prime multiplier leaf clears an element of a minimal prime into the radical
+by a multiplier outside that same prime, over any commutative semiring.
 The integral-homomorphism leaf gives dimension equality for integral injections
 without finiteness or nontriviality hypotheses. The minimal-prime localization leaf detects
 minimality over an arbitrary ideal by equality of radicals after localization at a prime,

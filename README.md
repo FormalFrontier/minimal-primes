@@ -10,7 +10,9 @@ For prime generators in commutative rings with well-founded strict divisibility,
 the library bounds the height of the principal ideal by one, with equality for
 regular generators and in domains. For arbitrary ideals of commutative semirings,
 localization at a prime detects minimality by equality of the localized radical
-with the extended prime ideal.
+with the extended prime ideal. For arbitrary commutative semirings, elements
+of a minimal prime over an ideal can be multiplied into its radical by a multiplier
+outside that same prime.
 
 ## Integral homomorphisms and dimension
 
@@ -70,6 +72,17 @@ bottom and total kernel, showing why arbitrary integral maps need the kernel quo
   The [integer client](MinimalPrimesTest/RingTheory/Ideal/MinimalPrimeLocalization.lean)
   applies the criterion to `(4)` in the canonical localization of `ℤ` at `(2)`
   and excludes the unit ideal as a boundary case.
+- **Multipliers outside a minimal prime.** The
+  [multiplier leaf](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean)
+  proves `Ideal.exists_mul_mem_radical_of_mem_minimalPrimes`: for ideals `I`, `q`
+  in any commutative semiring, `q ∈ I.minimalPrimes` and `x ∈ q` imply
+  `∃ s ∉ q, s * x ∈ I.radical`. Its zero-ideal specialization,
+  `Ideal.exists_isNilpotent_mul_of_mem_minimalPrimes`, gives a nilpotent product.
+  Neither theorem needs a ring, Noetherianity, finiteness, reducedness or a
+  separate primeness assumption. The
+  [examples](MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeRegularity.lean)
+  apply the first theorem to `I = q = (2)` in `ℤ`, and the specialization to the
+  nonzero element `2` of the minimal prime `(2)` in `ZMod 4`.
 - **Integral-map dimension.** The
   [integral leaf](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) gives the
   dimension upper bound for integral ring maps and equality for injective ones.
@@ -217,10 +230,12 @@ or `MinimalPrimes.RingTheory.Ideal.FiniteHeightChain` for both prime-chain
 interfaces; the latter re-exports the order leaf. Import
 `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight` for the principal-prime
 height bound and equalities. Import
+`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers` for multipliers outside a
+chosen minimal prime and the nilpotent-product specialization. Import
 `MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization` for the localized-radical
 criterion and its converse. Import `MinimalPrimes.RingTheory.KrullDimension.Integral`
 for integral-homomorphism dimension bounds and equality. `MinimalPrimes` re-exports
-all nine production leaves. The component equivalence has an order-dual codomain,
+all ten production leaves. The component equivalence has an order-dual codomain,
 as required by the underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
 `MinimalPrimesTest.LeafClient` (direct algebraic import),
@@ -242,15 +257,16 @@ The [historical native API reference](docs/API.md) preserves display signatures
 for the four normalized-factor declarations and docstrings from nine originally
 analyzed modules; it is not the complete API of this checkout.
 The added associated-prime, scalar-restriction, exact-annihilator, principal-prime
-height, finite-height, localized-radical and integral-dimension results below are not
-in that historical snapshot.
+height, minimal-prime multiplier, finite-height, localized-radical and integral-dimension
+results below are not in that historical snapshot.
 The [historical input manifest](docs/api-manifest.json) and
 [reproduction instructions](docs/README.md) identify the original analyzed
 source, pins and documentation tool, not a generation from the expanded library.
 
 The principal and quotient declarations are in namespace `Ideal`; scalar
 restriction uses namespaces `Submodule` and `IsAssociatedPrime`. Principal-prime
-height results use `Ideal`; finite-height results use `Order`, `PrimeSpectrum` and `Ideal`.
+height and minimal-prime multiplier results use `Ideal`; finite-height results
+use `Order`, `PrimeSpectrum` and `Ideal`.
 The localized-radical criterion uses `IsLocalization.AtPrime`; integral dimension uses
 `RingHom.IsIntegral` and `Algebra.IsIntegral`:
 
@@ -258,6 +274,8 @@ The localized-radical criterion uses `IsLocalization.AtPrime`; integral dimensio
 | --- | --- | --- |
 | [`IsLocalization.AtPrime.mem_minimalPrimes_of_radical_map_eq`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | `MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization` | Equality of the extended radical with the extended prime ideal implies minimality over the original ideal, without a containment assumption. |
 | [`IsLocalization.AtPrime.radical_map_eq_iff_mem_minimalPrimes`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | `MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization` | The extended radical equals the extended prime ideal exactly when that prime is minimal over the original ideal, for arbitrary commutative semirings. |
+| [`Ideal.exists_mul_mem_radical_of_mem_minimalPrimes`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | `MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers` | For `q ∈ I.minimalPrimes` and `x ∈ q` in a commutative semiring, some `s ∉ q` satisfies `s * x ∈ I.radical`. |
+| [`Ideal.exists_isNilpotent_mul_of_mem_minimalPrimes`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | `MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers` | For an element of a minimal prime over zero in a commutative semiring, some multiplier outside that prime gives a nilpotent product. |
 | `RingHom.IsIntegral.ringKrullDim_le` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | An integral ring map bounds target dimension by source dimension. |
 | `RingHom.IsIntegral.ringKrullDim_eq` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | An injective integral ring map gives `ringKrullDim R = ringKrullDim S`. |
 | `RingHom.IsIntegral.ringKrullDim_eq_quotient_ker` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | An integral ring map gives `ringKrullDim S = ringKrullDim (R ⧸ RingHom.ker f)` without injectivity. |
@@ -423,6 +441,8 @@ prime-ideal height criterion and regular-element height lower bound.
 The localized-radical criterion uses Mathlib's minimal-prime localization,
 radical invariance of minimal primes and prime-ideal correspondence; the implication
 from minimality is Mathlib's theorem, formalized by Andrew Yang.
+The minimal-prime multiplier proof uses Mathlib's radical equality after localization
+at a minimal prime, localization of radicals and denominator clearing for ideals.
 The integral-dimension proof uses Mathlib's incomparability, lying-over and
 going-up finite-chain lifting. Its supremum argument also follows the approach
 in Formal Frontier's finite-subset capture dimension bound. The kernel-quotient

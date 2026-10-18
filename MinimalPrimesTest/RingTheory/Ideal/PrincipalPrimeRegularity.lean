@@ -4,8 +4,10 @@ Authors: Formal Frontier Agents
 -/
 module
 
+import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 import Mathlib.Algebra.Divisibility.Finite
+import Mathlib.Data.Nat.Prime.Int
 import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Artinian.Module
 
@@ -22,13 +24,20 @@ minimal-prime API. The principal-prime upper bound from MinimalPrimes still appl
 the height-one conclusion fails. Thus regularity cannot be omitted from the
 regular-generator equality, even when strict divisibility is well-founded.
 
+The minimal-prime multiplier theorem is used on the prime ideal `(2)` in `ℤ`.
+Its zero-ideal specialization is used on `(2)` in `ZMod 4`, with the nonzero
+nilpotent element `2`. The latter reuses the same prime ideal and Artinian
+minimality as the height-zero example.
+
 ## References
 
 These examples use the upper bound in
 `MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`. The finite calculations use
 Mathlib's `ZMod.isUnit_iff_coprime`, finite divisibility and inverse-image well-foundedness
 through `measure`. The height calculation reuses Mathlib's `isArtinian_of_finite`,
-`IsArtinianRing.mem_minimalPrimes`, and `Ideal.height_eq_zero_iff`.
+`IsArtinianRing.mem_minimalPrimes`, and `Ideal.height_eq_zero_iff`. The multiplier
+examples use `MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers` and Mathlib's
+`Int.prime_two`.
 -/
 
 namespace PrincipalPrimeRegularityExamples
@@ -88,5 +97,22 @@ private theorem height_span_two_ne_one : (Ideal.span {(2 : ZMod 4)}).height ≠ 
 private theorem height_span_two_le_one : (Ideal.span {(2 : ZMod 4)}).height ≤ 1 := by
   let : WfDvdMonoid (ZMod 4) := zmod_four_wfDvdMonoid
   exact Ideal.height_span_singleton_le_one_of_prime two_prime
+
+private theorem integer_span_two_multiplier :
+    ∃ s ∉ Ideal.span {(2 : ℤ)}, s * 2 ∈ (Ideal.span {(2 : ℤ)}).radical := by
+  letI : (Ideal.span {(2 : ℤ)}).IsPrime :=
+    Ideal.isPrime_span_singleton_of_prime Int.prime_two
+  have hminimal : Ideal.span {(2 : ℤ)} ∈ (Ideal.span {(2 : ℤ)}).minimalPrimes := by
+    rw [Ideal.minimalPrimes_eq_subsingleton_self]
+    exact Set.mem_singleton _
+  exact Ideal.exists_mul_mem_radical_of_mem_minimalPrimes hminimal
+    (Ideal.mem_span_singleton_self _)
+
+private theorem zmod_four_nilpotent_multiplier :
+    ∃ s ∉ Ideal.span {(2 : ZMod 4)}, IsNilpotent (s * 2) := by
+  letI : IsArtinianRing (ZMod 4) := isArtinian_of_finite
+  letI : (Ideal.span {(2 : ZMod 4)}).IsPrime := span_two_isPrime
+  exact Ideal.exists_isNilpotent_mul_of_mem_minimalPrimes
+    (IsArtinianRing.mem_minimalPrimes bot_le) (Ideal.mem_span_singleton_self _)
 
 end PrincipalPrimeRegularityExamples
