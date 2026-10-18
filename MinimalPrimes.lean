@@ -14,6 +14,8 @@ public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
+public import MinimalPrimes.RingTheory.Localization.AtPrime
+public import MinimalPrimes.RingTheory.Localization.Reduced
 
 /-!
 # Minimal primes
@@ -34,5 +36,8 @@ The integral-homomorphism leaf gives dimension equality for integral injections
 without finiteness or nontriviality hypotheses. The minimal-prime localization leaf detects
 minimality over an arbitrary ideal by equality of radicals after localization at a prime,
 for commutative semirings and without a separate containment hypothesis.
+The localization leaves characterize field localizations at arbitrary primes of
+commutative semirings by minimality and target reducedness, and show that reducedness
+is preserved by arbitrary localization.
 Import a leaf directly for a smaller API.
 -/

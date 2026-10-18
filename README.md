@@ -12,7 +12,8 @@ regular generators and in domains. For arbitrary ideals of commutative semirings
 localization at a prime detects minimality by equality of the localized radical
 with the extended prime ideal. For arbitrary commutative semirings, elements
 of a minimal prime over an ideal can be multiplied into its radical by a multiplier
-outside that same prime.
+outside that same prime. Field localizations at arbitrary primes of commutative
+semirings are characterized by minimality of the prime and reducedness of the target.
 
 ## Integral homomorphisms and dimension
 
@@ -90,6 +91,22 @@ bottom and total kernel, showing why arbitrary integral maps need the kernel quo
   kernel without injectivity; its faithful-algebra statement uses the given
   algebra structure. All forms concern arbitrary commutative rings in independent
   universes, including zero rings and infinite dimension.
+- **Field localizations at minimal primes.** The
+  [prime-localization leaf](MinimalPrimes/RingTheory/Localization/AtPrime.lean)
+  implements `IsLocalization.AtPrime.isField_iff_mem_minimalPrimes_and_isReduced`:
+  for commutative semirings `R` and `A` in independent universes, with their
+  `R`-algebra structure, any prime `q` and `[IsLocalization.AtPrime A q]`,
+  `IsField A ↔ q ∈ minimalPrimes R ∧ IsReduced A`.
+  No ring, domain, Noetherianity, reduced-base or supplied local-ring hypothesis is
+  required. For semirings, `IsField` includes semifields such as `ℚ≥0`.
+  The corollary `isField_iff_mem_minimalPrimes` assumes `[IsReduced R]` and uses
+  `IsReduced.of_isLocalization`, which preserves reducedness under arbitrary
+  localization of commutative semirings. The
+  [clients](MinimalPrimesTest/RingTheory/Localization/AtPrime.lean) use `ℤ → ℚ`
+  and `ℕ → ℚ≥0` at zero and show that localization of `ℤ` at `(2)` is
+  reduced but not a field. This is not the quotient `ℤ / 2ℤ`.
+  For `ℤ / 4ℤ` at its minimal prime `(2)`, localization leaves a nonzero
+  square-zero element; target reducedness cannot be omitted.
 - **Principal prime witnesses and contraction.** The
   [principal-ideal leaf](MinimalPrimes/Principal.lean) proves that a proper
   principal ideal avoids at least one of two relatively prime elements, without
@@ -234,9 +251,12 @@ height bound and equalities. Import
 chosen minimal prime and the nilpotent-product specialization. Import
 `MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization` for the localized-radical
 criterion and its converse. Import `MinimalPrimes.RingTheory.KrullDimension.Integral`
-for integral-homomorphism dimension bounds and equality. `MinimalPrimes` re-exports
-all ten production leaves. The component equivalence has an order-dual codomain,
-as required by the underlying topology API. The tests live in
+for integral-homomorphism dimension bounds and equality. Import
+`MinimalPrimes.RingTheory.Localization.AtPrime` for the field criterion and its
+reduced-base corollary, or `MinimalPrimes.RingTheory.Localization.Reduced` for
+preservation of reducedness alone. `MinimalPrimes` re-exports all twelve production
+leaves. The component equivalence has an order-dual codomain, as required by the
+underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
 `MinimalPrimesTest.LeafClient` (direct algebraic import),
 `MinimalPrimesTest.AssociatedRestrictScalars` (including a nonsurjective
@@ -257,8 +277,8 @@ The [historical native API reference](docs/API.md) preserves display signatures
 for the four normalized-factor declarations and docstrings from nine originally
 analyzed modules; it is not the complete API of this checkout.
 The added associated-prime, scalar-restriction, exact-annihilator, principal-prime
-height, minimal-prime multiplier, finite-height, localized-radical and integral-dimension
-results below are not in that historical snapshot.
+height, minimal-prime multiplier, finite-height, localized-radical, integral-dimension
+and localization results below are not in that historical snapshot.
 The [historical input manifest](docs/api-manifest.json) and
 [reproduction instructions](docs/README.md) identify the original analyzed
 source, pins and documentation tool, not a generation from the expanded library.
@@ -280,6 +300,9 @@ The localized-radical criterion uses `IsLocalization.AtPrime`; integral dimensio
 | `RingHom.IsIntegral.ringKrullDim_eq` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | An injective integral ring map gives `ringKrullDim R = ringKrullDim S`. |
 | `RingHom.IsIntegral.ringKrullDim_eq_quotient_ker` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | An integral ring map gives `ringKrullDim S = ringKrullDim (R ⧸ RingHom.ker f)` without injectivity. |
 | `Algebra.IsIntegral.ringKrullDim_eq` | `MinimalPrimes.RingTheory.KrullDimension.Integral` | A faithful integral algebra gives `ringKrullDim R = ringKrullDim S` using its given algebra structure. |
+| `IsLocalization.AtPrime.isField_iff_mem_minimalPrimes_and_isReduced` | `MinimalPrimes.RingTheory.Localization.AtPrime` | For arbitrary prime `q` in a commutative semiring, `IsField A ↔ q ∈ minimalPrimes R ∧ IsReduced A` for any localization `A` at `q`. |
+| `IsLocalization.AtPrime.isField_iff_mem_minimalPrimes` | `MinimalPrimes.RingTheory.Localization.AtPrime` | The reduced-base corollary, with `[IsReduced R]`. |
+| `IsReduced.of_isLocalization` | `MinimalPrimes.RingTheory.Localization.Reduced` | An arbitrary localization of a reduced commutative semiring is reduced, in independent universes. |
 | `minimalPrimes_span_singleton_eq_normalizedFactors` | `MinimalPrimes.Principal` | Minimal primes over `(f)` equal the **set** of principal ideals generated by normalized factor values of nonzero `f`. |
 | `normalizedFactorsEquivMinimalPrimes` | `MinimalPrimes.Principal` | Equivalence from `{p // p ∈ normalizedFactors f}` to `(span {f}).minimalPrimes`; its forward map is `p ↦ span {p.1}`. |
 | `normalizedFactorsEquivMinimalPrimes_apply` | `MinimalPrimes.Principal` | `@[simp]` forward-map equality, definitional (`rfl`) despite the noncomputable inverse. |
@@ -432,6 +455,18 @@ private def readme_integerComponents {f : ℤ} (hf : f ≠ 0) :
   Ideal.normalizedFactorsEquivIrreducibleComponents hf
 ```
 
+## References
+
+The localization results use Mathlib's
+[minimal-prime localization correspondence](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/Ideal/MinimalPrime/Localization.lean),
+[radical localization API](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/Localization/Ideal.lean),
+and [local reducedness theory](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/LocalProperties/Reduced.lean).
+The earlier independent-universe ring formulation is in
+[SchemeProperties.Reduced](https://github.com/FormalFrontier/scheme-properties/blob/54d353b68e189ebe60efb9f1d8518ca0b16c2aef/SchemeProperties/Reduced.lean).
+The [reduced-stalk field criterion](https://github.com/FormalFrontier/scheme-properties/blob/54d353b68e189ebe60efb9f1d8518ca0b16c2aef/SchemeProperties/NormalValuationStalk.lean)
+is a related ring-geometric result, phrased using coheight rather than arbitrary
+commutative-semiring localizations.
+
 ## Provenance and credits
 
 This library builds on Mathlib and prior Formal Frontier formalizations of
@@ -449,7 +484,11 @@ in Formal Frontier's finite-subset capture dimension bound. The kernel-quotient
 form uses Mathlib's integral and injective kernel lift; the faithful-algebra
 form uses its algebra-map integrality and faithfulness bridges. The integer-diagonal
 hypotheses and independent dimension calculations use Mathlib's finite-module,
-product, principal-ideal-ring and surjective-map APIs. AI agents
+product, principal-ideal-ring and surjective-map APIs. The localization field
+criterion uses Andrew Yang's Mathlib minimal-prime correspondence. Reducedness under
+localization generalizes Andrew Yang's Mathlib theorem and the prior Formal Frontier
+formalization in `SchemeProperties.Reduced`; its proof composes the existing radical
+and nilradical APIs rather than repeating the denominator argument. AI agents
 developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
