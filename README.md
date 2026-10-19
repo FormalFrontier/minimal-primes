@@ -91,6 +91,18 @@ gives their full statements, examples, proof ideas and Mathlib dependencies.
   disconnectedness from the Hausdorff spectrum. For a **reduced, nontrivial
   commutative ring**, this bound and preconnectedness of its spectrum imply `IsField R`.
 
+### Topological dimension on open covers
+
+The [open-cover leaf](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) proves
+`topologicalKrullDim_eq_iSup_of_isOpenEmbedding_cover`: the dimension of a space is
+the supremum of the dimensions of any jointly surjective family of open-embedding
+charts, with independent universes for the space, index type and chart domains.
+Its open-subspace form, `topologicalKrullDim_eq_iSup_of_isOpen_cover`, applies to
+any family of open sets whose union is the whole space, with their induced topologies.
+Both equalities use `WithBot ℕ∞`, including bottom for an empty-index cover of the
+empty space and infinite or unbounded dimensions. No separation, sobriety,
+Noetherianity, quasi-compactness, finiteness or nonemptiness assumption is needed.
+
 ## Using the library
 
 Add the public library to your `lakefile.toml`:
@@ -173,7 +185,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## Contents
 
-`MinimalPrimes` re-exports these fourteen production leaves.
+`MinimalPrimes` re-exports all production leaves.
 
 | Module | Contents |
 | --- | --- |
@@ -191,6 +203,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
+| [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations
 
