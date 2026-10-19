@@ -75,6 +75,15 @@ for independent integrality, faithfulness and positive-dimension calculations on
 These results are navigation additions, not native signatures from the historical
 snapshot below. Import `MinimalPrimes` to re-export all current mathematical leaves.
 
+The [zero-dimensional spectrum leaf](../MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean)
+provides `PrimeSpectrum.t1Space_iff_krullDimLE_zero` and
+`PrimeSpectrum.t2Space_iff_krullDimLE_zero`: for arbitrary commutative semirings,
+T₁ and Hausdorff separation of the original Zariski spectrum are each equivalent
+to `Ring.KrullDimLE 0 R`. Both include the empty spectrum; zero-ring dimension is
+bottom, not zero. The [same-ring examples](../MinimalPrimesTest/RingTheory/Spectrum/Prime/ZeroDimensional.lean)
+apply both characterizations to a given field, its two-factor product and `ZMod 1`,
+and compare with Mathlib's finite-discrete and domain-field criteria.
+
 The four signatures below are native doc-gen4 display signatures from the
 historical inputs, with all displayed implicit arguments retained, not
 declarations with proof bodies. Short names use the source namespace and

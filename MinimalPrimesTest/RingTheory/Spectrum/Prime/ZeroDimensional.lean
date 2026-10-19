@@ -37,6 +37,25 @@ universe u
 
 namespace ZeroDimensionalSpectrumExamples
 
+-- The finite-and-T₁ factor is precisely Mathlib's original discrete criterion.
+-- Finite T₁ spaces are discrete; compact discrete spectra are finite.
+private theorem discrete_comparison {R : Type u} [CommSemiring R] :
+    DiscreteTopology (PrimeSpectrum R) ↔
+      Finite (PrimeSpectrum R) ∧ T1Space (PrimeSpectrum R) := by
+  rw [PrimeSpectrum.discreteTopology_iff_finite_and_krullDimLE_zero,
+    PrimeSpectrum.t1Space_iff_krullDimLE_zero]
+
+-- Compare with both the original domain criterion and its algebraic endpoint.
+private theorem domain_comparison {R : Type u} [CommSemiring R] [IsDomain R] :
+    Ring.KrullDimLE 0 R ↔ IsField R := by
+  constructor
+  · intro h
+    letI : Ring.KrullDimLE 0 R := h
+    exact Ring.KrullDimLE.isField_of_isDomain
+  · intro h
+    exact PrimeSpectrum.t1Space_iff_krullDimLE_zero.mp
+      (PrimeSpectrum.t1Space_iff_isField.mpr h)
+
 variable (K : Type u) [Field K]
 
 private theorem field_criterion : IsField K := by
@@ -44,6 +63,14 @@ private theorem field_criterion : IsField K := by
   letI : PreconnectedSpace (PrimeSpectrum K) :=
     ⟨Set.subsingleton_univ.isPreconnected⟩
   exact PrimeSpectrum.isField_of_isReduced_of_preconnectedSpace K
+
+private theorem field_separation :
+    T1Space (PrimeSpectrum K) ∧ T2Space (PrimeSpectrum K) := by
+  have hdim : Ring.KrullDimLE 0 K :=
+    PrimeSpectrum.t1Space_iff_krullDimLE_zero.mp
+      (PrimeSpectrum.t1Space_iff_isField.mpr (field_criterion K))
+  exact ⟨PrimeSpectrum.t1Space_iff_krullDimLE_zero.mpr hdim,
+    PrimeSpectrum.t2Space_iff_krullDimLE_zero.mpr hdim⟩
 
 private def firstPrime : PrimeSpectrum (K × K) :=
   ⟨RingHom.ker (RingHom.fst K K), RingHom.ker_isPrime (RingHom.fst K K)⟩
@@ -80,6 +107,11 @@ private theorem product_clopen_separates :
 private theorem product_hausdorff : T2Space (PrimeSpectrum (K × K)) := by
   letI : Ring.KrullDimLE 0 (K × K) := product_dimension K
   exact PrimeSpectrum.t2Space_of_krullDimLE_zero (K × K)
+
+private theorem product_dimension_from_separation :
+    Ring.KrullDimLE 0 (K × K) ∧ T1Space (PrimeSpectrum (K × K)) :=
+  ⟨PrimeSpectrum.t2Space_iff_krullDimLE_zero.mp (product_hausdorff K),
+    PrimeSpectrum.t1Space_iff_krullDimLE_zero.mpr (product_dimension K)⟩
 
 private theorem split_clopen :
     IsClopen (PrimeSpectrum.basicOpen ((1, 0) : K × K) : Set (PrimeSpectrum (K × K))) :=
@@ -120,6 +152,11 @@ private theorem zeroRing_boundary :
 
 private theorem zeroRing_hausdorff : T2Space (PrimeSpectrum (ZMod 1)) :=
   PrimeSpectrum.t2Space_of_krullDimLE_zero (ZMod 1)
+
+private theorem zeroRing_separation :
+    T1Space (PrimeSpectrum (ZMod 1)) ∧ Ring.KrullDimLE 0 (ZMod 1) :=
+  ⟨PrimeSpectrum.t1Space_iff_krullDimLE_zero.mpr zeroRing_boundary.2.1,
+    PrimeSpectrum.t2Space_iff_krullDimLE_zero.mp zeroRing_hausdorff⟩
 
 private theorem zmod_four_nonzero_nilpotent :
     (2 : ZMod 4) ≠ 0 ∧ IsNilpotent (2 : ZMod 4) :=

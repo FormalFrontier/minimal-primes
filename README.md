@@ -69,6 +69,11 @@ provides the following results:
 - `PrimeSpectrum.t2Space_of_krullDimLE_zero`: under the same assumptions,
   `PrimeSpectrum R` is Hausdorff. Mathlib supplies total separation and total
   disconnectedness from Hausdorffness and the spectrum's prespectral structure.
+- `PrimeSpectrum.t1Space_iff_krullDimLE_zero` and
+  `PrimeSpectrum.t2Space_iff_krullDimLE_zero`: for every commutative semiring `R`,
+  the T₁ and Hausdorff properties of `PrimeSpectrum R` are each equivalent to
+  `Ring.KrullDimLE 0 R`, including the empty spectrum. These are equivalences,
+  not reverse typeclass instances.
 - `PrimeSpectrum.isField_of_isReduced_of_preconnectedSpace`: for a reduced,
   nontrivial commutative ring `R` with `[Ring.KrullDimLE 0 R]` and
   `[PreconnectedSpace (PrimeSpectrum R)]`, the conclusion is `IsField R`.
@@ -284,7 +289,7 @@ for integral-homomorphism dimension bounds and equality. Import
 `MinimalPrimes.RingTheory.Localization.AtPrime` for the field criterion and its
 reduced-base corollary, or `MinimalPrimes.RingTheory.Localization.Reduced` for
 preservation of reducedness alone. Import
-`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional` for its three
+`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional` for its five
 spectrum results. `MinimalPrimes` re-exports all thirteen production leaves.
 The component equivalence has an order-dual codomain, as required by the
 underlying topology API. The tests live in
@@ -525,6 +530,13 @@ away-localization image and specialization-stable spectrum-map range theorem,
 which Mathlib attributes to the [Stacks Project, Tag 00HY](https://stacks.math.columbia.edu/tag/00HY).
 Its field criterion uses Mathlib's preconnected/totally-disconnected subsingleton
 theorem and Andrew Yang's reduced-ring singleton-spectrum field criterion.
+The separation characterizations factor the closed-point/maximal-ideal argument
+of Mathlib's `PrimeSpectrum.discreteTopology_iff_finite_and_krullDimLE_zero`,
+reusing this library's clopen-basis Hausdorff proof. For finite spectra the new
+T₁ characterization recovers Mathlib's discrete criterion; under `IsDomain R`
+it agrees with `PrimeSpectrum.t1Space_iff_isField` and
+`Ring.KrullDimLE.isField_of_isDomain`. The zero ring has dimension bottom, so
+these statements use the bound rather than equality of dimension with zero.
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
