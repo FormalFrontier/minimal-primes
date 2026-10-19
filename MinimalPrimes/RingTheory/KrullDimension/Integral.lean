@@ -42,8 +42,8 @@ namespace RingHom.IsIntegral
 Injectivity is not required for this inequality. -/
 theorem ringKrullDim_le {A : Type u} {B : Type v} [CommRing A] [CommRing B]
     {f : A →+* B} (hf : f.IsIntegral) : ringKrullDim B ≤ ringKrullDim A := by
-  letI : Algebra A B := f.toAlgebra
-  letI : Algebra.IsIntegral A B := ⟨hf⟩
+  let : Algebra A B := f.toAlgebra
+  let : Algebra.IsIntegral A B := ⟨hf⟩
   apply Order.krullDim_le_of_strictMono (PrimeSpectrum.comap f)
   intro P Q hPQ
   change P.asIdeal.under A < Q.asIdeal.under A
@@ -54,14 +54,14 @@ for the zero ring and top for infinite dimension. -/
 theorem ringKrullDim_eq {A : Type u} {B : Type v} [CommRing A] [CommRing B]
     {f : A →+* B} (hf : f.IsIntegral) (hinj : Function.Injective f) :
     ringKrullDim A = ringKrullDim B := by
-  letI : Algebra A B := f.toAlgebra
-  letI : Algebra.IsIntegral A B := ⟨hf⟩
+  let : Algebra A B := f.toAlgebra
+  let : Algebra.IsIntegral A B := ⟨hf⟩
   refine le_antisymm ?_ hf.ringKrullDim_le
   change Order.krullDim (PrimeSpectrum A) ≤ _
   -- Unlike the nonempty-spectrum reformulation, this supremum also covers bottom.
   refine iSup_le fun l => ?_
   obtain ⟨P, hP⟩ := hf.comap_surjective hinj l.head
-  haveI : P.asIdeal.LiesOver l.head.asIdeal := ⟨by
+  have : P.asIdeal.LiesOver l.head.asIdeal := ⟨by
     change l.head.asIdeal = Ideal.comap f P.asIdeal
     exact congrArg PrimeSpectrum.asIdeal hP.symm⟩
   obtain ⟨L, hL, _, _⟩ := Ideal.exists_ltSeries_of_hasGoingUp l P.asIdeal

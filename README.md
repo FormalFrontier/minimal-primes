@@ -118,6 +118,15 @@ the nonzero nilpotent `2` in `ZMod 4`.
   [examples](MinimalPrimesTest/RingTheory/Ideal/PrincipalPrimeRegularity.lean)
   apply the first theorem to `I = q = (2)` in `ℤ`, and the specialization to the
   nonzero element `2` of the minimal prime `(2)` in `ZMod 4`.
+- **Dimension under field extension.** For fields `K` and `L`, a given
+  `[Algebra K L]`, and a commutative `K`-algebra `A` with
+  `[Algebra.FiniteType K A]`, the
+  [field-extension leaf](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean)
+  proves `Algebra.ringKrullDim_tensorProduct_of_finiteType`:
+  `ringKrullDim (A ⊗[K] L) = ringKrullDim A`. All three types may lie in
+  independent universes. The extension need not be algebraic, and `A` need not
+  be a domain, reduced or nontrivial. Dimension takes values in `WithBot ℕ∞`;
+  the zero algebra has dimension `⊥`.
 - **Integral-map dimension.** The
   [integral leaf](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) gives the
   dimension upper bound for integral ring maps and equality for injective ones.
@@ -286,11 +295,13 @@ chosen minimal prime and the nilpotent-product specialization. Import
 `MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization` for the localized-radical
 criterion and its converse. Import `MinimalPrimes.RingTheory.KrullDimension.Integral`
 for integral-homomorphism dimension bounds and equality. Import
+`MinimalPrimes.RingTheory.KrullDimension.FieldExtension` for dimension invariance
+under extension of the base field for finite-type commutative algebras. Import
 `MinimalPrimes.RingTheory.Localization.AtPrime` for the field criterion and its
 reduced-base corollary, or `MinimalPrimes.RingTheory.Localization.Reduced` for
 preservation of reducedness alone. Import
 `MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional` for its five
-spectrum results. `MinimalPrimes` re-exports all thirteen production leaves.
+spectrum results. `MinimalPrimes` re-exports all fourteen production leaves.
 The component equivalence has an order-dual codomain, as required by the
 underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
@@ -537,6 +548,11 @@ T₁ characterization recovers Mathlib's discrete criterion; under `IsDomain R`
 it agrees with `PrimeSpectrum.t1Space_iff_isField` and
 `Ring.KrullDimLE.isField_of_isDomain`. The zero ring has dimension bottom, so
 these statements use the bound rather than equality of dimension with zero.
+The field-extension dimension proof uses Mathlib's Noether normalization
+theorem ([Stacks Project, Tag 00OW](https://stacks.math.columbia.edu/tag/00OW)),
+flatness over fields, finite tensor-product maps, polynomial base change and
+polynomial Krull dimension, together with this library's integral-injection
+dimension comparison.
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

@@ -13,6 +13,7 @@ public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
+public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
