@@ -19,6 +19,7 @@ public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
 public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 public import MinimalPrimes.Topology.KrullDimension.OpenCover
+public import MinimalPrimes.RingTheory.RingHom.ULift
 
 /-!
 # Minimal primes

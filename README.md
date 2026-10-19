@@ -202,6 +202,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
+| [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
