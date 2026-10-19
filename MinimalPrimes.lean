@@ -16,6 +16,7 @@ public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
+public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 
 /-!
 # Minimal primes
@@ -39,5 +40,7 @@ for commutative semirings and without a separate containment hypothesis.
 The localization leaves characterize field localizations at arbitrary primes of
 commutative semirings by minimality and target reducedness, and show that reducedness
 is preserved by arbitrary localization.
+The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
+and the reduced, nontrivial, preconnected-spectrum field criterion.
 Import a leaf directly for a smaller API.
 -/

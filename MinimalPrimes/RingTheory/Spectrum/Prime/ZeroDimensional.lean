@@ -1,0 +1,83 @@
+/-
+SPDX-License-Identifier: Apache-2.0
+Authors: Formal Frontier Agents
+-/
+module
+
+public import Mathlib.RingTheory.KrullDimension.Zero
+public import Mathlib.Topology.Connected.TotallyDisconnected
+public import Mathlib.Topology.Spectral.Prespectral
+import Mathlib.Topology.Connected.Separation
+import Mathlib.Topology.Separation.Profinite
+
+/-!
+# Zero-dimensional prime spectra
+
+For a commutative semiring of Krull dimension at most zero, the Zariski basic
+opens are clopen and the prime spectrum is Hausdorff. Mathlib then supplies total
+separation and total disconnectedness from its prespectral structure.
+For a reduced nontrivial commutative ring, preconnectedness of this spectrum
+therefore implies `IsField` for the original ring.
+
+## Implementation notes
+
+The topological statements need neither reducedness nor nontriviality and include
+the empty spectrum.
+The field criterion concludes a proposition, not a choice of a field structure.
+
+## References
+
+The topological argument uses Mathlib's closed-point/maximal-ideal criterion,
+its description of a basic open as an away-localization image, and
+`PrimeSpectrum.isClosed_range_of_stableUnderSpecialization`, which Mathlib
+attributes to the Stacks Project, Tag 00HY. Clopen basic opens separate points
+by Mathlib's Zariski basis theorem. The field criterion combines Mathlib's
+`subsingleton_of_preconnected_totallyDisconnected` with Andrew Yang's
+`PrimeSpectrum.subsingleton_iff_isField_of_isReduced`.
+-/
+
+@[expose] public section
+
+universe u
+
+namespace PrimeSpectrum
+
+/-- Every Zariski basic open of a commutative semiring of Krull dimension at most
+zero is clopen. The proof uses Mathlib's localization-image description and its
+specialization-stable range theorem (Stacks Project, Tag 00HY). -/
+theorem isClopen_basicOpen_of_krullDimLE_zero {R : Type u} [CommSemiring R]
+    [Ring.KrullDimLE 0 R] (a : R) :
+    IsClopen (basicOpen a : Set (PrimeSpectrum R)) := by
+  haveI : T1Space (PrimeSpectrum R) := ⟨fun x ↦
+    (isClosed_singleton_iff_isMaximal x).mpr (Ideal.isMaximal_of_isPrime x.asIdeal)⟩
+  refine ⟨?_, isOpen_basicOpen⟩
+  rw [← localization_away_comap_range (Localization (Submonoid.powers a)) a]
+  refine isClosed_range_of_stableUnderSpecialization _ ?_
+  intro x y hxy hx
+  exact hxy.eq ▸ hx
+
+/-- The Zariski prime spectrum of a commutative semiring of Krull dimension at
+most zero is Hausdorff. Its clopen basic-open basis separates distinct points. -/
+instance t2Space_of_krullDimLE_zero (R : Type u) [CommSemiring R]
+    [Ring.KrullDimLE 0 R] : T2Space (PrimeSpectrum R) := by
+  have hclopen : TopologicalSpace.IsTopologicalBasis
+      {s : Set (PrimeSpectrum R) | IsClopen s} :=
+    (isTopologicalBasis_basic_opens (R := R)).of_isOpen_of_subset
+      (fun _ hs => hs.isOpen) (by
+        rintro _ ⟨a, rfl⟩
+        exact isClopen_basicOpen_of_krullDimLE_zero a)
+  exact @TotallySeparatedSpace.t2Space (PrimeSpectrum R) _
+    (totallySeparatedSpace_of_t0_of_basis_clopen hclopen)
+
+/-- A reduced nontrivial commutative ring of Krull dimension at most zero with
+preconnected Zariski prime spectrum is a field in the sense of `IsField`.
+This combines Mathlib's preconnected/totally-disconnected subsingleton theorem
+with its reduced-ring singleton-spectrum field criterion. -/
+theorem isField_of_isReduced_of_preconnectedSpace (R : Type u) [CommRing R]
+    [IsReduced R] [Nontrivial R] [Ring.KrullDimLE 0 R]
+    [PreconnectedSpace (PrimeSpectrum R)] : IsField R := by
+  haveI : T2Space (PrimeSpectrum R) := t2Space_of_krullDimLE_zero R
+  exact (subsingleton_iff_isField_of_isReduced (R := R)).mp
+    (subsingleton_of_preconnected_totallyDisconnected (α := PrimeSpectrum R))
+
+end PrimeSpectrum

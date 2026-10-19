@@ -59,6 +59,35 @@ bottom and total kernel, showing why arbitrary integral maps need the kernel quo
 
 ## Headline results
 
+### Zero-dimensional spectra
+
+The [zero-dimensional spectrum leaf](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean)
+provides the following results:
+
+- `PrimeSpectrum.isClopen_basicOpen_of_krullDimLE_zero`: for a commutative
+  semiring `R` with `[Ring.KrullDimLE 0 R]`, every Zariski basic open is clopen.
+- `PrimeSpectrum.t2Space_of_krullDimLE_zero`: under the same assumptions,
+  `PrimeSpectrum R` is Hausdorff. Mathlib supplies total separation and total
+  disconnectedness from Hausdorffness and the spectrum's prespectral structure.
+- `PrimeSpectrum.isField_of_isReduced_of_preconnectedSpace`: for a reduced,
+  nontrivial commutative ring `R` with `[Ring.KrullDimLE 0 R]` and
+  `[PreconnectedSpace (PrimeSpectrum R)]`, the conclusion is `IsField R`.
+
+The topology is the Zariski topology throughout. The topological statements
+require neither reducedness nor nontriviality, and the field criterion assumes
+no domain, local-ring, Hausdorff, finiteness or Noetherian condition.
+For an integral homomorphism from a given field, the existing
+`RingHom.IsIntegral.ringKrullDim_le` supplies the dimension bound; no additional
+field or algebra structure on the target is needed in the criterion.
+The [examples](MinimalPrimesTest/RingTheory/Spectrum/Prime/ZeroDimensional.lean)
+use a given field and the product `K × K`, with its two projection-kernel
+spectrum points separated by `D((1, 0))`. Mathlib's Artinian product instances
+supply the product's dimension bound independently. Separate arguments give
+its failure of preconnectedness, the empty-spectrum zero-ring boundary, and
+the nonzero nilpotent `2` in `ZMod 4`.
+
+### Implemented results
+
 - **Minimal primes detected by localization.** The
   [localization leaf](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean)
   proves `IsLocalization.AtPrime.radical_map_eq_iff_mem_minimalPrimes`: for
@@ -254,8 +283,10 @@ criterion and its converse. Import `MinimalPrimes.RingTheory.KrullDimension.Inte
 for integral-homomorphism dimension bounds and equality. Import
 `MinimalPrimes.RingTheory.Localization.AtPrime` for the field criterion and its
 reduced-base corollary, or `MinimalPrimes.RingTheory.Localization.Reduced` for
-preservation of reducedness alone. `MinimalPrimes` re-exports all twelve production
-leaves. The component equivalence has an order-dual codomain, as required by the
+preservation of reducedness alone. Import
+`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional` for its three
+spectrum results. `MinimalPrimes` re-exports all thirteen production leaves.
+The component equivalence has an order-dual codomain, as required by the
 underlying topology API. The tests live in
 `MinimalPrimesTest.Audit` (aggregate and boundary cases),
 `MinimalPrimesTest.LeafClient` (direct algebraic import),
@@ -488,8 +519,13 @@ product, principal-ideal-ring and surjective-map APIs. The localization field
 criterion uses Andrew Yang's Mathlib minimal-prime correspondence. Reducedness under
 localization generalizes Andrew Yang's Mathlib theorem and the prior Formal Frontier
 formalization in `SchemeProperties.Reduced`; its proof composes the existing radical
-and nilradical APIs rather than repeating the denominator argument. AI agents
-developed the Lean code and examples.
+and nilradical APIs rather than repeating the denominator argument.
+The zero-dimensional spectrum argument uses Mathlib's closed-point criterion,
+away-localization image and specialization-stable spectrum-map range theorem,
+which Mathlib attributes to the [Stacks Project, Tag 00HY](https://stacks.math.columbia.edu/tag/00HY).
+Its field criterion uses Mathlib's preconnected/totally-disconnected subsingleton
+theorem and Andrew Yang's reduced-ring singleton-spectrum field criterion.
+AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
 Exercise 3.7.H, and *The Rising Sea*, Exercise 6.6.F, are mathematical
@@ -547,7 +583,7 @@ axioms of stored private clients and generated declarations, including proof-fie
 declarations. It does not independently replay stored proof bodies.
 Transitive axioms must be restricted to `propext`, `Classical.choice`, and
 `Quot.sound`.
-The production library and completed examples contain no admissions or custom
+The implemented results and completed examples contain no admissions or custom
 axioms.
 
 Unless stated otherwise in a file, original code in this repository is made
