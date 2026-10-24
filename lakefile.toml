@@ -1,6 +1,7 @@
 name = "minimal-primes"
 version = "0.1.0"
 defaultTargets = ["MinimalPrimes", "MinimalPrimesTest"]
+lintDriver = "batteries/runLinter"
 
 [leanOptions]
 autoImplicit = false
@@ -19,4 +20,4 @@ name = "MinimalPrimes"
 [[lean_lib]]
 name = "MinimalPrimesTest"
 roots = ["MinimalPrimesTest", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]
-globs = ["MinimalPrimesTest.+", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]
+globs = ["MinimalPrimesTest", "MinimalPrimesTest.+", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]

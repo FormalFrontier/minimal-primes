@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.Principal
+public import MinimalPrimes.Principal
 import MinimalPrimes.IrreducibleComponents
 import Mathlib.RingTheory.UniqueFactorizationDomain.Nat
 
@@ -19,6 +19,46 @@ using a semiring without additive inverses.
 -/
 
 open UniqueFactorizationMonoid
+
+section GenericClassification
+
+/-! ## Generic principal-ideal examples: generic classification and the forward map -/
+
+open UniqueFactorizationMonoid
+
+universe u
+
+noncomputable local instance readmeGenericNormalization (M : Type*) [CommMonoidWithZero M]
+    [UniqueFactorizationMonoid M] : StrongNormalizationMonoid M :=
+  UniqueFactorizationMonoid.strongNormalizationMonoid
+
+variable {R : Type u} [CommSemiring R] [UniqueFactorizationMonoid R]
+
+private theorem readme_classification {f : R} (hf : f ≠ 0) :
+    (Ideal.span {f}).minimalPrimes =
+      {P | ∃ p ∈ normalizedFactors f, P = Ideal.span {p}} :=
+  Ideal.minimalPrimes_span_singleton_eq_normalizedFactors hf
+
+private noncomputable def readme_minimalPrimes {f : R} (hf : f ≠ 0) :
+    {p // p ∈ normalizedFactors f} ≃ (Ideal.span {f}).minimalPrimes :=
+  Ideal.normalizedFactorsEquivMinimalPrimes hf
+
+private theorem readme_forwardMap {f : R} (hf : f ≠ 0)
+    (p : {p // p ∈ normalizedFactors f}) :
+    (Ideal.normalizedFactorsEquivMinimalPrimes hf p).1 = Ideal.span {p.1} := by
+  simp
+
+end GenericClassification
+
+section LocalNormalization
+
+/-! ## Local normalization: a caller's local normalization choice -/
+
+noncomputable local instance readmeNormalization (M : Type*) [CommMonoidWithZero M]
+    [UniqueFactorizationMonoid M] : StrongNormalizationMonoid M :=
+  UniqueFactorizationMonoid.strongNormalizationMonoid
+
+end LocalNormalization
 
 noncomputable section
 
@@ -41,7 +81,8 @@ private theorem natSix_normalizedFactors :
   · exact Nat.irreducible_iff_prime.mpr Nat.prime_two.prime
   · exact Nat.irreducible_iff_prime.mpr Nat.prime_three.prime
 
-private theorem natSix_classification :
+/-- The minimal primes over the natural-number ideal `(6)` are `(2)` and `(3)`. -/
+public theorem Ideal.minimalPrimes_span_nat_six :
     (Ideal.span {(6 : ℕ)}).minimalPrimes =
       {Ideal.span {(2 : ℕ)}, Ideal.span {(3 : ℕ)}} := by
   rw [Ideal.minimalPrimes_span_singleton_eq_normalizedFactors natSix_ne_zero,
@@ -51,12 +92,12 @@ private theorem natSix_classification :
 
 private theorem natSix_two_mem :
     Ideal.span {(2 : ℕ)} ∈ (Ideal.span {(6 : ℕ)}).minimalPrimes := by
-  rw [natSix_classification]
+  rw [Ideal.minimalPrimes_span_nat_six]
   simp
 
 private theorem natSix_three_mem :
     Ideal.span {(3 : ℕ)} ∈ (Ideal.span {(6 : ℕ)}).minimalPrimes := by
-  rw [natSix_classification]
+  rw [Ideal.minimalPrimes_span_nat_six]
   simp
 
 private theorem natSix_distinct : Ideal.span {(2 : ℕ)} ≠ Ideal.span {(3 : ℕ)} := by

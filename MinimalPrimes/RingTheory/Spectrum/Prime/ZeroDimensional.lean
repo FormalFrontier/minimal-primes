@@ -54,7 +54,7 @@ specialization-stable range theorem (Stacks Project, Tag 00HY). -/
 theorem isClopen_basicOpen_of_krullDimLE_zero {R : Type u} [CommSemiring R]
     [Ring.KrullDimLE 0 R] (a : R) :
     IsClopen (basicOpen a : Set (PrimeSpectrum R)) := by
-  haveI : T1Space (PrimeSpectrum R) := ⟨fun x ↦
+  have : T1Space (PrimeSpectrum R) := ⟨fun x ↦
     (isClosed_singleton_iff_isMaximal x).mpr (Ideal.isMaximal_of_isPrime x.asIdeal)⟩
   refine ⟨?_, isOpen_basicOpen⟩
   rw [← localization_away_comap_range (Localization (Submonoid.powers a)) a]
@@ -83,13 +83,13 @@ theorem t1Space_iff_krullDimLE_zero {R : Type u} [CommSemiring R] :
     T1Space (PrimeSpectrum R) ↔ Ring.KrullDimLE 0 R := by
   constructor
   · intro h
-    letI : T1Space (PrimeSpectrum R) := h
+    let : T1Space (PrimeSpectrum R) := h
     apply Ring.krullDimLE_zero_iff.mpr
     intro I hI
     exact (isClosed_singleton_iff_isMaximal ⟨I, hI⟩).mp isClosed_singleton
   · intro h
-    letI : Ring.KrullDimLE 0 R := h
-    letI : T2Space (PrimeSpectrum R) := t2Space_of_krullDimLE_zero R
+    let : Ring.KrullDimLE 0 R := h
+    let : T2Space (PrimeSpectrum R) := t2Space_of_krullDimLE_zero R
     infer_instance
 
 /-- The Zariski prime spectrum of a commutative semiring is Hausdorff exactly
@@ -99,10 +99,10 @@ theorem t2Space_iff_krullDimLE_zero {R : Type u} [CommSemiring R] :
     T2Space (PrimeSpectrum R) ↔ Ring.KrullDimLE 0 R := by
   constructor
   · intro h
-    letI : T2Space (PrimeSpectrum R) := h
+    let : T2Space (PrimeSpectrum R) := h
     exact t1Space_iff_krullDimLE_zero.mp inferInstance
   · intro h
-    letI : Ring.KrullDimLE 0 R := h
+    let : Ring.KrullDimLE 0 R := h
     exact t2Space_of_krullDimLE_zero R
 
 /-- A reduced nontrivial commutative ring of Krull dimension at most zero with
@@ -112,7 +112,7 @@ with its reduced-ring singleton-spectrum field criterion. -/
 theorem isField_of_isReduced_of_preconnectedSpace (R : Type u) [CommRing R]
     [IsReduced R] [Nontrivial R] [Ring.KrullDimLE 0 R]
     [PreconnectedSpace (PrimeSpectrum R)] : IsField R := by
-  haveI : T2Space (PrimeSpectrum R) := t2Space_of_krullDimLE_zero R
+  have : T2Space (PrimeSpectrum R) := t2Space_of_krullDimLE_zero R
   exact (subsingleton_iff_isField_of_isReduced (R := R)).mp
     (subsingleton_of_preconnected_totallyDisconnected (α := PrimeSpectrum R))
 

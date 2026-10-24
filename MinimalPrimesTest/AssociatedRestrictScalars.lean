@@ -57,6 +57,7 @@ private theorem colon_restrictScalars_annihilator
           Module.annihilator R M := Module.comap_annihilator
       _ = (⊥ : Submodule R M).colon (Set.univ : Set M) := hSource.symm
 
+/-- The `ℚ × ℚ`-module structure on `ℚ` induced by the first projection. -/
 scoped instance firstProjectionModule : Module (ℚ × ℚ) ℚ :=
   Module.compHom ℚ (RingHom.fst ℚ ℚ)
 

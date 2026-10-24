@@ -253,9 +253,10 @@ concrete types such as `ℤ` export an instance already. A generic development, 
 a type such as `MvPolynomial` that does not export a global normalization choice,
 can use the conventional noncomputable local choice:
 
-The following complete example module is stored in
-[`MinimalPrimesTest/ReadmeNormalization.lean`](../MinimalPrimesTest/ReadmeNormalization.lean).
-The named local instance is private to this module.
+**Illustrative Lean snippet.** This shows a module-local normalization choice.
+Maintained local-normalization and generic clients are in
+[`MinimalPrimesTest/NatSix.lean`](../MinimalPrimesTest/NatSix.lean).
+The instance is local to the illustrated module.
 
 ```lean
 /-
@@ -302,9 +303,12 @@ preservation of reducedness alone. Import
 `MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional` for its five
 spectrum results. `MinimalPrimes` re-exports all fourteen production leaves.
 The component equivalence has an order-dual codomain, as required by the
-underlying topology API. The tests live in
-`MinimalPrimesTest.Audit` (aggregate and boundary cases),
-`MinimalPrimesTest.LeafClient` (direct algebraic import),
+underlying topology API. The maintained integer and boundary examples live in
+[`MinimalPrimes/PrincipalExamples.lean`](../MinimalPrimes/PrincipalExamples.lean)
+and its [algebraic submodule](../MinimalPrimes/PrincipalExamples/Algebra.lean).
+Generic and local-normalization clients and the natural-number example live in
+[`MinimalPrimesTest/NatSix.lean`](../MinimalPrimesTest/NatSix.lean).
+Further tests live in
 `MinimalPrimesTest.AssociatedRestrictScalars` (including a nonsurjective
 diagonal), and `MinimalPrimesTest.AssociatedPrincipal` (quotient and zero-ring
 examples). The finite-height clients live in
@@ -388,8 +392,9 @@ noncomputable; no topological homeomorphism or arbitrary-ideal classification is
 asserted. Here is a caller-supplied generic normalization, with classification,
 equivalence, and forward-map use through the algebraic leaf alone:
 
-This complete module is stored in
-[`MinimalPrimesTest/ReadmeGeneric.lean`](../MinimalPrimesTest/ReadmeGeneric.lean).
+**Illustrative Lean snippet.** This presents the generic classification and
+forward map. Maintained generic clients are in
+[`MinimalPrimesTest/NatSix.lean`](../MinimalPrimesTest/NatSix.lean).
 The Equiv-valued construction is a definition, not a proposition.
 
 ```lean
@@ -438,8 +443,9 @@ that these are distinct proper prime ideals and that the factor equivalence send
 For ordinary integers, use the exported normalization instance; there is no
 local override in this separate client:
 
-This complete module is stored in
-[`MinimalPrimesTest/ReadmeInteger.lean`](../MinimalPrimesTest/ReadmeInteger.lean).
+**Illustrative Lean snippet.** This shows the integer specialization using
+the exported normalization instance. For maintained integer examples, see
+[`MinimalPrimes/PrincipalExamples/Algebra.lean`](../MinimalPrimes/PrincipalExamples/Algebra.lean).
 
 ```lean
 /-
@@ -471,8 +477,9 @@ private def readme_integerMinimalPrimes {f : ℤ} (hf : f ≠ 0) :
 Import the geometric leaf (or the re-exporting root) for the actual order-dual
 codomain. This client uses the ordinary integer normalization as well:
 
-This complete module is stored in
-[`MinimalPrimesTest/ReadmeComponents.lean`](../MinimalPrimesTest/ReadmeComponents.lean).
+**Illustrative Lean snippet.** This shows the factor-to-component equivalence.
+Maintained component and boundary examples are in
+[`MinimalPrimes/PrincipalExamples.lean`](../MinimalPrimes/PrincipalExamples.lean).
 
 ```lean
 /-
@@ -520,8 +527,8 @@ before any build with:
 lake exe cache get
 ```
 
-Build the default library targets, including the production, test and
-README-example modules:
+Build the default library targets, including production modules, maintained
+examples and test clients:
 
 ```sh
 lake build
@@ -539,19 +546,21 @@ lake build MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 lake build MinimalPrimesTest.Order.FiniteHeightChain MinimalPrimesTest.RingTheory.Ideal.FiniteHeightChain
 ```
 
-The prescribed linters report nonfatal "The current module only contains private
-declarations" warnings in `MinimalPrimesTest/{Audit,LeafClient,ReadmeComponents,
-ReadmeGeneric,ReadmeInteger,ReadmeNormalization,NatSix}.lean`. These modules retain
-private test clients; the full build and axiom audit include them without `--wfail`.
+The focused commands above include compatibility imports:
+`MinimalPrimesTest.Audit`, `MinimalPrimesTest.LeafClient` and the four
+`MinimalPrimesTest.Readme*` modules. They build the maintained dependencies,
+but are not the locations of the stored example declarations.
 
-The four Lean fences above are exact copies of their named source modules and are
-included by the default test-library glob. Their stored declarations, including
-local instances and Equiv-valued definitions, are part of the full proof audit.
+The four Lean fences in this guide are illustrative, not verbatim source copies
+or separate compiled test modules. Markdown fences are not audit inputs; the
+full axiom audit checks declarations in the compiled library and test modules.
 
-The audit file retains stored private generic and integer tests and
-unit/repeated/zero boundaries; it has no `#print axioms` commands. The complete
-standard-axiom audit loads the compiled private module parts and checks transitive
-axioms of stored private clients and generated declarations, including proof-field
+Stored generic clients and local normalization choices are in
+`MinimalPrimesTest.NatSix`; integer calculations are in
+`MinimalPrimes.PrincipalExamples.Algebra`; component examples and
+unit/repeated/zero boundaries are in `MinimalPrimes.PrincipalExamples`.
+The complete standard-axiom audit loads the compiled private module parts and
+checks transitive axioms of stored private clients and generated declarations, including proof-field
 declarations. It does not independently replay stored proof bodies.
 Transitive axioms must be restricted to `propext`, `Classical.choice`, and
 `Quot.sound`.

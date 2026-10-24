@@ -38,7 +38,7 @@ variable {R : Type u} [CommSemiring R] {I q : Ideal R} {x : R}
 whose product lies in `I.radical`. This holds in every commutative semiring. -/
 theorem exists_mul_mem_radical_of_mem_minimalPrimes (hq : q ∈ I.minimalPrimes)
     (hx : x ∈ q) : ∃ s ∉ q, s * x ∈ I.radical := by
-  letI : q.IsPrime := hq.isPrime
+  let : q.IsPrime := hq.isPrime
   have hxmap : algebraMap R (Localization.AtPrime q) x ∈
       I.radical.map (algebraMap R (Localization.AtPrime q)) := by
     rw [IsLocalization.map_radical q.primeCompl (Localization.AtPrime q),

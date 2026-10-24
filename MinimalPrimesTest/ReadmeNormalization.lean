@@ -4,10 +4,13 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.Principal
+public import MinimalPrimesTest.NatSix
 
-/-! # README example: a caller's local normalization choice -/
+/-!
+# Compatibility import for commutative algebra examples
 
-noncomputable local instance readmeNormalization (M : Type*) [CommMonoidWithZero M]
-    [UniqueFactorizationMonoid M] : StrongNormalizationMonoid M :=
-  UniqueFactorizationMonoid.strongNormalizationMonoid
+Use `MinimalPrimesTest.NatSix` instead. This compatibility import is retained for
+at least three months after the release introducing the module move.
+-/
+
+deprecated_module (since := "2026-10-23")

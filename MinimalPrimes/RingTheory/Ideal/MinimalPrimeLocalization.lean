@@ -37,7 +37,7 @@ theorem mem_minimalPrimes_of_radical_map_eq
     (q : Ideal R) [q.IsPrime] [IsLocalization.AtPrime A q] (I : Ideal R)
     (h : (I.map (algebraMap R A)).radical = q.map (algebraMap R A)) :
     q ∈ I.minimalPrimes := by
-  haveI : (q.map (algebraMap R A)).IsPrime :=
+  have : (q.map (algebraMap R A)).IsPrime :=
     Ideal.isPrime_map_of_isLocalizationAtPrime (S := A) q le_rfl
   have hmin : q.map (algebraMap R A) ∈ (I.map (algebraMap R A)).minimalPrimes := by
     rw [← Ideal.radical_minimalPrimes, h, Ideal.minimalPrimes_eq_subsingleton_self]

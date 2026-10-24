@@ -4,21 +4,13 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.Principal
-import Mathlib.Algebra.EuclideanDomain.Int
-import Mathlib.RingTheory.PrincipalIdealDomain
+public import MinimalPrimes.PrincipalExamples.Algebra
 
-/-! # README examples: integers with their exported normalization -/
+/-!
+# Compatibility import for principal-ideal examples
 
-open UniqueFactorizationMonoid
+Use `MinimalPrimes.PrincipalExamples.Algebra` instead. This compatibility import is retained for
+at least three months after the release introducing the module move.
+-/
 
-noncomputable section
-
-private theorem readme_integerClassification {f : ℤ} (hf : f ≠ 0) :
-    (Ideal.span {f}).minimalPrimes =
-      {P | ∃ p ∈ normalizedFactors f, P = Ideal.span {p}} :=
-  Ideal.minimalPrimes_span_singleton_eq_normalizedFactors hf
-
-private def readme_integerMinimalPrimes {f : ℤ} (hf : f ≠ 0) :
-    {p // p ∈ normalizedFactors f} ≃ (Ideal.span {f}).minimalPrimes :=
-  Ideal.normalizedFactorsEquivMinimalPrimes hf
+deprecated_module (since := "2026-10-23")

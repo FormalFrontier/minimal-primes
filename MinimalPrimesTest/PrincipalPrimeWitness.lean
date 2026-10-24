@@ -72,7 +72,7 @@ private theorem nat_six_prime_witness_contains_two_or_three :
     hprime.mem_or_mem (show (2 : ℕ) * 3 ∈ Q from h6)⟩
 
 /-- The paired witness for `2, 3, 6` contains exactly one of `2` and `3`. -/
-private theorem nat_two_three_six_paired_witness :
+public theorem Nat.exists_prime_ideal_six_mem_two_three :
     ∃ Q : Ideal ℕ, Q.IsPrime ∧ Q.IsPrincipal ∧ (6 : ℕ) ∈ Q ∧
       (((2 : ℕ) ∈ Q ∧ (3 : ℕ) ∉ Q) ∨ ((3 : ℕ) ∈ Q ∧ (2 : ℕ) ∉ Q)) := by
   obtain ⟨Q, hprime, hprincipal, h6, havoid⟩ :=
@@ -97,7 +97,7 @@ private theorem field_zero_witness_eq_bot (K : Type v) [Field K] :
     Ideal.span_singleton_zero.trans hbottom.symm, fun h => h.ne_zero rfl⟩
 
 /-- A zero-image input lies in a nonbottom contracted prime, even with source zero divisors. -/
-private theorem nat_prod_first_projection_nonbot_witness :
+public theorem Nat.exists_prime_ideal_comap_fst_ne_bot :
     ∃ Q : Ideal ℕ, Q.IsPrime ∧ Q.IsPrincipal ∧
       (Q.comap (RingHom.fst ℕ ℕ)).IsPrime ∧ (Q.comap (RingHom.fst ℕ ℕ)).IsTwoSided ∧
       ((0, 1) : ℕ × ℕ) ∈ Q.comap (RingHom.fst ℕ ℕ) ∧

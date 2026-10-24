@@ -4,9 +4,10 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
+public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 public import Mathlib.Algebra.Field.Defs
-import Mathlib.Data.ZMod.Basic
+public import Mathlib.Basic.IsEmpty.Defs
+public import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Spectrum.Prime.Noetherian
 import Mathlib.Topology.Connected.Clopen
 
@@ -50,7 +51,7 @@ private theorem domain_comparison {R : Type u} [CommSemiring R] [IsDomain R] :
     Ring.KrullDimLE 0 R ↔ IsField R := by
   constructor
   · intro h
-    letI : Ring.KrullDimLE 0 R := h
+    let : Ring.KrullDimLE 0 R := h
     exact Ring.KrullDimLE.isField_of_isDomain
   · intro h
     exact PrimeSpectrum.t1Space_iff_krullDimLE_zero.mp
@@ -59,8 +60,8 @@ private theorem domain_comparison {R : Type u} [CommSemiring R] [IsDomain R] :
 variable (K : Type u) [Field K]
 
 private theorem field_criterion : IsField K := by
-  letI : Ring.KrullDimLE 0 K := inferInstance
-  letI : PreconnectedSpace (PrimeSpectrum K) :=
+  let : Ring.KrullDimLE 0 K := inferInstance
+  let : PreconnectedSpace (PrimeSpectrum K) :=
     ⟨Set.subsingleton_univ.isPreconnected⟩
   exact PrimeSpectrum.isField_of_isReduced_of_preconnectedSpace K
 
@@ -93,19 +94,19 @@ private theorem projection_primes_ne : firstPrime K ≠ secondPrime K := by
   exact secondPrime_notMem K (h ▸ firstPrime_mem K)
 
 private theorem product_dimension : Ring.KrullDimLE 0 (K × K) := by
-  letI : IsArtinianRing (K × K) := inferInstance
+  let : IsArtinianRing (K × K) := inferInstance
   infer_instance
 
 private theorem product_clopen_separates :
     IsClopen (PrimeSpectrum.basicOpen ((1, 0) : K × K) : Set (PrimeSpectrum (K × K))) ∧
       firstPrime K ∈ PrimeSpectrum.basicOpen ((1, 0) : K × K) ∧
       secondPrime K ∉ PrimeSpectrum.basicOpen ((1, 0) : K × K) := by
-  letI : Ring.KrullDimLE 0 (K × K) := product_dimension K
+  let : Ring.KrullDimLE 0 (K × K) := product_dimension K
   exact ⟨PrimeSpectrum.isClopen_basicOpen_of_krullDimLE_zero _,
     firstPrime_mem K, secondPrime_notMem K⟩
 
 private theorem product_hausdorff : T2Space (PrimeSpectrum (K × K)) := by
-  letI : Ring.KrullDimLE 0 (K × K) := product_dimension K
+  let : Ring.KrullDimLE 0 (K × K) := product_dimension K
   exact PrimeSpectrum.t2Space_of_krullDimLE_zero (K × K)
 
 private theorem product_dimension_from_separation :
@@ -120,7 +121,7 @@ private theorem split_clopen :
 
 private theorem product_not_preconnected : ¬ PreconnectedSpace (PrimeSpectrum (K × K)) := by
   intro h
-  letI : PreconnectedSpace (PrimeSpectrum (K × K)) := h
+  let : PreconnectedSpace (PrimeSpectrum (K × K)) := h
   have hwhole := (split_clopen K).eq_univ ⟨firstPrime K, firstPrime_mem K⟩
   apply secondPrime_notMem K
   change secondPrime K ∈
@@ -137,13 +138,16 @@ private theorem product_not_field : ¬ IsField (K × K) := by
   apply (zero_ne_one : (0 : K) ≠ 1)
   simpa using congrArg Prod.snd hb
 
-private theorem product_boundary :
+/-- A product of two fields is reduced and zero-dimensional, but is not a field and has
+disconnected spectrum. -/
+public theorem field_prod_zero_dimensional :
     IsReduced (K × K) ∧ Nontrivial (K × K) ∧ Ring.KrullDimLE 0 (K × K) ∧
       ¬ PreconnectedSpace (PrimeSpectrum (K × K)) ∧ ¬ IsField (K × K) :=
   ⟨inferInstance, inferInstance, product_dimension K,
     product_not_preconnected K, product_not_field K⟩
 
-private theorem zeroRing_boundary :
+/-- The zero ring is reduced and zero-dimensional, with empty spectrum, but is not a field. -/
+public theorem zmod_one_zero_dimensional :
     IsReduced (ZMod 1) ∧ Ring.KrullDimLE 0 (ZMod 1) ∧
       IsEmpty (PrimeSpectrum (ZMod 1)) ∧ PreconnectedSpace (PrimeSpectrum (ZMod 1)) ∧
       ¬ IsField (ZMod 1) :=
@@ -155,16 +159,17 @@ private theorem zeroRing_hausdorff : T2Space (PrimeSpectrum (ZMod 1)) :=
 
 private theorem zeroRing_separation :
     T1Space (PrimeSpectrum (ZMod 1)) ∧ Ring.KrullDimLE 0 (ZMod 1) :=
-  ⟨PrimeSpectrum.t1Space_iff_krullDimLE_zero.mpr zeroRing_boundary.2.1,
+  ⟨PrimeSpectrum.t1Space_iff_krullDimLE_zero.mpr zmod_one_zero_dimensional.2.1,
     PrimeSpectrum.t2Space_iff_krullDimLE_zero.mp zeroRing_hausdorff⟩
 
 private theorem zmod_four_nonzero_nilpotent :
     (2 : ZMod 4) ≠ 0 ∧ IsNilpotent (2 : ZMod 4) :=
   ⟨by decide, ⟨2, by decide⟩⟩
 
-private theorem zmod_four_not_reduced : ¬ IsReduced (ZMod 4) := by
+/-- The ring of integers modulo four is not reduced. -/
+public theorem zmod_four_not_isReduced : ¬ IsReduced (ZMod 4) := by
   intro h
-  letI : IsReduced (ZMod 4) := h
+  let : IsReduced (ZMod 4) := h
   exact zmod_four_nonzero_nilpotent.1 zmod_four_nonzero_nilpotent.2.eq_zero
 
 end ZeroDimensionalSpectrumExamples

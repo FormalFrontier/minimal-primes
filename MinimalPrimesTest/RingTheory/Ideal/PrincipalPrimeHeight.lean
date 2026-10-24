@@ -4,7 +4,9 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
+public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
+public import Mathlib.Algebra.Field.Defs
+public import Mathlib.Algebra.MvPolynomial.Basic
 import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 import Mathlib.Algebra.MvPolynomial.Division
 import Mathlib.RingTheory.KrullDimension.NonZeroDivisors
@@ -90,7 +92,8 @@ private theorem height_span_X_zero_eq_one_of_nonZeroDivisors :
   Ideal.height_span_singleton_eq_one_of_prime_of_mem_nonZeroDivisors
     (X_zero_prime K) (X_zero_mem_nonZeroDivisors K)
 
-private theorem height_span_X_zero_eq_one :
+/-- The zeroth variable generates an ideal of height one. -/
+public theorem height_span_X_zero_eq_one :
     (Ideal.span {MvPolynomial.X 0} : Ideal (MvPolynomial ℕ K)).height = 1 :=
   Ideal.height_span_singleton_eq_one_of_prime (X_zero_prime K)
 

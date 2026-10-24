@@ -4,18 +4,13 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import MinimalPrimes.IrreducibleComponents
-import Mathlib.Algebra.EuclideanDomain.Int
-import Mathlib.RingTheory.PrincipalIdealDomain
+public import MinimalPrimes.PrincipalExamples
 
-/-! # README example: order-dual components of the integer zero locus -/
+/-!
+# Compatibility import for principal-ideal examples
 
-open UniqueFactorizationMonoid TopologicalSpace
+Use `MinimalPrimes.PrincipalExamples` instead. This compatibility import is retained for
+at least three months after the release introducing the module move.
+-/
 
-noncomputable section
-
-private def readme_integerComponents {f : ℤ} (hf : f ≠ 0) :
-    {p // p ∈ normalizedFactors f} ≃
-      (irreducibleComponents
-        (PrimeSpectrum.zeroLocus (Ideal.span {f} : Set ℤ)))ᵒᵈ :=
-  Ideal.normalizedFactorsEquivIrreducibleComponents hf
+deprecated_module (since := "2026-10-23")

@@ -123,9 +123,10 @@ Use the compatible toolchain and dependency versions recorded by that release.
 import MinimalPrimes
 ```
 
-Import a leaf from [Contents](#contents) for a smaller API. For example, the following
-complete integer module uses the exported normalization instance; it is stored in
-[`MinimalPrimesTest/ReadmeInteger.lean`](MinimalPrimesTest/ReadmeInteger.lean).
+Import a leaf from [Contents](#contents) for a smaller API. The following
+**illustrative Lean snippet**
+uses the exported integer normalization instance. Maintained integer examples
+are in [`MinimalPrimes/PrincipalExamples/Algebra.lean`](MinimalPrimes/PrincipalExamples/Algebra.lean).
 
 ```lean
 /-
@@ -173,14 +174,14 @@ dependency graph. Obtain the matching Mathlib cache before building:
 lake exe cache get
 ```
 
-Build the default production and test targets, including the README example modules:
+Build the default production and test targets, including the maintained example modules:
 
 ```sh
 lake build
 ```
 
 See the [build and audit guide](docs/Guide.md#build-and-audit) for focused module
-commands, private-client warnings and transitive-axiom coverage and limitations.
+commands, maintained examples and transitive-axiom coverage and limitations.
 The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`.
 
 ## Contents

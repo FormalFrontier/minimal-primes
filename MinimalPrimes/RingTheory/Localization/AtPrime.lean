@@ -54,7 +54,7 @@ localization correspondence and its zero-maximal-ideal criterion for `IsField`.
 For semirings, `IsField` expresses semifieldhood, without requiring additive inverses. -/
 theorem isField_iff_mem_minimalPrimes_and_isReduced :
     IsField A ↔ q ∈ minimalPrimes R ∧ IsReduced A := by
-  letI : IsLocalRing A := isLocalRing A q
+  let : IsLocalRing A := isLocalRing A q
   constructor
   · intro h
     have hm : IsLocalRing.maximalIdeal A = ⊥ :=
