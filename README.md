@@ -26,8 +26,10 @@ gives their full statements, examples, proof ideas and Mathlib dependencies.
   `I.comap f ≤ J.comap f ↔ I ≤ J` for arbitrary `I` and radical `J`.
   The map may have any type with `FunLike` and `RingHomClass` instances, in an
   independent universe. No surjectivity, uniform exponent or radicality of `I`
-  is assumed. For commutative semirings on both sides, this gives injectivity
-  of the existing `PrimeSpectrum.comap f`.
+  is assumed. For commutative semirings on both sides and a bundled homomorphism,
+  `PrimeSpectrum.isEmbedding_comap_of_pos_pow_mem_range` proves that the existing
+  `PrimeSpectrum.comap f` is a topological embedding, with independent source and
+  target universes. Its image need not be closed or the whole spectrum.
 - **Dimension under field extension.** For fields `K` and `L`, a given
   `[Algebra K L]`, and a commutative `K`-algebra `A` with
   `[Algebra.FiniteType K A]`, the
@@ -216,7 +218,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
-| [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity of spectrum pullback from the positive-power criterion. |
+| [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations
