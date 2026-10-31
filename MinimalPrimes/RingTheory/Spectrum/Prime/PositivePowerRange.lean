@@ -6,6 +6,9 @@ module
 
 public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange
 public import Mathlib.RingTheory.Spectrum.Prime.Topology
+import Mathlib.RingTheory.Ideal.Quotient.Operations
+import Mathlib.RingTheory.Spectrum.Prime.Homeomorph
+import Mathlib.Topology.Homeomorph.Lemmas
 
 /-!
 # Prime-spectrum embeddings from positive powers in the image
@@ -16,6 +19,15 @@ Injectivity follows by reflecting ideal containment in both directions, since
 prime ideals are radical. For the topology, every basic open of the source
 spectrum is the preimage of a basic open of the target spectrum. The proof uses
 Mathlib's basic-open identities and neighborhood-basis criterion.
+
+For commutative rings, pullback is a closed embedding. The proof applies
+Mathlib's spectrum homeomorphism criterion to the induced injection from the
+quotient by the kernel, then composes with the closed embedding for the quotient map.
+
+## References
+
+- Mathlib's `PrimeSpectrum.isHomeomorph_comap`, the homeomorphism criterion
+  associated with Stacks Project, Tag 0BR8.
 -/
 
 @[expose] public section
@@ -23,6 +35,8 @@ Mathlib's basic-open identities and neighborhood-basis criterion.
 universe u v
 
 namespace PrimeSpectrum
+
+section CommSemiring
 
 variable {R : Type u} {S : Type v} [CommSemiring R] [CommSemiring S]
 
@@ -83,5 +97,40 @@ theorem isEmbedding_comap_of_pos_pow_mem_range (f : R →+* S)
       exact hp
     · rw [hprea]
       exact hVU
+
+end CommSemiring
+
+section CommRing
+
+variable {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+
+/-- Pullback on prime spectra is a closed embedding if every target element has a
+positive power in the image of the ring homomorphism.
+
+Apply Mathlib's `PrimeSpectrum.isHomeomorph_comap` after quotienting by the kernel,
+then compose with the closed embedding associated to the quotient map. -/
+theorem isClosedEmbedding_comap_of_pos_pow_mem_range (f : R →+* S)
+    (hf : ∀ x : S, ∃ n : ℕ, 0 < n ∧ x ^ n ∈ Set.range f) :
+    Topology.IsClosedEmbedding (comap f) := by
+  have hzero : ∀ a : R, a ∈ RingHom.ker f → f a = 0 :=
+    fun _ ha => RingHom.mem_ker.mp ha
+  let g := Ideal.Quotient.lift (RingHom.ker f) f hzero
+  have hgpow : ∀ x : S, ∃ n : ℕ, 0 < n ∧ x ^ n ∈ g.range := by
+    intro x
+    obtain ⟨n, hn, a, ha⟩ := hf x
+    refine ⟨n, hn, RingHom.mem_range.mpr ⟨Ideal.Quotient.mk _ a, ?_⟩⟩
+    simpa only [g, Ideal.Quotient.lift_mk] using ha
+  have hginj : Function.Injective g :=
+    RingHom.lift_injective_of_ker_le_ideal (RingHom.ker f) hzero le_rfl
+  have hg := isHomeomorph_comap g hgpow (by
+    rw [(RingHom.injective_iff_ker_eq_bot g).mp hginj]
+    exact bot_le)
+  have hq := isClosedEmbedding_comap_of_surjective
+    (S := R ⧸ RingHom.ker f) (f := Ideal.Quotient.mk (RingHom.ker f))
+    (Ideal.Quotient.mk_surjective (I := RingHom.ker f))
+  rw [← Ideal.Quotient.lift_comp_mk (RingHom.ker f) f hzero, comap_comp]
+  exact hq.comp hg.isClosedEmbedding
+
+end CommRing
 
 end PrimeSpectrum

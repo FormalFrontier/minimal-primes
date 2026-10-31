@@ -10,7 +10,8 @@ public import MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange
 # Surjective compatibility for prime-spectrum pullback
 
 The positive-power criterion recovers Mathlib's topological embedding conclusion
-for pullback along a surjective homomorphism by taking exponent one.
+for pullback along a surjective homomorphism by taking exponent one. Over rings,
+the closed-embedding strengthening also makes pullback a closed map.
 -/
 
 @[expose] public section
@@ -25,3 +26,9 @@ example {R : Type u} {S : Type v} [CommSemiring R] [CommSemiring S]
   obtain ⟨a, ha⟩ := hf x
   refine ⟨1, Nat.zero_lt_one, a, ?_⟩
   simpa only [pow_one] using ha
+
+-- The ring strengthening controls images of all closed sets, not only the induced topology.
+example {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (f : R →+* S) (hf : ∀ x : S, ∃ n : ℕ, 0 < n ∧ x ^ n ∈ Set.range f) :
+    IsClosedMap (PrimeSpectrum.comap f) :=
+  (PrimeSpectrum.isClosedEmbedding_comap_of_pos_pow_mem_range f hf).isClosedMap
