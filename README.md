@@ -24,6 +24,9 @@ gives their full statements, examples, proof ideas and Mathlib dependencies.
   For a homomorphism from a semiring `R` to a commutative semiring `S`, suppose
   every `x : S` has some positive power in `Set.range f`. Then
   `I.comap f ≤ J.comap f ↔ I ≤ J` for arbitrary `I` and radical `J`.
+  For every target ideal `I`,
+  `Ideal.radical_map_comap_of_pos_pow_mem_range` also gives
+  `(Ideal.map f (Ideal.comap f I)).radical = I.radical`.
   The map may have any type with `FunLike` and `RingHomClass` instances, in an
   independent universe. No surjectivity, uniform exponent or radicality of `I`
   is assumed. For commutative semirings on both sides and a bundled homomorphism,
@@ -211,7 +214,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality detected by a localized radical. |
-| [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals when positive powers lie in the image. |
+| [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
