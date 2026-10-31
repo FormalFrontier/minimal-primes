@@ -18,6 +18,7 @@ public import MinimalPrimesTest.RingTheory.Ideal.PrincipalPrimeRegularity
 public import MinimalPrimesTest.RingTheory.Localization.AtPrime
 public import MinimalPrimesTest.RingTheory.RingHom.ULift
 public import MinimalPrimesTest.RingTheory.Spectrum.Prime.ZeroDimensional
+public import MinimalPrimesTest.RingTheory.Spectrum.Prime.PositivePowerRange
 public import MinimalPrimesTest.Topology.OpenCoverDimension
 public import MinimalPrimesTypeTests.IntegralDimension
 

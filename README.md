@@ -18,6 +18,16 @@ gives their full statements, examples, proof ideas and Mathlib dependencies.
 - **Multipliers outside a minimal prime** ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean)).
   For ideals `I`, `q` in a commutative semiring, `q ∈ I.minimalPrimes` and `x ∈ q`
   imply `∃ s ∉ q, s * x ∈ I.radical`. Over the zero ideal, the product is nilpotent.
+- **Ideal contraction and positive powers in the image**
+  ([ideals](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean),
+  [prime spectra](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean)).
+  For a homomorphism from a semiring `R` to a commutative semiring `S`, suppose
+  every `x : S` has some positive power in `Set.range f`. Then
+  `I.comap f ≤ J.comap f ↔ I ≤ J` for arbitrary `I` and radical `J`.
+  The map may have any type with `FunLike` and `RingHomClass` instances, in an
+  independent universe. No surjectivity, uniform exponent or radicality of `I`
+  is assumed. For commutative semirings on both sides, this gives injectivity
+  of the existing `PrimeSpectrum.comap f`.
 - **Dimension under field extension.** For fields `K` and `L`, a given
   `[Algebra K L]`, and a commutative `K`-algebra `A` with
   `[Algebra.FiniteType K A]`, the
@@ -199,12 +209,14 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality detected by a localized radical. |
+| [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals when positive powers lie in the image. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
+| [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations

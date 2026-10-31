@@ -13,11 +13,13 @@ public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
+public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange
 public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
 public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
+public import MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange
 public import MinimalPrimes.Topology.KrullDimension.OpenCover
 public import MinimalPrimes.RingTheory.RingHom.ULift
 
@@ -43,6 +45,9 @@ for commutative semirings and without a separate containment hypothesis.
 The localization leaves characterize field localizations at arbitrary primes of
 commutative semirings by minimality and target reducedness, and show that reducedness
 is preserved by arbitrary localization.
+The positive-power leaves show that contraction reflects containment in a radical
+right-hand ideal when every target element has a positive power in the image, and
+deduce injectivity of pullback on prime spectra of commutative semirings.
 The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
 and the reduced, nontrivial, preconnected-spectrum field criterion.
 Import a leaf directly for a smaller API.
