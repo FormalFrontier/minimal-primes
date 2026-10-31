@@ -1,7 +1,8 @@
 # Minimal primes
 
 Lean theory of minimal and associated prime ideals, localization, Krull
-dimension and finite-height prime chains. The results include semiring versions
+dimension, finite-height prime chains and prime ideals of products of semifields.
+The results include semiring versions
 of principal-ideal factorization and localization criteria, and ring-theoretic
 dimension and associated-prime comparisons.
 
@@ -10,6 +11,16 @@ dimension and associated-prime comparisons.
 The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
 and the linked module documentation for statements, examples, proof ideas and Mathlib dependencies.
 
+- **Prime ideals of arbitrary products of semifields**
+  ([module](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean)). For any dependent
+  family `K : ι → Type v` of semifields, `PrimeSpectrum.piEquivUltrafilter K`
+  identifies every prime ideal of `Π i, K i` with an ultrafilter on `ι`.
+  A function belongs to the ideal for `U` exactly when `{i | f i = 0} ∈ U`.
+  The index universe is independent of `v`, and no additive cancellation, ring,
+  finite-index or nonempty-index hypothesis is imposed. The forward ideal construction
+  works already for semiring factors, with evaluation-kernel and constant-family
+  germ-kernel bridges. Finite products have uniquely labelled coordinate kernels;
+  the cofinite ultrafilter gives non-coordinate primes on infinite index types.
 - **Minimal primes of finite products**
   ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimePi.lean)). For commutative
   semirings `R i` and a finite index type, `Ideal.mem_minimalPrimes_pi_iff`
@@ -225,6 +236,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality detected by a localized radical. |
+| [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Prime ideals of arbitrary dependent products of semifields, classified by ultrafilters. |
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |

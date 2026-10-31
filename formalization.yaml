@@ -9,6 +9,9 @@ project:
     For principal quotients in commutative rings with unique factorization, identifies
     associated primes with minimal primes over the principal ideal for every generator,
     and characterizes quotient-spectrum points by associated primes and exact annihilators.
+    For arbitrary dependent families of semifields, classifies all prime ideals of
+    the product by ultrafilters, with zero-set membership, evaluation and germ-kernel
+    bridges, and finite-coordinate and infinite non-coordinate controls.
     Associated primes also transport along compatible algebra maps. In commutative
     rings with well-founded DvdNotUnit, prime generators give principal ideals of height
     at most one, with height one for non-zero-divisors and for prime elements in domains.

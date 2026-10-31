@@ -44,6 +44,10 @@ and injective labelled spectrum map. Its finite-intersection argument follows
 the Formal Frontier Agents' formalization of prime spectra of finite products
 of commutative semirings. The evaluation transport is a specialization of the
 existing localization engine, not a new generic minimality engine.
+The classification of primes of products of semifields uses Mathlib's ideal,
+prime-spectrum, ultrafilter and germ interfaces, including its cofinite ultrafilter
+and constant-family ultraproduct. The zero-set test argument is expressed directly
+for semifields, without introducing another quotient construction.
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
