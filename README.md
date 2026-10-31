@@ -7,9 +7,20 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
-The following interfaces are implemented in this library. The [reader guide](docs/Guide.md)
-gives their full statements, examples, proof ideas and Mathlib dependencies.
+The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
+and the linked module documentation for statements, examples, proof ideas and Mathlib dependencies.
 
+- **Minimal primes of finite products**
+  ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimePi.lean)). For commutative
+  semirings `R i` and a finite index type, `Ideal.mem_minimalPrimes_pi_iff`
+  identifies minimal primes over any ideal of the product with unique labelled coordinate
+  minimal primes. `Ideal.minimalPrimesPiEquiv` gives the corresponding equivalence
+  with the dependent sum of the minimal primes over `Ideal.piOrderIso I i`.
+  Its inverse is evaluation comap, with forward/comap and evaluation-image laws.
+  The transport theorem `Ideal.comap_eval_mem_minimalPrimes_iff` works even for
+  infinite index types; it does not classify all primes of an infinite product.
+  No nonempty-index, nontrivial-factor, proper-base-ideal or ring assumptions
+  are needed. Equal factors retain distinct coordinate labels.
 - **Minimality detected by localization** ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean)).
   For commutative semirings `R`, `A` with `[Algebra R A]`, a prime ideal `q`
   and `[IsLocalization.AtPrime A q]`, any ideal `I` satisfies

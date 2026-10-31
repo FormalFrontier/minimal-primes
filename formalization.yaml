@@ -21,7 +21,12 @@ project:
     Without injectivity, the target has the dimension of the source modulo the kernel.
     A faithful integral algebra has the dimension of its base ring for its given algebra
     structure. These results use the full WithBot ℕ∞ dimension, including zero rings
-    and infinite dimension.
+    and infinite dimension. Minimal primes over arbitrary ideals of finite dependent
+    products of commutative semirings correspond to labelled coordinate minimal primes,
+    using the evaluation-image coordinates of Ideal.piOrderIso. Evaluation comap
+    transports minimality over arbitrary ideals without finiteness of the index.
+    The finite classification includes empty indices, subsingleton factors and whole
+    base ideals, and retains the labels of repeated isomorphic factors.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 

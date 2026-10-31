@@ -37,6 +37,13 @@ theorem ([Stacks Project, Tag 00OW](https://stacks.math.columbia.edu/tag/00OW)),
 flatness over fields, finite tensor-product maps, polynomial base change and
 polynomial Krull dimension, together with this library's integral-injection
 dimension comparison.
+The finite-product minimal-prime classification uses Andrew Yang's Mathlib
+minimal-prime localization correspondence, Mathlib's idempotent-localization
+criterion, product-ideal order isomorphism, finite-intersection prime criterion
+and injective labelled spectrum map. Its finite-intersection argument follows
+the Formal Frontier Agents' formalization of prime spectra of finite products
+of commutative semirings. The evaluation transport is a specialization of the
+existing localization engine, not a new generic minimality engine.
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
