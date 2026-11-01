@@ -11,7 +11,9 @@ project:
     and characterizes quotient-spectrum points by associated primes and exact annihilators.
     For arbitrary dependent families of semifields, classifies all prime ideals of
     the product by ultrafilters, with zero-set membership, evaluation and germ-kernel
-    bridges, and finite-coordinate and infinite non-coordinate controls.
+    bridges, and finite-coordinate and infinite non-coordinate controls. The same
+    equivalence is a homeomorphism for the Zariski and existing Stone topologies,
+    with both basis pullback laws and dense coordinate primes.
     Associated primes also transport along compatible algebra maps. In commutative
     rings with well-founded DvdNotUnit, prime generators give principal ideals of height
     at most one, with height one for non-zero-divisors and for prime elements in domains.
@@ -117,6 +119,8 @@ status:
     codomain, including bottom for the zero ring and top for infinite dimension.
   sorry_count: 0
   main_results:
+    - declaration: PrimeSpectrum.piHomeomorphUltrafilter
+      file: MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean
     - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
       file: MinimalPrimes/Principal.lean
     - declaration: Ideal.normalizedFactorsEquivMinimalPrimes

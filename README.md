@@ -21,6 +21,12 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   works already for semiring factors, with evaluation-kernel and constant-family
   germ-kernel bridges. Finite products have uniquely labelled coordinate kernels;
   the cofinite ultrafilter gives non-coordinate primes on infinite index types.
+  The [topological extension](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean)
+  `PrimeSpectrum.piHomeomorphUltrafilter K` retains this exact equivalence as a
+  homeomorphism for the Zariski and existing Stone topologies. Its basis pullback
+  laws use the nonzero locus and the function one on a subset and zero off it.
+  Coordinate primes are dense, even when non-coordinate primes occur; the topology
+  is not in general discrete.
 - **Minimal primes of finite products**
   ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimePi.lean)). For commutative
   semirings `R i` and a finite index type, `Ideal.mem_minimalPrimes_pi_iff`
@@ -243,6 +249,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
+| [`MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter`](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean) | Stone homeomorphism for arbitrary dependent products of semifields, basis transport and dense coordinate primes. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |

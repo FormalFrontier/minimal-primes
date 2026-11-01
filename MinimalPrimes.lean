@@ -20,6 +20,7 @@ public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
+public import MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter
 public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 public import MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange
 public import MinimalPrimes.Topology.KrullDimension.OpenCover
@@ -52,6 +53,9 @@ is preserved by arbitrary localization.
 The positive-power leaves show that contraction reflects containment in a radical
 right-hand ideal when every target element has a positive power in the image, and
 deduce injectivity of pullback on prime spectra of commutative semirings.
+The product-semifield spectrum leaf upgrades the ultrafilter classification to a
+homeomorphism for the existing Zariski and Stone topologies, with basis-transport laws
+and density of coordinate primes.
 The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
 and the reduced, nontrivial, preconnected-spectrum field criterion.
 Import a leaf directly for a smaller API.

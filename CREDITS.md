@@ -48,6 +48,12 @@ The classification of primes of products of semifields uses Mathlib's ideal,
 prime-spectrum, ultrafilter and germ interfaces, including its cofinite ultrafilter
 and constant-family ultraproduct. The zero-set test argument is expressed directly
 for semifields, without introducing another quotient construction.
+The topological extension follows that classification and uses Reid Barton's Mathlib
+ultrafilter Stone topology (whose general Stone–Čech construction also credits
+Marius Stekelenburg), Johan Commelin's prime-spectrum topology and basic-open basis,
+and Mathlib's homeomorphism and dense-embedding interfaces. Both topologies are the
+existing ones; the new proofs compare their bases and transport density of pure
+ultrafilters to coordinate primes.
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
