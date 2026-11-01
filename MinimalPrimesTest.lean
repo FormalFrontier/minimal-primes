@@ -8,6 +8,7 @@ public import MinimalPrimesIntegralDimensionModels
 public import MinimalPrimesTest.AssociatedPrincipal
 public import MinimalPrimesTest.AssociatedRestrictScalars
 public import MinimalPrimesTest.NatSix
+public import MinimalPrimesTest.ResidueFieldPiUltrafilter
 public import MinimalPrimesTest.Order.FiniteHeightChain
 public import MinimalPrimesTest.PrincipalPrimeWitness
 public import MinimalPrimesTest.RingTheory.Ideal.FiniteHeightChain

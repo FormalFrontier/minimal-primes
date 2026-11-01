@@ -5,8 +5,10 @@ Authors: Formal Frontier Agents
 module
 
 public import MinimalPrimes.RingTheory.Ideal.PiFilter
+public import Mathlib.Order.Atoms
 public import Mathlib.Order.Filter.Ultrafilter.Basic
 public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.Ideal.Maximal
 public import Mathlib.RingTheory.Spectrum.Prime.Defs
 
 /-!
@@ -14,8 +16,10 @@ public import Mathlib.RingTheory.Spectrum.Prime.Defs
 
 `Ultrafilter.piIdeal` assigns to an ultrafilter the ideal of functions whose zero set
 belongs to it. The construction works for semiring factors; it is prime for nontrivial
-factors without zero divisors. For an arbitrary dependent family of semifields,
-`PrimeSpectrum.piEquivUltrafilter` classifies all prime ideals by ultrafilters.
+factors without zero divisors. These zero-set ideals are maximal already for division
+semiring fibres, by extremality in the ideal/filter order isomorphism. For an arbitrary
+dependent family of semifields, `PrimeSpectrum.piEquivUltrafilter` classifies all prime
+ideals by ultrafilters.
 
 The inverse classification uses functions which are zero on a set and one off it.
 Intersection closure uses a disjoint-piece sum, so neither subtraction nor additive
@@ -95,6 +99,14 @@ theorem mem_piIdeal_hyperfilter_of_finite_support [Infinite ι] (f : Π i, A i)
     (hf : {i | f i ≠ 0}.Finite) : f ∈ (Filter.hyperfilter ι).piIdeal A := by
   rw [mem_piIdeal]
   simpa only [Set.compl_ofPred, not_not] using hf.compl_mem_hyperfilter
+
+/-- Extremality in the ideal/filter order isomorphism makes every ultrafilter
+zero-set ideal maximal, already for division semiring fibres. -/
+instance piIdeal_isMaximal (K : ι → Type v) [∀ i, DivisionSemiring (K i)]
+    (U : Ultrafilter ι) : (U.piIdeal K).IsMaximal := by
+  apply Ideal.isMaximal_def.mpr
+  exact ((Ideal.piOrderIsoFilter K).symm.isCoatom_iff
+    (OrderDual.toDual (U : Filter ι))).2 U.isAtom
 
 end Ultrafilter
 

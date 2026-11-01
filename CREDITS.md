@@ -58,6 +58,16 @@ Marius Stekelenburg), Johan Commelin's prime-spectrum topology and basic-open ba
 and Mathlib's homeomorphism and dense-embedding interfaces. Both topologies are the
 existing ones; the new proofs compare their bases and transport density of pure
 ultrafilters to coordinate primes.
+
+The canonical residue comparison composes Mathlib's quotient first-isomorphism
+formalization by Kenny Lau and Patrick Massot with Andrew Yang's ideal-residue-field
+and induced-map APIs, built on Mathlib's local-ring residue fields and prime
+localizations. Its dependent Product carrier and pointwise inversion follow the
+filter-germ and ultraproduct formalizations of Abhimanyu Pallavi Sudhir and Yury
+Kudryashov; the quotient algebra and descended maps reuse Antoine Chambert-Loir's
+ring-congruence interfaces. Maximality transports ultrafilter extremality through
+the existing division-semiring ideal/filter correspondence.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

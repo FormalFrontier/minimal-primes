@@ -29,6 +29,8 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   family `K : ι → Type v` of semifields, `PrimeSpectrum.piEquivUltrafilter K`
   identifies every prime ideal of `Π i, K i` with an ultrafilter on `ι`.
   A function belongs to the ideal for `U` exactly when `{i | f i = 0} ∈ U`.
+  Already for **division-semiring** fibres, `Ultrafilter.piIdeal_isMaximal` makes
+  every such ultrafilter zero-set ideal maximal, via the ideal/filter order isomorphism.
   The index universe is independent of `v`, and no additive cancellation, ring,
   finite-index or nonempty-index hypothesis is imposed. The forward ideal construction
   works already for semiring factors, with evaluation-kernel and constant-family
@@ -40,6 +42,22 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   laws use the nonzero locus and the function one on a subset and zero off it.
   Coordinate primes are dense, even when non-coordinate primes occur; the topology
   is not in general discrete.
+- **Residue fields of dependent products of fields**
+  ([module](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean)). For a
+  dependent family `K : ι → Type v` of fields and `U : Ultrafilter ι`,
+  `Ultrafilter.residueFieldProductEquiv K U` canonically identifies
+  `(U.piIdeal K).ResidueField` with the existing `(U : Filter ι).Product K`.
+  This is a ring equivalence over the section ring `R = Π i, K i`: for **every
+  section** `r`, it sends `algebraMap R (U.piIdeal K).ResidueField r` to the
+  reduced-product class of `r`. The API includes the inverse equation, uniqueness
+  from this property and its equality-of-homomorphisms form. Fibrewise field
+  homomorphisms give a commuting square with `Ideal.ResidueField.map` and
+  `Filter.Product.mapRingHom`. Index and fibre universes are independent; no
+  common characteristic, finite-index or nonempty-index hypothesis, or global
+  field instance on the Product, is required. The
+  [examples](MinimalPrimesTest/ResidueFieldPiUltrafilter.lean) check the principal
+  coordinate kernel and a dependent `ZMod 2`/`ZMod 3` family with distinct residue
+  characteristics and opposite-characteristic nonzero controls.
 - **Minimal primes of finite products**
   ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimePi.lean)). For commutative
   semirings `R i` and a finite index type, `Ideal.mem_minimalPrimes_pi_iff`
@@ -285,7 +303,8 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality detected by a localized radical. |
-| [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Prime ideals of arbitrary dependent products of semifields, classified by ultrafilters. |
+| [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Maximal ultrafilter ideals for division semirings; prime ideals of dependent products of semifields classified by ultrafilters. |
+| [`MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter`](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean) | Canonical residue-field/dependent-Product comparison over the section ring, with characteristic equations, uniqueness and fibrewise naturality. |
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
@@ -322,6 +341,13 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 - Mathlib's factorization, ideal, spectrum, localization and dimension APIs; exact
   pinned module references and the related `SchemeProperties` ring formulations
   are in the [guide](docs/Guide.md#references).
+- The dependent-product residue comparison reuses Mathlib's
+  [filter germs and dependent Product](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Order/Filter/Germ/Basic.lean),
+  [ultraproduct inversion](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Order/Filter/FilterProduct.lean),
+  [quotient first-isomorphism theorem](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/Ideal/Quotient/Operations.lean)
+  and [ideal residue-field maps](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/LocalRing/ResidueField/Ideal.lean).
+  Further algebraic dependencies are listed in the
+  [comparison module](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean).
 - Ravi Vakil, *Foundations of Algebraic Geometry*, October 21, 2025 draft, Exercise 3.7.H;
   *The Rising Sea*, Exercise 6.6.F: mathematical motivation, not authorship or endorsement.
 - Stacks Project, [Tag 00HY](https://stacks.math.columbia.edu/tag/00HY) and

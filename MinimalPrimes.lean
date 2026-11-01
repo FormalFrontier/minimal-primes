@@ -15,6 +15,7 @@ public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimePi
 public import MinimalPrimes.RingTheory.Ideal.PiFilter
 public import MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter
+public import MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange
 public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
@@ -56,7 +57,10 @@ right-hand ideal when every target element has a positive power in the image, an
 deduce injectivity of pullback on prime spectra of commutative semirings.
 The product-semifield spectrum leaf upgrades the ultrafilter classification to a
 homeomorphism for the existing Zariski and Stone topologies, with basis-transport laws
-and density of coordinate primes.
+and density of coordinate primes. Ultrafilter zero-set ideals are maximal already
+for division semiring fibres; for field fibres, the residue-field leaf identifies
+their stock residue fields with dependent reduced products over the section ring,
+compatibly with fibrewise field homomorphisms.
 The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
 and the reduced, nontrivial, preconnected-spectrum field criterion.
 Import a leaf directly for a smaller API.
