@@ -13,6 +13,7 @@ public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimePi
+public import MinimalPrimes.RingTheory.Ideal.PiFilter
 public import MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange

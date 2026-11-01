@@ -48,6 +48,10 @@ The classification of primes of products of semifields uses Mathlib's ideal,
 prime-spectrum, ultrafilter and germ interfaces, including its cofinite ultrafilter
 and constant-family ultraproduct. The zero-set test argument is expressed directly
 for semifields, without introducing another quotient construction.
+The all-ideal/filter correspondence generalizes that predecessor's zero-set tests,
+disjoint-piece sum and pointwise-inverse argument: the constructors work for
+semirings, and the classification for division semirings uses Mathlib's left ideals.
+Its finite-product comparison and germ-kernel client reuse Mathlib's existing APIs.
 The topological extension follows that classification and uses Reid Barton's Mathlib
 ultrafilter Stone topology (whose general Stone–Čech construction also credits
 Marius Stekelenburg), Johan Commelin's prime-spectrum topology and basic-open basis,

@@ -11,6 +11,19 @@ dimension and associated-prime comparisons.
 The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
 and the linked module documentation for statements, examples, proof ideas and Mathlib dependencies.
 
+- **All ideals of products and standard filters**
+  ([module](MinimalPrimes/RingTheory/Ideal/PiFilter.lean)). For a dependent family
+  `K : ι → Type v` of division semirings, `Ideal.piOrderIsoFilter K` identifies
+  `Ideal (Π i, K i)` with the order dual of `Filter ι`; in particular it applies
+  to semifields. Its characteristic law is
+  `{i | f i = 0} ∈ I.piFilter K ↔ f ∈ I`. Both constructors already work for
+  semirings, but division is used to recover every ideal. The improper filter
+  gives the whole ideal, a principal filter gives functions vanishing on its
+  generating set, and the cofinite filter gives finite support. The API includes
+  germ kernels, singly generated ideals, and compatibility with Mathlib's finite
+  coordinate-ideal classification. Index and factor universes are independent;
+  empty products are included without a nontrivial-product assumption.
+  ([examples](MinimalPrimesTest/RingTheory/Ideal/PiFilter.lean)).
 - **Prime ideals of arbitrary products of semifields**
   ([module](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean)). For any dependent
   family `K : ι → Type v` of semifields, `PrimeSpectrum.piEquivUltrafilter K`

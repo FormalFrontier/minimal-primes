@@ -14,6 +14,7 @@ public import MinimalPrimesTest.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimesTest.RingTheory.Ideal.InfiniteHeightPrimeChain
 public import MinimalPrimesTest.RingTheory.Ideal.MinimalPrimeLocalization
 public import MinimalPrimesTest.RingTheory.Ideal.PositivePowerRange
+public import MinimalPrimesTest.RingTheory.Ideal.PiFilter
 public import MinimalPrimesTest.RingTheory.Ideal.PrimePiUltrafilter
 public import MinimalPrimesTest.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimesTest.RingTheory.Ideal.PrincipalPrimeRegularity

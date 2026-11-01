@@ -4,8 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.Algebra.Ring.Pi
-public import Mathlib.Order.Filter.FilterProduct
+public import MinimalPrimes.RingTheory.Ideal.PiFilter
 public import Mathlib.Order.Filter.Ultrafilter.Basic
 public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.RingTheory.Spectrum.Prime.Defs
@@ -47,23 +46,12 @@ namespace Ultrafilter
 variable (A : ι → Type v) [∀ i, Semiring (A i)]
 
 /-- Functions whose zero set belongs to an ultrafilter form a left ideal. -/
-def piIdeal (U : Ultrafilter ι) : Ideal (Π i, A i) where
-  carrier := {f | {i | f i = 0} ∈ U}
-  zero_mem' := Filter.Eventually.of_forall fun _ => rfl
-  add_mem' := by
-    intro f g hf hg
-    exact Filter.mem_of_superset (Filter.inter_mem hf hg) fun i hi => by
-      rcases hi with ⟨hfi, hgi⟩
-      change f i = 0 at hfi
-      change g i = 0 at hgi
-      change f i + g i = 0
-      rw [hfi, hgi, zero_add]
-  smul_mem' := by
-    intro a f hf
-    exact Filter.mem_of_superset hf fun i hi => by
-      change f i = 0 at hi
-      change a i * f i = 0
-      rw [hi, mul_zero]
+def piIdeal (U : Ultrafilter ι) : Ideal (Π i, A i) :=
+  Filter.piIdeal A (U : Filter ι)
+
+/-- The old ultrafilter construction is the general filter construction. -/
+theorem piIdeal_eq_filter_piIdeal (U : Ultrafilter ι) :
+    U.piIdeal A = (U : Filter ι).piIdeal A := rfl
 
 /-- Membership in the ultrafilter ideal is exactly membership of the zero set. -/
 @[simp]
@@ -93,12 +81,8 @@ theorem piIdeal_pure (i : ι) :
 
 /-- For a constant family, the ultrafilter ideal is the kernel of the existing germ map. -/
 theorem piIdeal_eq_ker_coeRingHom (R : Type v) [Semiring R] (U : Ultrafilter ι) :
-    U.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) (U : Filter ι)) := by
-  ext f
-  rw [mem_piIdeal, RingHom.mem_ker]
-  change {i | f i = 0} ∈ U ↔
-    (f : Filter.Germ (U : Filter ι) R) = ((0 : ι → R) : Filter.Germ (U : Filter ι) R)
-  exact Filter.Germ.coe_eq.symm
+    U.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) (U : Filter ι)) :=
+  Filter.piIdeal_eq_ker_coeRingHom R (U : Filter ι)
 
 /-- A finitely supported function belongs to the ideal of the cofinite ultrafilter. -/
 theorem mem_piIdeal_hyperfilter_of_finite_support [Infinite ι] (f : Π i, A i)
@@ -120,98 +104,27 @@ namespace PrimeSpectrum
 
 variable (K : ι → Type v) [∀ i, Semifield (K i)]
 
-private noncomputable def zeroTest (s : Set ι) : Π i, K i := by
-  classical
-  exact fun i => if i ∈ s then 0 else 1
-
-private theorem zeroTest_zeroSet (s : Set ι) :
-    {i | zeroTest K s i = 0} = s := by
-  classical
-  ext i
-  by_cases hi : i ∈ s <;> simp [zeroTest, hi]
-
-private theorem zeroTest_mem_mono (p : PrimeSpectrum (Π i, K i))
-    {s t : Set ι} (hs : zeroTest K s ∈ p.asIdeal) (hst : s ⊆ t) :
-    zeroTest K t ∈ p.asIdeal := by
-  classical
-  have he : zeroTest K t = zeroTest K t * zeroTest K s := by
-    ext i
-    by_cases hs : i ∈ s
-    · simp [zeroTest, hs, hst hs]
-    · simp [zeroTest, hs]
-  rw [he]
-  exact p.asIdeal.mul_mem_left _ hs
-
-private theorem zeroTest_mem_inter (p : PrimeSpectrum (Π i, K i))
-    {s t : Set ι} (hs : zeroTest K s ∈ p.asIdeal) (ht : zeroTest K t ∈ p.asIdeal) :
-    zeroTest K (s ∩ t) ∈ p.asIdeal := by
-  classical
-  have he : zeroTest K (s ∩ t) = zeroTest K s + zeroTest K sᶜ * zeroTest K t := by
-    ext i
-    by_cases hs : i ∈ s <;> by_cases ht : i ∈ t <;> simp [zeroTest, hs, ht]
-  rw [he]
-  exact p.asIdeal.add_mem hs (p.asIdeal.mul_mem_left _ ht)
-
-private theorem zeroTest_compl_notMem_iff (p : PrimeSpectrum (Π i, K i)) (s : Set ι) :
-    zeroTest K sᶜ ∉ p.asIdeal ↔ zeroTest K s ∈ p.asIdeal := by
-  classical
-  have hm : zeroTest K s * zeroTest K sᶜ = 0 := by
-    ext i
-    by_cases hi : i ∈ s <;> simp [zeroTest, hi]
-  have ha : zeroTest K s + zeroTest K sᶜ = 1 := by
-    ext i
-    by_cases hi : i ∈ s <;> simp [zeroTest, hi]
-  constructor
-  · intro h
-    exact (p.isPrime.mem_or_mem_of_mul_eq_zero hm).resolve_right h
-  · intro hs hc
-    exact p.isPrime.one_notMem (ha ▸ p.asIdeal.add_mem hs hc)
-
 /-- The ultrafilter associated to a prime ideal of a dependent product of semifields. -/
+@[expose]
 noncomputable def piUltrafilter (p : PrimeSpectrum (Π i, K i)) : Ultrafilter ι :=
-  Ultrafilter.ofComplNotMemIff
-    { sets := {s | zeroTest K s ∈ p.asIdeal}
-      univ_sets := by
-        have he : zeroTest K Set.univ = 0 := by
-          classical
-          ext i
-          simp [zeroTest]
-        change zeroTest K Set.univ ∈ p.asIdeal
-        rw [he]
-        exact p.asIdeal.zero_mem
-      sets_of_superset := fun hs hst => zeroTest_mem_mono K p hs hst
-      inter_sets := fun hs ht => zeroTest_mem_inter K p hs ht }
-    (zeroTest_compl_notMem_iff K p)
+  Ultrafilter.ofComplNotMemIff (p.asIdeal.piFilter K)
+    (Ideal.compl_notMem_piFilter K p.asIdeal)
+
+/-- The old prime classification uses the filter of the general all-ideal construction. -/
+@[simp]
+theorem coe_piUltrafilter (p : PrimeSpectrum (Π i, K i)) :
+    (p.piUltrafilter K : Filter ι) = p.asIdeal.piFilter K := rfl
 
 /-- A zero set belongs to the associated ultrafilter exactly when its function is in the prime. -/
 @[simp]
 theorem zeroSet_mem_piUltrafilter (p : PrimeSpectrum (Π i, K i)) (f : Π i, K i) :
-    {i | f i = 0} ∈ p.piUltrafilter K ↔ f ∈ p.asIdeal := by
-  classical
-  change zeroTest K {i | f i = 0} ∈ p.asIdeal ↔ f ∈ p.asIdeal
-  have he : zeroTest K {i | f i = 0} = (fun i => (f i)⁻¹) * f := by
-    ext i
-    by_cases hi : f i = 0
-    · simp [zeroTest, hi]
-    · simp [zeroTest, hi]
-  have hf : f = f * zeroTest K {i | f i = 0} := by
-    ext i
-    by_cases hi : f i = 0 <;> simp [zeroTest, hi]
-  constructor
-  · intro h
-    exact hf.symm ▸ p.asIdeal.mul_mem_left f h
-  · intro h
-    rw [he]
-    exact p.asIdeal.mul_mem_left _ h
+    {i | f i = 0} ∈ p.piUltrafilter K ↔ f ∈ p.asIdeal :=
+  Ideal.zeroSet_mem_piFilter K p.asIdeal f
 
 /-- The all-set membership law: members contain the zero set of a function in the prime. -/
 theorem mem_piUltrafilter (p : PrimeSpectrum (Π i, K i)) (s : Set ι) :
-    s ∈ p.piUltrafilter K ↔ ∃ f : Π i, K i, f ∈ p.asIdeal ∧ {i | f i = 0} ⊆ s := by
-  constructor
-  · intro hs
-    exact ⟨zeroTest K s, hs, (zeroTest_zeroSet K s).subset⟩
-  · rintro ⟨f, hf, hfs⟩
-    exact Filter.mem_of_superset ((zeroSet_mem_piUltrafilter K p f).2 hf) hfs
+    s ∈ p.piUltrafilter K ↔ ∃ f : Π i, K i, f ∈ p.asIdeal ∧ {i | f i = 0} ⊆ s :=
+  Ideal.mem_piFilter_iff_exists_zeroSet K p.asIdeal s
 
 /-- Recovering a prime's ideal from its associated ultrafilter. -/
 @[simp]
@@ -226,8 +139,8 @@ theorem piUltrafilter_piIdeal (U : Ultrafilter ι) :
     piUltrafilter K ⟨U.piIdeal K, inferInstance⟩ = U := by
   apply Ultrafilter.ext
   intro s
-  change zeroTest K s ∈ U.piIdeal K ↔ s ∈ U
-  rw [Ultrafilter.mem_piIdeal, zeroTest_zeroSet]
+  change s ∈ ((U : Filter ι).piIdeal K).piFilter K ↔ s ∈ (U : Filter ι)
+  rw [Ideal.piFilter_piIdeal]
 
 /-- Prime ideals of an arbitrary dependent product of semifields are classified by ultrafilters. -/
 @[expose]
