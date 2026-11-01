@@ -79,6 +79,12 @@ theorem piIdeal_pure (i : ι) :
   ext f
   simp [RingHom.mem_ker]
 
+/-- The dependent section homomorphism has the existing ultrafilter zero-set ideal as kernel.
+For semifield fibres this is the prime ideal of the product-spectrum correspondence. -/
+theorem piIdeal_eq_ker_productMk (U : Ultrafilter ι) :
+    U.piIdeal A = RingHom.ker (Filter.productRingCon (U : Filter ι) A).mk' :=
+  Filter.piIdeal_eq_ker_productMk A (U : Filter ι)
+
 /-- For a constant family, the ultrafilter ideal is the kernel of the existing germ map. -/
 theorem piIdeal_eq_ker_coeRingHom (R : Type v) [Semiring R] (U : Ultrafilter ι) :
     U.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) (U : Filter ι)) :=

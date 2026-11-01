@@ -6,7 +6,7 @@ module
 
 public import Mathlib.Algebra.Ring.Pi
 public import Mathlib.Order.Filter.Cofinite
-public import Mathlib.Order.Filter.FilterProduct
+public import MinimalPrimes.Order.Filter.Product
 public import Mathlib.RingTheory.Ideal.Maps
 
 /-!
@@ -94,14 +94,20 @@ theorem piIdeal_pure (i : ι) :
   ext f
   simp [RingHom.mem_ker]
 
+/-- The section homomorphism to the dependent reduced product has the existing filter ideal
+as its kernel, for arbitrary semiring fibres and without a properness assumption. -/
+theorem piIdeal_eq_ker_productMk (F : Filter ι) :
+    F.piIdeal A = RingHom.ker (productRingCon F A).mk' := by
+  ext f
+  rw [mem_piIdeal, RingHom.mem_ker]
+  exact (Product.coe_eq_zero f).symm
+
 /-- For a constant family, the filter ideal is the kernel of the existing germ map. -/
 theorem piIdeal_eq_ker_coeRingHom (R : Type v) [Semiring R] (F : Filter ι) :
     F.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) F) := by
+  rw [piIdeal_eq_ker_productMk]
   ext f
-  rw [mem_piIdeal, RingHom.mem_ker]
-  change {i | f i = 0} ∈ F ↔
-    (f : Filter.Germ F R) = ((0 : ι → R) : Filter.Germ F R)
-  exact Filter.Germ.coe_eq.symm
+  rfl
 
 /-- The cofinite filter gives exactly the functions with finite support. -/
 theorem mem_piIdeal_cofinite (f : Π i, A i) :

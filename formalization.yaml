@@ -14,6 +14,11 @@ project:
     bridges, and finite-coordinate and infinite non-coordinate controls. The same
     equivalence is a homeomorphism for the Zariski and existing Stone topologies,
     with both basis pullback laws and dense coordinate primes.
+    For arbitrary filters and independently universed dependent semiring fibres,
+    equips the existing total-section Filter.Product with semiring operations,
+    fibrewise maps and principal-filter restriction equivalences. Ultrafilters give
+    division semirings and semifields with pointwise inversion. The section-map
+    kernels are the existing zero-set ideals, compatibly with constant-family germs.
     Associated primes also transport along compatible algebra maps. In commutative
     rings with well-founded DvdNotUnit, prime generators give principal ideals of height
     at most one, with height one for non-zero-divisors and for prime elements in domains.
