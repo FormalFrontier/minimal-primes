@@ -16,7 +16,7 @@ For arbitrary commutative semiring factors, `PrimeSpectrum.piUltrafilterMap` is
 continuous for the Zariski and Stone topologies. For commutative ring factors,
 `PrimeSpectrum.piUltrafilterFiberHomeomorph` identifies each fiber with the spectrum
 of the existing zero-set quotient. Its forward map is quotient comap, including
-when the quotient and fiber are empty.
+when the quotient is the zero ring and its spectrum and fiber are empty.
 
 For semifield factors, `PrimeSpectrum.piHomeomorphUltrafilter` upgrades the zero-set
 classification to a homeomorphism for the Zariski topology and the existing Stone
