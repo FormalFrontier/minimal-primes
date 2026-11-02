@@ -16,8 +16,10 @@ public import Mathlib.RingTheory.Spectrum.Prime.Defs
 # Ultrafilter coordinates of prime ideals of products
 
 `Ultrafilter.piIdeal` assigns to an ultrafilter the ideal of functions whose zero set
-belongs to it. The construction works for semiring factors; it is prime for nontrivial
-factors without zero divisors. These zero-set ideals are maximal already for division
+belongs to it. The construction works for semiring factors, and the ideals of distinct
+ultrafilters have join equal to the whole ideal. This uses Mathlib's ultrafilter
+disjointness API. The ideal is prime for nontrivial factors without zero divisors.
+These zero-set ideals are maximal already for division
 semiring fibres, by extremality in the ideal/filter order isomorphism. For an arbitrary
 dependent family of semifields, `PrimeSpectrum.piEquivUltrafilter` classifies all prime
 ideals by ultrafilters.
@@ -70,6 +72,14 @@ theorem piIdeal_eq_filter_piIdeal (U : Ultrafilter ι) :
 @[simp]
 theorem mem_piIdeal (U : Ultrafilter ι) (f : Π i, A i) :
     f ∈ U.piIdeal A ↔ {i | f i = 0} ∈ U := Iff.rfl
+
+/-- The zero-set ideals of distinct ultrafilters have sum equal to the whole ideal. -/
+theorem piIdeal_sup_eq_top_of_ne {U V : Ultrafilter ι} (hUV : U ≠ V) :
+    U.piIdeal A ⊔ V.piIdeal A = ⊤ := by
+  have hdisj : Disjoint (U : Filter ι) (V : Filter ι) :=
+    disjoint_iff_not_le.mpr fun hle => hUV (coe_le_coe.mp hle)
+  change (U : Filter ι).piIdeal A ⊔ (V : Filter ι).piIdeal A = ⊤
+  rw [← Filter.piIdeal_inf A, hdisj.eq_bot, Filter.piIdeal_bot]
 
 /-- A dependent index map and fibrewise homomorphisms pull back the zero-set ideal
 along the stock product homomorphism. Division semiring sources and nontrivial

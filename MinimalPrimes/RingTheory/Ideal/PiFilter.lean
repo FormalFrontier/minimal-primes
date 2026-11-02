@@ -23,6 +23,11 @@ nonempty or nontrivial-product hypothesis is needed, and the two universes are
 independent. The semiring constructors do not themselves classify all ideals:
 division is used in `Ideal.zeroSet_mem_piFilter`.
 
+For arbitrary semiring factors, the zero-set construction exchanges filter infima
+and suprema with ideal suprema and infima. The infimum-to-supremum law uses the
+reversed-order adjunction with `Ideal.piFilter`; the other law follows from zero-set
+membership. The proofs reuse Mathlib's Galois-connection and filter/submodule lattice APIs.
+
 The zero-set tests, disjoint-piece sum and pointwise inverse argument generalize
 the original prime/ultrafilter construction by Formal Frontier Agents in
 `MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`. The constructions use Mathlib's
@@ -141,7 +146,7 @@ public section
 
 open Filter
 
-universe u v
+universe u v w
 
 variable {ι : Type u}
 
@@ -306,7 +311,33 @@ end Ideal
 
 namespace Filter
 
-variable (A : ι → Type v) [∀ i, Semiring (A i)] [∀ i, Nontrivial (A i)]
+variable (A : ι → Type v) [∀ i, Semiring (A i)]
+
+/-- The zero-set ideal of an indexed infimum of filters is the supremum of their ideals. -/
+theorem piIdeal_iInf {κ : Sort w} (Fs : κ → Filter ι) :
+    (iInf Fs).piIdeal A = ⨆ j, (Fs j).piIdeal A := by
+  have gc : GaloisConnection
+      (fun F : (Filter ι)ᵒᵈ => (OrderDual.ofDual F).piIdeal A)
+      (fun I : Ideal (Π i, A i) => OrderDual.toDual (I.piFilter A)) :=
+    fun F I => Ideal.piIdeal_le_iff_piFilter_le A (OrderDual.ofDual F) I
+  exact gc.l_iSup (f := fun j => OrderDual.toDual (Fs j))
+
+/-- The zero-set ideal of an indexed supremum of filters is the infimum of their ideals. -/
+theorem piIdeal_iSup {κ : Sort w} (Fs : κ → Filter ι) :
+    (iSup Fs).piIdeal A = ⨅ j, (Fs j).piIdeal A := by
+  ext f
+  simp only [mem_piIdeal, Filter.mem_iSup, Submodule.mem_iInf]
+
+/-- The zero-set ideal of the infimum of two filters is the join of their ideals. -/
+theorem piIdeal_inf (F G : Filter ι) :
+    (F ⊓ G).piIdeal A = F.piIdeal A ⊔ G.piIdeal A := by
+  have gc : GaloisConnection
+      (fun F : (Filter ι)ᵒᵈ => (OrderDual.ofDual F).piIdeal A)
+      (fun I : Ideal (Π i, A i) => OrderDual.toDual (I.piFilter A)) :=
+    fun F I => Ideal.piIdeal_le_iff_piFilter_le A (OrderDual.ofDual F) I
+  exact gc.l_sup (a₁ := OrderDual.toDual F) (a₂ := OrderDual.toDual G)
+
+variable [∀ i, Nontrivial (A i)]
 
 /-- Zero-set ideals distinguish filters as soon as all factors are nontrivial. -/
 theorem piIdeal_injective : Function.Injective (piIdeal A) := by
