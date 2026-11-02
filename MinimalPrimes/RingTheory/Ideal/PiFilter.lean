@@ -211,6 +211,31 @@ theorem mem_piFilter (I : Ideal (Π i, A i)) (s : Set ι) :
     change zeroTest A s ∈ I
     exact he ▸ hf
 
+/-- Every function whose zero set belongs to the ideal's filter belongs to the ideal.
+This direction needs no division or nontriviality assumption on the factors. -/
+theorem piIdeal_piFilter_le (I : Ideal (Π i, A i)) :
+    (I.piFilter A).piIdeal A ≤ I := by
+  classical
+  intro f hf
+  change zeroTest A {i | f i = 0} ∈ I at hf
+  have he : f = f * zeroTest A {i | f i = 0} := by
+    ext i
+    by_cases hi : f i = 0 <;> simp [zeroTest, hi]
+  exact he.symm ▸ I.mul_mem_left f hf
+
+/-- The zero-set ideal and characteristic-test filter satisfy the reversed-order
+adjunction already for arbitrary semiring factors. -/
+theorem piIdeal_le_iff_piFilter_le (F : Filter ι) (I : Ideal (Π i, A i)) :
+    F.piIdeal A ≤ I ↔ I.piFilter A ≤ F := by
+  classical
+  constructor
+  · intro h s hs
+    change zeroTest A s ∈ I
+    apply h
+    exact Filter.mem_of_superset hs fun i hi => by simp [zeroTest, hi]
+  · intro h
+    exact (Filter.piIdeal_antitone A h).trans (piIdeal_piFilter_le A I)
+
 /-- Ideal inclusion reverses the native filter order. -/
 theorem piFilter_antitone : Antitone (piFilter A) := by
   intro I J h s hs
@@ -322,12 +347,9 @@ theorem zeroSet_mem_piFilter (I : Ideal (Π i, K i)) (f : Π i, K i) :
   have he : zeroTest K {i | f i = 0} = (fun i => (f i)⁻¹) * f := by
     ext i
     by_cases hi : f i = 0 <;> simp [zeroTest, hi]
-  have hf : f = f * zeroTest K {i | f i = 0} := by
-    ext i
-    by_cases hi : f i = 0 <;> simp [zeroTest, hi]
   constructor
   · intro h
-    exact hf.symm ▸ I.mul_mem_left f h
+    exact piIdeal_piFilter_le K I h
   · intro h
     rw [he]
     exact I.mul_mem_left _ h

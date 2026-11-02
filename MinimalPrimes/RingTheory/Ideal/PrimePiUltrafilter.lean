@@ -13,7 +13,7 @@ public import Mathlib.RingTheory.Ideal.Maximal
 public import Mathlib.RingTheory.Spectrum.Prime.Defs
 
 /-!
-# Prime ideals of products of semifields
+# Ultrafilter coordinates of prime ideals of products
 
 `Ultrafilter.piIdeal` assigns to an ultrafilter the ideal of functions whose zero set
 belongs to it. The construction works for semiring factors; it is prime for nontrivial
@@ -21,6 +21,12 @@ factors without zero divisors. These zero-set ideals are maximal already for div
 semiring fibres, by extremality in the ideal/filter order isomorphism. For an arbitrary
 dependent family of semifields, `PrimeSpectrum.piEquivUltrafilter` classifies all prime
 ideals by ultrafilters.
+
+For arbitrary commutative semiring factors, `PrimeSpectrum.piUltrafilterMap` gives
+the ultrafilter coordinate of each prime through the characteristic-test filter
+`Ideal.piFilter`. Containment of `Ultrafilter.piIdeal` characterizes a coordinate
+fiber. The semifield constructor `PrimeSpectrum.piUltrafilter` uses this same map;
+only the inverse classification needs division and nontriviality.
 
 The inverse classification uses functions which are zero on a set and one off it.
 Intersection closure uses a disjoint-piece sum, so neither subtraction nor additive
@@ -136,13 +142,73 @@ variable {ι : Type u}
 
 namespace PrimeSpectrum
 
+section CommSemiring
+
+variable (R : ι → Type v) [∀ i, CommSemiring (R i)]
+
+/-- The ultrafilter coordinate of a prime of an arbitrary dependent semiring product.
+Its underlying filter is the original characteristic-test filter of the prime ideal. -/
+@[expose]
+noncomputable def piUltrafilterMap (p : PrimeSpectrum (Π i, R i)) : Ultrafilter ι :=
+  Ultrafilter.ofComplNotMemIff (p.asIdeal.piFilter R)
+    (Ideal.compl_notMem_piFilter R p.asIdeal)
+
+/-- The coordinate retains the existing ideal-to-filter construction. -/
+@[simp]
+theorem coe_piUltrafilterMap (p : PrimeSpectrum (Π i, R i)) :
+    (piUltrafilterMap R p : Filter ι) = p.asIdeal.piFilter R := rfl
+
+open Classical in
+/-- Membership is detected by nonmembership of the one-on-set, zero-off-set function.
+No zero-set equality or nontriviality assumption on the factors is needed. -/
+theorem mem_piUltrafilterMap (p : PrimeSpectrum (Π i, R i)) (s : Set ι) :
+    s ∈ piUltrafilterMap R p ↔
+      (fun i ↦ if i ∈ s then (1 : R i) else 0) ∉ p.asIdeal := by
+  have hmem : sᶜ ∈ piUltrafilterMap R p ↔
+      (fun i ↦ if i ∈ s then (1 : R i) else 0) ∈ p.asIdeal := by
+    change sᶜ ∈ p.asIdeal.piFilter R ↔ _
+    rw [Ideal.mem_piFilter]
+    constructor
+    · rintro ⟨f, hf, hzero, hone⟩
+      have he : f = (fun i ↦ if i ∈ s then (1 : R i) else 0) := by
+        funext i
+        by_cases hi : i ∈ s
+        · simpa [hi] using hone i (by simpa using hi)
+        · simpa [hi] using hzero i hi
+      exact he ▸ hf
+    · intro hf
+      refine ⟨_, hf, ?_, ?_⟩
+      · intro i hi
+        simp only [Set.mem_compl_iff] at hi
+        simp [hi]
+      · intro i hi
+        have his : i ∈ s := by simpa only [Set.mem_compl_iff, not_not] using hi
+        simp [his]
+  exact Ultrafilter.compl_notMem_iff.symm.trans (not_congr hmem)
+
+/-- The zero-set ideal is contained in a prime precisely when its coordinate is the
+specified ultrafilter, including when some or all factors are zero semirings. -/
+theorem piIdeal_le_asIdeal_iff_piUltrafilterMap_eq (U : Ultrafilter ι)
+    (p : PrimeSpectrum (Π i, R i)) :
+    U.piIdeal R ≤ p.asIdeal ↔ piUltrafilterMap R p = U := by
+  change (U : Filter ι).piIdeal R ≤ p.asIdeal ↔ _
+  rw [Ideal.piIdeal_le_iff_piFilter_le]
+  change (piUltrafilterMap R p : Filter ι) ≤ (U : Filter ι) ↔ _
+  exact Ultrafilter.coe_le_coe
+
+end CommSemiring
+
 variable (K : ι → Type v) [∀ i, Semifield (K i)]
 
 /-- The ultrafilter associated to a prime ideal of a dependent product of semifields. -/
 @[expose]
 noncomputable def piUltrafilter (p : PrimeSpectrum (Π i, K i)) : Ultrafilter ι :=
-  Ultrafilter.ofComplNotMemIff (p.asIdeal.piFilter K)
-    (Ideal.compl_notMem_piFilter K p.asIdeal)
+  piUltrafilterMap K p
+
+/-- The general coordinate specializes to the original semifield entry point. -/
+@[simp]
+theorem piUltrafilterMap_eq_piUltrafilter :
+    piUltrafilterMap K = piUltrafilter K := rfl
 
 /-- The old prime classification uses the filter of the general all-ideal construction. -/
 @[simp]

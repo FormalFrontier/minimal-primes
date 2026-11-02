@@ -10,10 +10,17 @@ public import Mathlib.Topology.Compactification.StoneCech
 import Mathlib.Topology.Homeomorph.Lemmas
 
 /-!
-# Stone topology on spectra of products of semifields
+# Ultrafilter coordinates and fibers of product spectra
 
-`PrimeSpectrum.piHomeomorphUltrafilter` upgrades the zero-set classification to a
-homeomorphism for the Zariski topology and the existing Stone topology on ultrafilters.
+For arbitrary commutative semiring factors, `PrimeSpectrum.piUltrafilterMap` is
+continuous for the Zariski and Stone topologies. For commutative ring factors,
+`PrimeSpectrum.piUltrafilterFiberHomeomorph` identifies each fiber with the spectrum
+of the existing zero-set quotient. Its forward map is quotient comap, including
+when the quotient and fiber are empty.
+
+For semifield factors, `PrimeSpectrum.piHomeomorphUltrafilter` upgrades the zero-set
+classification to a homeomorphism for the Zariski topology and the existing Stone
+topology on ultrafilters.
 Its underlying equivalence is `PrimeSpectrum.piEquivUltrafilter`.
 
 The inverse image of a Zariski basic open is the Stone basic set of the nonzero locus.
@@ -23,7 +30,8 @@ directions without changing either topology. Coordinate primes form a dense subs
 even when non-coordinate primes occur.
 
 The index and factor universes are independent. Neither finiteness nor nonemptiness
-of the index, nor additive inverses in the factors, are required.
+of the index is required. The coordinate and semifield classification need no
+additive inverses; the quotient-fiber theorem assumes commutative ring factors.
 
 ## References
 
@@ -43,7 +51,114 @@ universe u v w x
 
 namespace PrimeSpectrum
 
-variable {ι : Type u} (K : ι → Type v) [∀ i, Semifield (K i)]
+variable {ι : Type u}
+
+section CommSemiring
+
+variable (R : ι → Type v) [∀ i, CommSemiring (R i)]
+
+open Classical in
+/-- A Stone membership basic set pulls back to the Zariski basic open of its
+one-on-set, zero-off-set function. -/
+theorem piUltrafilterMap_preimage_mem (s : Set ι) :
+    piUltrafilterMap R ⁻¹' {U : Ultrafilter ι | s ∈ U} =
+      (basicOpen (fun i ↦ if i ∈ s then (1 : R i) else 0) :
+        Set (PrimeSpectrum (Π i, R i))) := by
+  ext p
+  exact mem_piUltrafilterMap R p s
+
+/-- The canonical ultrafilter coordinate is continuous, without nontriviality,
+nonemptiness or finiteness hypotheses on the factors or index. -/
+theorem continuous_piUltrafilterMap : Continuous (piUltrafilterMap R) := by
+  apply ultrafilterBasis_is_basis.continuous_iff.mpr
+  rintro _ ⟨s, rfl⟩
+  change IsOpen (piUltrafilterMap R ⁻¹' {U : Ultrafilter ι | s ∈ U})
+  rw [piUltrafilterMap_preimage_mem]
+  exact isOpen_basicOpen
+
+/-- Coordinate comap has the corresponding principal ultrafilter coordinate,
+even when the selected factor is a zero semiring. -/
+@[simp]
+theorem piUltrafilterMap_comap_evalRingHom (i : ι) (p : PrimeSpectrum (R i)) :
+    piUltrafilterMap R (comap (Pi.evalRingHom R i) p) = pure i := by
+  apply (piIdeal_le_asIdeal_iff_piUltrafilterMap_eq R (pure i) _).1
+  rw [Ultrafilter.piIdeal_pure]
+  intro f hf
+  change f i = 0 at hf
+  change f i ∈ p.asIdeal
+  rw [hf]
+  exact p.asIdeal.zero_mem
+
+end CommSemiring
+
+section CommRing
+
+variable (R : ι → Type v) [∀ i, CommRing (R i)]
+
+/-- The range of quotient comap is exactly the prescribed ultrafilter fiber. -/
+theorem range_comap_piIdeal_quotient (U : Ultrafilter ι) :
+    Set.range (comap (Ideal.Quotient.mk (U.piIdeal R))) =
+      {p : PrimeSpectrum (Π i, R i) | piUltrafilterMap R p = U} := by
+  rw [_root_.range_comap_of_surjective _ _ Ideal.Quotient.mk_surjective, Ideal.mk_ker]
+  ext p
+  change U.piIdeal R ≤ p.asIdeal ↔ piUltrafilterMap R p = U
+  exact piIdeal_le_asIdeal_iff_piUltrafilterMap_eq R U p
+
+/-- Quotient comap canonically identifies the spectrum of the existing zero-set
+quotient with its ultrafilter fiber, with the inherited subtype topology. Neither
+the ideal nor the quotient is assumed proper, prime or nontrivial. -/
+noncomputable def piUltrafilterFiberHomeomorph (U : Ultrafilter ι) :
+    PrimeSpectrum ((Π i, R i) ⧸ U.piIdeal R) ≃ₜ
+      {p : PrimeSpectrum (Π i, R i) // piUltrafilterMap R p = U} :=
+  (isEmbedding_comap_of_surjective _ (Ideal.Quotient.mk (U.piIdeal R))
+    Ideal.Quotient.mk_surjective).toHomeomorph.trans
+      (Homeomorph.setCongr (range_comap_piIdeal_quotient R U))
+
+/-- The forward value is exactly the canonical quotient comap. -/
+@[simp]
+theorem piUltrafilterFiberHomeomorph_apply_val (U : Ultrafilter ι)
+    (x : PrimeSpectrum ((Π i, R i) ⧸ U.piIdeal R)) :
+    (piUltrafilterFiberHomeomorph R U x).val =
+      comap (Ideal.Quotient.mk (U.piIdeal R)) x := rfl
+
+/-- The inverse prime has the image of the fiber prime as its underlying ideal. -/
+@[simp]
+theorem piUltrafilterFiberHomeomorph_symm_asIdeal (U : Ultrafilter ι)
+    (p : {p : PrimeSpectrum (Π i, R i) // piUltrafilterMap R p = U}) :
+    ((piUltrafilterFiberHomeomorph R U).symm p).asIdeal =
+      Ideal.map (Ideal.Quotient.mk (U.piIdeal R)) p.val.asIdeal := by
+  have h : comap (Ideal.Quotient.mk (U.piIdeal R))
+      ((piUltrafilterFiberHomeomorph R U).symm p) = p.val := by
+    calc
+      _ = (piUltrafilterFiberHomeomorph R U
+          ((piUltrafilterFiberHomeomorph R U).symm p)).val :=
+        (piUltrafilterFiberHomeomorph_apply_val R U _).symm
+      _ = p.val :=
+        congrArg Subtype.val ((piUltrafilterFiberHomeomorph R U).apply_symm_apply p)
+  have hI := congrArg (fun x : PrimeSpectrum (Π i, R i) => x.asIdeal) h
+  calc
+    _ = Ideal.map (Ideal.Quotient.mk (U.piIdeal R))
+        (Ideal.comap (Ideal.Quotient.mk (U.piIdeal R))
+          ((piUltrafilterFiberHomeomorph R U).symm p).asIdeal) :=
+      (Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective _).symm
+    _ = _ := congrArg (Ideal.map (Ideal.Quotient.mk (U.piIdeal R))) hI
+
+/-- Evaluation comap identifies a factor spectrum with the principal fiber.
+Together with the surjective-comap embedding, this gives the canonical
+homeomorphism onto that fiber, including when the factor is a zero ring. -/
+theorem range_comap_evalRingHom (i : ι) :
+    Set.range (comap (Pi.evalRingHom R i)) =
+      {p : PrimeSpectrum (Π i, R i) | piUltrafilterMap R p = pure i} := by
+  rw [_root_.range_comap_of_surjective _ _ (Function.surjective_eval _)]
+  ext p
+  change RingHom.ker (Pi.evalRingHom R i) ≤ p.asIdeal ↔
+    piUltrafilterMap R p = pure i
+  rw [← Ultrafilter.piIdeal_pure R i]
+  exact piIdeal_le_asIdeal_iff_piUltrafilterMap_eq R (pure i) p
+
+end CommRing
+
+variable (K : ι → Type v) [∀ i, Semifield (K i)]
 
 private theorem piEquivUltrafilter_symm_preimage_basicOpen (f : Π i, K i) :
     (piEquivUltrafilter K).symm ⁻¹' (basicOpen f : Set (PrimeSpectrum (Π i, K i))) =
@@ -60,23 +175,14 @@ private theorem piEquivUltrafilter_preimage_mem (s : Set ι) :
         Set (PrimeSpectrum (Π i, K i))) := by
   ext p
   change s ∈ p.piUltrafilter K ↔ (fun i ↦ if i ∈ s then (1 : K i) else 0) ∉ p.asIdeal
-  have hz : {i | (if i ∈ s then (1 : K i) else 0) = 0} = sᶜ := by
-    ext i
-    by_cases hi : i ∈ s <;> simp [hi]
-  rw [← zeroSet_mem_piUltrafilter K p, hz]
-  exact Ultrafilter.compl_notMem_iff.symm
+  exact mem_piUltrafilterMap K p s
 
 /-- The prime spectrum of an arbitrary dependent product of semifields is homeomorphic
 to the ultrafilter space with its existing Stone topology. The equivalence is the
 zero-set classification `piEquivUltrafilter`. -/
 noncomputable def piHomeomorphUltrafilter : PrimeSpectrum (Π i, K i) ≃ₜ Ultrafilter ι where
   toEquiv := piEquivUltrafilter K
-  continuous_toFun := by
-    apply ultrafilterBasis_is_basis.continuous_iff.mpr
-    rintro _ ⟨s, rfl⟩
-    change IsOpen (piEquivUltrafilter K ⁻¹' {U : Ultrafilter ι | s ∈ U})
-    rw [piEquivUltrafilter_preimage_mem]
-    exact isOpen_basicOpen
+  continuous_toFun := continuous_piUltrafilterMap K
   continuous_invFun := by
     apply isTopologicalBasis_basic_opens.continuous_iff.mpr
     rintro _ ⟨f, rfl⟩
@@ -94,6 +200,10 @@ theorem piHomeomorphUltrafilter_toEquiv :
 @[simp]
 theorem piHomeomorphUltrafilter_apply (p : PrimeSpectrum (Π i, K i)) :
     piHomeomorphUltrafilter K p = p.piUltrafilter K := rfl
+
+/-- The general coordinate agrees with the legacy Stone homeomorphism. -/
+theorem piUltrafilterMap_eq_piHomeomorphUltrafilter (p : PrimeSpectrum (Π i, K i)) :
+    piUltrafilterMap K p = piHomeomorphUltrafilter K p := rfl
 
 /-- The inverse map has precisely the existing ultrafilter ideal. -/
 @[simp]

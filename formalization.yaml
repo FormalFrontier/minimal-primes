@@ -40,6 +40,22 @@ project:
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
+highlights:
+  - title: Prime spectra of products of semifields
+    statement: >-
+      The prime spectrum of an arbitrary dependent product of semifields is
+      canonically homeomorphic to the Stone space of ultrafilters on its index type.
+    declarations:
+      - declaration: PrimeSpectrum.piHomeomorphUltrafilter
+        file: MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean
+  - title: Ideals in products of division semirings
+    statement: >-
+      Every left ideal of an arbitrary dependent product of division semirings
+      is the zero-set ideal of its characteristic-test filter.
+    declarations:
+      - declaration: Ideal.piIdeal_piFilter
+        file: MinimalPrimes/RingTheory/Ideal/PiFilter.lean
+
 sources:
   - title: Foundations of Algebraic Geometry
     authors: [Ravi Vakil]
