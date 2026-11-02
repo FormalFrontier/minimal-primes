@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import MinimalPrimes.RingTheory.Ideal.PiFilter
+public import Mathlib.Algebra.GroupWithZero.Units.Lemmas
 public import Mathlib.Order.Atoms
 public import Mathlib.Order.Filter.Ultrafilter.Basic
 public import Mathlib.RingTheory.Ideal.Maps
@@ -41,7 +42,7 @@ finite-product comparison is the coordinate-ideal viewpoint also used in
 
 open Set Filter
 
-universe u v
+universe u v w x
 
 variable {ι : Type u}
 
@@ -61,6 +62,21 @@ theorem piIdeal_eq_filter_piIdeal (U : Ultrafilter ι) :
 @[simp]
 theorem mem_piIdeal (U : Ultrafilter ι) (f : Π i, A i) :
     f ∈ U.piIdeal A ↔ {i | f i = 0} ∈ U := Iff.rfl
+
+/-- A dependent index map and fibrewise homomorphisms pull back the zero-set ideal
+along the stock product homomorphism. Division semiring sources and nontrivial
+semiring targets suffice: the fibre maps automatically reflect zero. -/
+theorem piIdeal_map_comap_piRingHom {κ : Type w}
+    (K : ι → Type v) [∀ i, DivisionSemiring (K i)]
+    {L : κ → Type x} [∀ j, Semiring (L j)] [∀ j, Nontrivial (L j)]
+    (g : κ → ι) (U : Ultrafilter κ) (φ : ∀ j, K (g j) →+* L j) :
+    (U.map g).piIdeal K = (U.piIdeal L).comap
+      (RingHom.pi fun j => (φ j).comp (Pi.evalRingHom K (g j))) := by
+  ext r
+  change {i | r i = 0} ∈ U.map g ↔ {j | φ j (r (g j)) = 0} ∈ U
+  rw [Ultrafilter.mem_map]
+  change {j | r (g j) = 0} ∈ U ↔ {j | φ j (r (g j)) = 0} ∈ U
+  simp only [map_eq_zero]
 
 instance piIdeal_isPrime [∀ i, Nontrivial (A i)] [∀ i, NoZeroDivisors (A i)]
     (U : Ultrafilter ι) : (U.piIdeal A).IsPrime where

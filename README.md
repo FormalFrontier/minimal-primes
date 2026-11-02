@@ -41,7 +41,11 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   homeomorphism for the Zariski and existing Stone topologies. Its basis pullback
   laws use the nonzero locus and the function one on a subset and zero off it.
   Coordinate primes are dense, even when non-coordinate primes occur; the topology
-  is not in general discrete.
+  is not in general discrete. For an arbitrary index map `g : κ → ι` and fibrewise
+  semifield homomorphisms `φ j : K (g j) →+* L j`, spectral pullback along the stock
+  product homomorphism corresponds to `Ultrafilter.map g`. The API includes the
+  inverse square, index precomposition and same-index family-map specializations;
+  the index and fibre universes are independent, with no injectivity or finiteness assumption.
 - **Residue fields of dependent products of fields**
   ([module](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean)). For a
   dependent family `K : ι → Type v` of fields and `U : Ultrafilter ι`,

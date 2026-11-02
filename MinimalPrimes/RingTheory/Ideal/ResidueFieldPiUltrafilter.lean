@@ -112,22 +112,12 @@ section Naturality
 
 variable {L : ι → Type w} [∀ i, Field (L i)]
 
-/-- Fibrewise field maps reflect zero and pull back the corresponding zero-set ideal. -/
+/-- Fibrewise field maps pull back the zero-set ideal. The exact legacy telescope
+is retained; `piIdeal_map_comap_piRingHom` provides the weaker, general-index core. -/
 theorem piIdeal_comap_piRingHom (φ : ∀ i, K i →+* L i) :
     U.piIdeal K = (U.piIdeal L).comap
       (RingHom.pi fun i => (φ i).comp (Pi.evalRingHom K i)) := by
-  ext r
-  change {i | r i = 0} ∈ U ↔ {i | φ i (r i) = 0} ∈ U
-  have hz : {i | r i = 0} = {i | φ i (r i) = 0} := by
-    ext i
-    change r i = 0 ↔ φ i (r i) = 0
-    constructor
-    · intro h
-      rw [h, map_zero]
-    · intro h
-      apply (φ i).injective
-      simpa only [map_zero] using h
-  rw [hz]
+  simpa only [Ultrafilter.map_id, id_eq] using piIdeal_map_comap_piRingHom K id U φ
 
 /-- The same canonical comparison commutes with the stock fibrewise maps. -/
 @[simp]
@@ -136,7 +126,10 @@ theorem residueFieldProductEquiv_map (φ : ∀ i, K i →+* L i)
     residueFieldProductEquiv L U
       (Ideal.ResidueField.map (U.piIdeal K) (U.piIdeal L)
         (RingHom.pi fun i => (φ i).comp (Pi.evalRingHom K i))
-        (piIdeal_comap_piRingHom K U φ) x) =
+        -- Keep this consumer explicit to exercise the legacy universe/class interface.
+        (@piIdeal_comap_piRingHom.{u, v, w} ι K
+          (inferInstance : ∀ i, Field (K i)) U L
+          (inferInstance : ∀ i, Field (L i)) φ) x) =
       Filter.Product.mapRingHom (U : Filter ι) φ (residueFieldProductEquiv K U x) := by
   obtain ⟨r, rfl⟩ := Ideal.algebraMap_residueField_surjective (U.piIdeal K) x
   rw [Ideal.ResidueField.map_algebraMap, residueFieldProductEquiv_algebraMap,

@@ -39,7 +39,7 @@ formalization by Johan Commelin. We use Mathlib's homeomorphism and dense-embedd
 
 open Set Filter
 
-universe u v
+universe u v w x
 
 namespace PrimeSpectrum
 
@@ -143,5 +143,53 @@ theorem denseRange_piHomeomorphUltrafilter_symm_pure :
   change Dense (Set.range ((piHomeomorphUltrafilter K).symm ∘ (pure : ι → Ultrafilter ι)))
   rw [Set.range_comp]
   exact (piHomeomorphUltrafilter K).symm.isDenseEmbedding.dense_image.mpr denseRange_pure
+
+section Naturality
+
+variable {κ : Type w} (L : κ → Type x) [∀ j, Semifield (L j)]
+
+/-- The spectrum-to-ultrafilter homeomorphism is natural for dependent index maps
+and fibrewise semifield homomorphisms. No injectivity of either the index map or
+the product homomorphism is required. -/
+theorem piHomeomorphUltrafilter_comap_piRingHom (g : κ → ι)
+    (φ : ∀ j, K (g j) →+* L j) (p : PrimeSpectrum (Π j, L j)) :
+    piHomeomorphUltrafilter K
+        (comap (RingHom.pi fun j => (φ j).comp (Pi.evalRingHom K (g j))) p) =
+      Ultrafilter.map g (piHomeomorphUltrafilter L p) := by
+  apply piIdeal_injective K
+  simpa only [piHomeomorphUltrafilter_apply, piIdeal_piUltrafilter, comap_asIdeal] using
+    (Ultrafilter.piIdeal_map_comap_piRingHom K g (p.piUltrafilter L) φ).symm
+
+/-- The inverse classification carries ultrafilter pushforward to spectral pullback. -/
+@[simp]
+theorem comap_piHomeomorphUltrafilter_symm (g : κ → ι)
+    (φ : ∀ j, K (g j) →+* L j) (U : Ultrafilter κ) :
+    comap (RingHom.pi fun j => (φ j).comp (Pi.evalRingHom K (g j)))
+        ((piHomeomorphUltrafilter L).symm U) =
+      (piHomeomorphUltrafilter K).symm (Ultrafilter.map g U) := by
+  apply (piHomeomorphUltrafilter K).injective
+  rw [piHomeomorphUltrafilter_comap_piRingHom K L]
+  simp
+
+end Naturality
+
+/-- Precomposition of dependent sections corresponds to pushforward of ultrafilters. -/
+theorem piHomeomorphUltrafilter_comap_precomp {κ : Type w} (g : κ → ι)
+    (p : PrimeSpectrum (Π j, K (g j))) :
+    piHomeomorphUltrafilter K (comap (RingHom.pi fun j => Pi.evalRingHom K (g j)) p) =
+      Ultrafilter.map g (piHomeomorphUltrafilter (fun j => K (g j)) p) := by
+  simpa only [RingHom.id_comp] using
+    piHomeomorphUltrafilter_comap_piRingHom K (fun j => K (g j)) g
+      (fun j => RingHom.id (K (g j))) p
+
+/-- Fibrewise semifield homomorphisms preserve the ultrafilter coordinate. -/
+theorem piHomeomorphUltrafilter_comap_piRingHom_sameIndex
+    {L : ι → Type w} [∀ i, Semifield (L i)] (φ : ∀ i, K i →+* L i)
+    (p : PrimeSpectrum (Π i, L i)) :
+    piHomeomorphUltrafilter K
+        (comap (RingHom.pi fun i => (φ i).comp (Pi.evalRingHom K i)) p) =
+      piHomeomorphUltrafilter L p := by
+  simpa only [Ultrafilter.map_id, id_eq] using
+    piHomeomorphUltrafilter_comap_piRingHom K L id φ p
 
 end PrimeSpectrum
