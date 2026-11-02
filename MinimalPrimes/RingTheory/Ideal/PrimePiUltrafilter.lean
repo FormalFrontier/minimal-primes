@@ -25,7 +25,9 @@ ideals by ultrafilters.
 For arbitrary commutative semiring factors, `PrimeSpectrum.piUltrafilterMap` gives
 the ultrafilter coordinate of each prime through the characteristic-test filter
 `Ideal.piFilter`. Containment of `Ultrafilter.piIdeal` characterizes a coordinate
-fiber. The semifield constructor `PrimeSpectrum.piUltrafilter` uses this same map;
+fiber. Its image consists exactly of the ultrafilters containing the set of
+nontrivial factors, and it is surjective exactly when every factor is nontrivial.
+The semifield constructor `PrimeSpectrum.piUltrafilter` uses this same map;
 only the inverse classification needs division and nontriviality.
 
 The inverse classification uses functions which are zero on a set and one off it.
@@ -83,6 +85,23 @@ theorem piIdeal_map_comap_piRingHom {κ : Type w}
   rw [Ultrafilter.mem_map]
   change {j | r (g j) = 0} ∈ U ↔ {j | φ j (r (g j)) = 0} ∈ U
   simp only [map_eq_zero]
+
+/-- The zero-set ideal is proper exactly when the nontrivial factors form a member
+of the ultrafilter. This criterion allows arbitrary semiring factors. -/
+theorem piIdeal_ne_top_iff (U : Ultrafilter ι) :
+    U.piIdeal A ≠ ⊤ ↔ {i | Nontrivial (A i)} ∈ U := by
+  have hz : {i | (1 : Π i, A i) i = 0} = {i | Nontrivial (A i)}ᶜ := by
+    ext i
+    change (1 : A i) = 0 ↔ ¬ Nontrivial (A i)
+    constructor
+    · intro h hnt
+      let := hnt
+      exact one_ne_zero h
+    · intro h
+      let : Subsingleton (A i) := not_nontrivial_iff_subsingleton.mp h
+      exact Subsingleton.elim _ _
+  rw [Ideal.ne_top_iff_one, mem_piIdeal, hz]
+  exact Ultrafilter.compl_notMem_iff
 
 instance piIdeal_isPrime [∀ i, Nontrivial (A i)] [∀ i, NoZeroDivisors (A i)]
     (U : Ultrafilter ι) : (U.piIdeal A).IsPrime where
@@ -195,6 +214,45 @@ theorem piIdeal_le_asIdeal_iff_piUltrafilterMap_eq (U : Ultrafilter ι)
   rw [Ideal.piIdeal_le_iff_piFilter_le]
   change (piUltrafilterMap R p : Filter ι) ≤ (U : Filter ι) ↔ _
   exact Ultrafilter.coe_le_coe
+
+/-- An ultrafilter occurs as a prime's coordinate exactly when it contains the set
+of nontrivial factors. No nontriviality assumption on the whole family is needed. -/
+theorem mem_range_piUltrafilterMap (U : Ultrafilter ι) :
+    U ∈ Set.range (piUltrafilterMap R) ↔ {i | Nontrivial (R i)} ∈ U := by
+  constructor
+  · rintro ⟨p, hp⟩
+    apply (Ultrafilter.piIdeal_ne_top_iff R U).1
+    have hle := (piIdeal_le_asIdeal_iff_piUltrafilterMap_eq R U p).2 hp
+    intro htop
+    apply p.isPrime.ne_top
+    apply top_unique
+    rw [← htop]
+    exact hle
+  · intro hU
+    obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (U.piIdeal R)
+      ((Ultrafilter.piIdeal_ne_top_iff R U).2 hU)
+    exact ⟨⟨M, hM.isPrime⟩,
+      (piIdeal_le_asIdeal_iff_piUltrafilterMap_eq R U ⟨M, hM.isPrime⟩).1 hle⟩
+
+/-- The exact image of the ultrafilter coordinate map for arbitrary commutative
+semiring factors. -/
+theorem range_piUltrafilterMap :
+    Set.range (piUltrafilterMap R) = {U | {i | Nontrivial (R i)} ∈ U} := by
+  ext U
+  exact mem_range_piUltrafilterMap R U
+
+/-- The ultrafilter coordinate map is surjective exactly when every factor is
+nontrivial, including the vacuous case of an empty index type. -/
+theorem piUltrafilterMap_surjective_iff :
+    Function.Surjective (piUltrafilterMap R) ↔ ∀ i, Nontrivial (R i) := by
+  constructor
+  · intro h i
+    exact Ultrafilter.mem_pure.1 ((mem_range_piUltrafilterMap R (pure i)).1 (h _))
+  · intro h U
+    apply (mem_range_piUltrafilterMap R U).2
+    have hD : {i | Nontrivial (R i)} = Set.univ := Set.eq_univ_of_forall h
+    rw [hD]
+    exact Filter.univ_mem
 
 end CommSemiring
 
