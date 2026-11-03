@@ -6,6 +6,7 @@ module
 
 public import Mathlib.GroupTheory.Submonoid.Center
 public import Mathlib.Order.Filter.Germ.Basic
+public import MinimalPrimes.Order.Filter.Center
 public import MinimalPrimes.Order.Filter.Germ.Map
 
 /-!
@@ -45,39 +46,17 @@ variable {ι : Type u} {M : Type v}
 is central eventually. This includes improper filters and empty types. -/
 theorem mem_center_coe_iff [Mul M] (D : Filter ι) (f : ι → M) :
     (f : Germ D M) ∈ Set.center (Germ D M) ↔ ∀ᶠ i in D, f i ∈ Set.center M := by
-  classical
-  -- A diagonal choice turns tests against all varying arguments into eventual
-  -- universal quantification. A supplied function handles empty codomains too.
-  have diagonal {A : Type v} (a : ι → A) (P : ι → A → Prop)
-      (h : ∀ b : ι → A, ∀ᶠ i in D, P i (b i)) : ∀ᶠ i in D, ∀ b, P i b := by
-    have hex (i : ι) : ∃ b : A, P i b → ∀ c, P i c := by
-      by_cases hi : ∀ b, P i b
-      · exact ⟨a i, fun _ => hi⟩
-      · obtain ⟨b, hb⟩ := not_forall.mp hi
-        exact ⟨b, fun h => (hb h).elim⟩
-    choose b hb using hex
-    exact (h b).mono fun i hi => hb i hi
   simp only [Set.mem_center_iff]
   constructor
   · intro h
-    have hc : ∀ᶠ i in D, ∀ a, Commute (f i) a := by
-      apply diagonal f
-      intro a
+    apply (Filter.eventually_mem_center_iff D f).2
+    refine ⟨?_, ?_, ?_⟩
+    · intro a
       simpa only [commute_iff_eq] using (coe_eq.mp (h.comm (a : Germ D M)).eq).eventually
-    have hl : ∀ᶠ i in D, ∀ p : M × M,
-        f i * (p.1 * p.2) = (f i * p.1) * p.2 := by
-      apply diagonal (fun i => (f i, f i))
-      intro a
-      exact coe_eq.mp
-        (h.left_assoc ((fun i => (a i).1) : Germ D M) ((fun i => (a i).2) : Germ D M))
-    have hr : ∀ᶠ i in D, ∀ p : M × M,
-        (p.1 * p.2) * f i = p.1 * (p.2 * f i) := by
-      apply diagonal (fun i => (f i, f i))
-      intro a
-      exact coe_eq.mp
-        (h.right_assoc ((fun i => (a i).1) : Germ D M) ((fun i => (a i).2) : Germ D M))
-    filter_upwards [hc, hl, hr] with i hc hl hr
-    exact ⟨hc, fun a b => hl (a, b), fun a b => hr (a, b)⟩
+    · intro a b
+      exact coe_eq.mp (h.left_assoc (a : Germ D M) (b : Germ D M))
+    · intro a b
+      exact coe_eq.mp (h.right_assoc (a : Germ D M) (b : Germ D M))
   · intro h
     refine ⟨?_, ?_, ?_⟩
     · intro a
