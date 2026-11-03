@@ -80,6 +80,14 @@ natural-number cancellation interfaces. Related multiplication-regularity criter
 were developed by Formal Frontier Agents/Almanac; the general function criterion
 introduces no dependency on that specialization.
 
+The dependent-product unit-locus criterion generalizes the germ unit-locus proof by
+Formal Frontier Agents, retaining its constant-family API and the germ units
+equivalence. It uses Andrew Yang's Mathlib `Pi.isUnit_iff` and `MulEquiv.piUnits`,
+the units homomorphism APIs formalized by Johan Commelin, Chris Hughes and Kevin
+Buzzard, and the germ carrier and quotient APIs by Yury Kudryashov and Abhimanyu
+Pallavi Sudhir. Everywhere-unit representative choice uses the filter API developed
+by Johannes Hölzl and Jeremy Avigad.
+
 The germ non-zero-divisor criteria use Mathlib's germ representation and multiplication
 APIs by Yury Kudryashov and Abhimanyu Pallavi Sudhir, and its non-zero-divisor
 submonoids and annihilator witnesses by Kenny Lau, Devon Tuma and Oliver Nash.

@@ -4,9 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.Algebra.Group.Pi.Units
-public import Mathlib.Algebra.Group.Units.Hom
-public import Mathlib.Order.Filter.Germ.Basic
+public import MinimalPrimes.Order.Filter.Product.Units
 
 /-!
 # Units in monoids of filter germs
@@ -18,9 +16,8 @@ of the germ monoid has an everywhere-unit representative.
 
 ## Implementation notes
 
-The forward implication uses both inverse identities on a common filter-large set.
-For the converse, replacing nonunit values by `1` gives a unit in the total function
-monoid, whose image under `Filter.Germ.coeMulHom` is the original germ.
+The unit-locus criterion and section-map surjectivity specialize the dependent
+results in `MinimalPrimes.Order.Filter.Product.Units` to constant families.
 The equivalence bundles the coefficientwise value map and lifts it with
 `MonoidHom.toHomUnits`. The unit-locus criterion and `Filter.skolem` supply a
 unit-valued representative for surjectivity.
@@ -46,24 +43,8 @@ variable {ι : Type u} {M : Type v} [Monoid M]
 
 /-- A germ in a monoid is a unit if and only if its representative is eventually a unit. -/
 theorem isUnit_coe_iff (D : Filter ι) (f : ι → M) :
-    IsUnit (f : Filter.Germ D M) ↔ ∀ᶠ i in D, IsUnit (f i) := by
-  constructor
-  · intro hf
-    obtain ⟨g, hfg, hgf⟩ := isUnit_iff_exists.mp hf
-    revert hfg hgf
-    refine inductionOn g fun g hfg hgf => ?_
-    have hfg' : ∀ᶠ i in D, f i * g i = 1 := coe_eq.mp hfg
-    have hgf' : ∀ᶠ i in D, g i * f i = 1 := coe_eq.mp hgf
-    filter_upwards [hfg', hgf'] with i hfg hgf
-    exact isUnit_iff_exists.mpr ⟨g i, hfg, hgf⟩
-  · intro hf
-    classical
-    let g : ι → M := fun i => if IsUnit (f i) then f i else 1
-    have hg : IsUnit g := Pi.isUnit_iff.mpr fun i => by
-      by_cases hi : IsUnit (f i) <;> simp [g, hi]
-    have hgf : (g : Filter.Germ D M) = f :=
-      coe_eq.mpr <| hf.mono fun i hi => by simp [g, hi]
-    exact hgf ▸ IsUnit.map (coeMulHom D) hg
+    IsUnit (f : Filter.Germ D M) ↔ ∀ᶠ i in D, IsUnit (f i) :=
+  Product.isUnit_coe_iff (K := fun _ : ι => M) D f
 
 private def unitsValHom (D : Filter ι) : Germ D Mˣ →* Germ D M where
   toFun := map (Units.coeHom M)
@@ -131,11 +112,7 @@ theorem unitsMulEquiv_coe_piUnits (D : Filter ι) (w : (ι → M)ˣ) :
 
 /-- Every unit of a germ monoid has a representative that is a unit in the function monoid. -/
 theorem units_map_coeMulHom_surjective (D : Filter ι) :
-    Function.Surjective (Units.map (coeMulHom D : (ι → M) →* Germ D M)) := by
-  intro u
-  obtain ⟨v, hv⟩ := Quotient.mk_surjective ((unitsMulEquiv D).symm u)
-  refine ⟨MulEquiv.piUnits.symm v, ?_⟩
-  rw [← unitsMulEquiv_coe_piUnits, MulEquiv.apply_symm_apply]
-  exact (congrArg (unitsMulEquiv D) hv).trans ((unitsMulEquiv D).apply_symm_apply u)
+    Function.Surjective (Units.map (coeMulHom D : (ι → M) →* Germ D M)) :=
+  Product.units_map_coeMulHom_surjective (K := fun _ : ι => M) D
 
 end Filter.Germ

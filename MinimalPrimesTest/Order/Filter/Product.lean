@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import MinimalPrimes.Order.Filter.Product
+public import MinimalPrimes.Order.Filter.Product.Units
 public import Mathlib.Algebra.Group.End
 public import Mathlib.Algebra.GroupWithZero.WithZero
 
@@ -13,8 +13,10 @@ public import Mathlib.Algebra.GroupWithZero.WithZero
 
 The structure comparisons check full data, including natural powers, along the named
 semiring and ultrafilter constructions. Varying endomorphism monoids then exercise
-composition without addition, commutativity or inverses. Adjoining zero gives nonzero
-elements without right inverses even after taking the top-filter product.
+composition without addition, commutativity or inverses. The unit-locus criterion
+distinguishes identity sections from constant endomorphisms and the top filter from
+the bottom filter in this same family. Adjoining zero gives nonzero elements without
+right inverses even after taking the top-filter product.
 -/
 
 @[expose] public section
@@ -134,7 +136,7 @@ example (f : ∀ n, EndFamily n) (m : ℕ) :
   map_pow (Product.coeMulHom (K := EndFamily) (⊤ : Filter ℕ)) f m
 
 -- A constant endomorphism cannot acquire a right inverse in the top-filter product.
-example : ¬ ∃ q : (⊤ : Filter ℕ).Product EndFamily,
+private theorem leftConstant_no_right_inverse : ¬ ∃ q : (⊤ : Filter ℕ).Product EndFamily,
     Product.coeMulHom (K := EndFamily) (⊤ : Filter ℕ) leftConstant * q = 1 := by
   obtain ⟨e, he, _⟩ := Product.existsUnique_monoidHom
     (F := (⊤ : Filter ℕ)) (K := EndFamily) (Pi.evalMonoidHom EndFamily 0)
@@ -148,6 +150,17 @@ example : ¬ ∃ q : (⊤ : Filter ℕ).Product EndFamily,
   have h₀ : leftConstant 0 * e q = 1 := by
     simpa only [map_mul, map_one, he₀] using congrArg e hq
   exact (by decide : (0 : Fin 2) ≠ 1) (congrFun h₀ 1)
+
+-- The same nonunit section becomes a unit at bottom; the identity is a unit already at top.
+example :
+    @IsUnit ((⊥ : Filter ℕ).Product EndFamily) inferInstance leftConstant ∧
+      ¬ @IsUnit ((⊤ : Filter ℕ).Product EndFamily) inferInstance leftConstant ∧
+      @IsUnit ((⊤ : Filter ℕ).Product EndFamily) inferInstance (1 : ∀ n, EndFamily n) := by
+  refine ⟨(Product.isUnit_coe_iff _ _).2 (by simp), ?_, ?_⟩
+  · intro h
+    obtain ⟨q, hq, _⟩ := isUnit_iff_exists.mp h
+    exact leftConstant_no_right_inverse ⟨q, hq⟩
+  · exact (Product.isUnit_coe_iff _ _).2 (Eventually.of_forall fun _ => isUnit_one)
 
 private def withZeroLeft : ∀ n, WithZero (EndFamily n) :=
   fun n => (leftConstant n : WithZero (EndFamily n))
@@ -199,5 +212,15 @@ example {ι : Type u} {K : ι → Type v} [∀ i, MonoidWithZero (K i)]
     [∀ i, Subsingleton (K i)] (F : Filter ι) : (0 : F.Product K) = 1 :=
   (Product.coe_eq (F := F) (0 : ∀ i, K i) 1).2
     (Eventually.of_forall fun _ => Subsingleton.elim _ _)
+
+-- These unit-locus consequences need only monoids, not the zero operations above.
+example {K : Empty → Type v} [∀ i, Monoid (K i)] (F : Filter Empty) (f : ∀ i, K i) :
+    @IsUnit (F.Product K) inferInstance f :=
+  (Product.isUnit_coe_iff F f).2 (Eventually.of_forall fun i => nomatch i)
+
+example {ι : Type u} {K : ι → Type v} [∀ i, Monoid (K i)]
+    [∀ i, Subsingleton (K i)] (F : Filter ι) (f : ∀ i, K i) :
+    @IsUnit (F.Product K) inferInstance f :=
+  (Product.isUnit_coe_iff F f).2 (Eventually.of_forall fun _ => isUnit_of_subsingleton _)
 
 end FilterProductExamples

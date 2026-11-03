@@ -301,12 +301,28 @@ normalized-factor declarations and nine modules, not the complete current API.
 ### Dependent reduced products
 
 [`Order/Filter/Product.lean`](MinimalPrimes/Order/Filter/Product.lean) equips the existing
-`Filter.Product F K` with pointwise semiring operations for arbitrary filters and dependent
-semiring fibres in an independent universe. `Filter.productRingCon F K` has exactly the
-stock `Filter.productSetoid`, so `RingCon.mk'`, its surjectivity/equality API, and
-`RingCon.lift` with its computation and uniqueness laws apply directly. Fibrewise
-homomorphisms descend through `Filter.Product.mapRingHom`, preserving identity and composition.
-For constant families the section homomorphism is the existing `Filter.Germ.coeRingHom`.
+`Filter.Product F K` with pointwise monoid operations for arbitrary filters and dependent
+monoid fibres in an independent universe. `Filter.productCon F K` uses the stock
+`Filter.productSetoid`, and `Filter.Product.coeMulHom F` is the section projection.
+Monoid-with-zero and semiring fibres give the corresponding quotient structures.
+`Filter.productRingCon F K` extends the same congruence, so `RingCon.mk'`, its
+surjectivity/equality API, and `RingCon.lift` with its computation and uniqueness laws
+apply directly. Fibrewise homomorphisms descend through `Filter.Product.mapRingHom`,
+preserving identity and composition. For constant families the section homomorphisms
+are the existing `Filter.Germ.coeMulHom` and `Filter.Germ.coeRingHom`.
+
+[`Product/Units.lean`](MinimalPrimes/Order/Filter/Product/Units.lean) proves
+`Filter.Product.isUnit_coe_iff`: a represented element is a unit exactly when its
+section is a unit on a filter-large set. Only monoid fibres are required, with no
+commutativity, properness or nontriviality assumptions. Bottom filters, empty indices
+and trivial fibres are included. `Filter.Product.units_map_coeMulHom_surjective`
+states that every quotient unit has an everywhere-unit section representative.
+The corresponding `Filter.Germ.isUnit_coe_iff` and
+`Filter.Germ.units_map_coeMulHom_surjective` remain constant-family specializations;
+the germ units equivalence and its projection laws are unchanged.
+The [dependent-product examples](MinimalPrimesTest/Order/Filter/Product.lean) use
+varying noncommutative endomorphism monoids to contrast identity and nonunit sections,
+and the same section at the top and bottom filters.
 
 The quotient is trivial exactly when `{i | (0 : K i) = 1}` belongs to the filter.
 Thus nontrivial fibres and a proper filter give a nontrivial quotient, whereas the
