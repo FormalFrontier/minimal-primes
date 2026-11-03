@@ -24,6 +24,12 @@ semiring fibres, by extremality in the ideal/filter order isomorphism. For an ar
 dependent family of semifields, `PrimeSpectrum.piEquivUltrafilter` classifies all prime
 ideals by ultrafilters.
 
+For any family of left ideals in dependent semirings,
+`Ultrafilter.isPrime_pi_sup_piIdeal_iff` and
+`Ultrafilter.isMaximal_pi_sup_piIdeal_iff` characterize primality and maximality
+of the sum of the coordinate ideal and the filter ideal by the corresponding
+ultrafilter-large coordinate loci.
+
 For arbitrary commutative semiring factors, `PrimeSpectrum.piUltrafilterMap` gives
 the ultrafilter coordinate of each prime through the characteristic-test filter
 `Ideal.piFilter`. Containment of `Ultrafilter.piIdeal` characterizes a coordinate
@@ -117,6 +123,131 @@ theorem piIdeal_ne_top_iff (U : Ultrafilter ι) :
       exact Subsingleton.elim _ _
   simpa [hbot, piIdeal_eq_filter_piIdeal, htop] using
     (Filter.pi_sup_piIdeal_ne_top_iff (fun i => (⊥ : Ideal (A i))) (U : Filter ι))
+
+private theorem pi_sup_piIdeal_ne_top_iff (I : ∀ i, Ideal (A i)) (U : Ultrafilter ι) :
+    Ideal.pi I ⊔ (U : Filter ι).piIdeal A ≠ ⊤ ↔ {i | I i ≠ ⊤} ∈ U := by
+  have hsets : {i | (1 : Π i, A i) i ∈ I i} = {i | I i ≠ ⊤}ᶜ := by
+    ext i
+    simp only [Pi.one_apply, Set.mem_ofPred_eq, mem_compl_iff, not_not, Ideal.eq_top_iff_one]
+  rw [Ideal.ne_top_iff_one, Filter.mem_pi_sup_piIdeal, hsets]
+  exact Ultrafilter.compl_notMem_iff
+
+/-- The sum of a coordinate ideal and an ultrafilter ideal is prime exactly when
+its prime coordinate ideals form a member of the ultrafilter. This holds for
+ordinary left ideals over arbitrary dependent semiring families. -/
+theorem isPrime_pi_sup_piIdeal_iff (I : ∀ i, Ideal (A i)) (U : Ultrafilter ι) :
+    (Ideal.pi I ⊔ (U : Filter ι).piIdeal A).IsPrime ↔ {i | (I i).IsPrime} ∈ U := by
+  classical
+  constructor
+  · intro hJ
+    by_contra hP
+    let T : Set ι := {i | I i ≠ ⊤ ∧ ¬ (I i).IsPrime}
+    have hT : T ∈ U := Filter.inter_mem
+      ((pi_sup_piIdeal_ne_top_iff A I U).mp hJ.ne_top)
+      (Ultrafilter.compl_mem_iff_notMem.mpr hP)
+    have hw (i) : ∃ a b : A i, i ∈ T → a ∉ I i ∧ b ∉ I i ∧ a * b ∈ I i := by
+      by_cases hi : i ∈ T
+      · have hn : ¬ ∀ a b : A i, a * b ∈ I i → a ∈ I i ∨ b ∈ I i := by
+          intro h
+          exact hi.2 ⟨hi.1, fun {a b} => h a b⟩
+        push Not at hn
+        obtain ⟨a, b, hab, ha, hb⟩ := hn
+        exact ⟨a, b, fun _ => ⟨ha, hb, hab⟩⟩
+      · exact ⟨0, 0, fun h => (hi h).elim⟩
+    choose a b hab using hw
+    let f : Π i, A i := fun i => if i ∈ T then a i else 0
+    let g : Π i, A i := fun i => if i ∈ T then b i else 0
+    have hfg : f * g ∈ Ideal.pi I ⊔ (U : Filter ι).piIdeal A := by
+      apply (Filter.mem_pi_sup_piIdeal I (U : Filter ι) (f * g)).mpr
+      exact Filter.mem_of_superset hT fun i hi => by
+        simpa [f, g, hi] using (hab i hi).2.2
+    have hf : f ∉ Ideal.pi I ⊔ (U : Filter ι).piIdeal A := by
+      rw [Filter.mem_pi_sup_piIdeal]
+      apply Ultrafilter.compl_mem_iff_notMem.mp
+      exact Filter.mem_of_superset hT fun i hi => by
+        simpa [f, hi] using (hab i hi).1
+    have hg : g ∉ Ideal.pi I ⊔ (U : Filter ι).piIdeal A := by
+      rw [Filter.mem_pi_sup_piIdeal]
+      apply Ultrafilter.compl_mem_iff_notMem.mp
+      exact Filter.mem_of_superset hT fun i hi => by
+        simpa [g, hi] using (hab i hi).2.1
+    exact (hJ.mem_or_mem hfg).elim hf hg
+  · intro hP
+    refine ⟨(pi_sup_piIdeal_ne_top_iff A I U).mpr
+      (Filter.mem_of_superset hP fun i hi => hi.ne_top), ?_⟩
+    intro f g hfg
+    simp only [Filter.mem_pi_sup_piIdeal] at hfg ⊢
+    apply Ultrafilter.union_mem_iff.mp
+    exact Filter.mem_of_superset (Filter.inter_mem hP hfg) fun i hi =>
+      hi.1.mem_or_mem hi.2
+
+/-- The sum of a coordinate ideal and an ultrafilter ideal is maximal exactly when
+its maximal coordinate ideals form a member of the ultrafilter. No commutativity
+or subtractivity hypothesis on the semirings or their left ideals is needed. -/
+theorem isMaximal_pi_sup_piIdeal_iff (I : ∀ i, Ideal (A i)) (U : Ultrafilter ι) :
+    (Ideal.pi I ⊔ (U : Filter ι).piIdeal A).IsMaximal ↔ {i | (I i).IsMaximal} ∈ U := by
+  classical
+  constructor
+  · intro hJ
+    by_contra hM
+    let T : Set ι := {i | I i ≠ ⊤ ∧ ¬ (I i).IsMaximal}
+    have hT : T ∈ U := Filter.inter_mem
+      ((pi_sup_piIdeal_ne_top_iff A I U).mp hJ.ne_top)
+      (Ultrafilter.compl_mem_iff_notMem.mpr hM)
+    -- Proper nonmaximal coordinates admit proper strict extensions. Elsewhere,
+    -- the top ideal and zero supply the witnesses without any nontriviality assumption.
+    have hw (i) : ∃ K : Ideal (A i), ∃ x : A i,
+        I i ≤ K ∧ x ∈ K ∧ (i ∈ T → K ≠ ⊤ ∧ x ∉ I i) := by
+      by_cases hi : i ∈ T
+      · have hn : ¬ ∀ K : Ideal (A i), K ≠ ⊤ → I i ≤ K → K ≤ I i := by
+          intro h
+          exact hi.2 (Ideal.isMaximal_def.mpr (isCoatom_iff_ge_of_le.mpr ⟨hi.1, h⟩))
+        push Not at hn
+        obtain ⟨K, hK, hIK, hKI⟩ := hn
+        obtain ⟨x, hxK, hxI⟩ := SetLike.not_le_iff_exists.mp hKI
+        exact ⟨K, x, hIK, hxK, fun _ => ⟨hK, hxI⟩⟩
+      · exact ⟨⊤, 0, le_top, Submodule.mem_top, fun h => (hi h).elim⟩
+    choose K x hIK hxK hbad using hw
+    have hJK : Ideal.pi I ⊔ (U : Filter ι).piIdeal A ≤
+        Ideal.pi K ⊔ (U : Filter ι).piIdeal A := by
+      intro f hf
+      apply (Filter.mem_pi_sup_piIdeal K (U : Filter ι) f).mpr
+      exact Filter.mem_of_superset
+        ((Filter.mem_pi_sup_piIdeal I (U : Filter ι) f).mp hf) fun i hi => hIK i hi
+    have hKproper : Ideal.pi K ⊔ (U : Filter ι).piIdeal A ≠ ⊤ :=
+      (pi_sup_piIdeal_ne_top_iff A K U).mpr
+        (Filter.mem_of_superset hT fun i hi => (hbad i hi).1)
+    have hxKJ : x ∈ Ideal.pi K ⊔ (U : Filter ι).piIdeal A :=
+      (Filter.mem_pi_sup_piIdeal K (U : Filter ι) x).mpr
+        (Filter.Eventually.of_forall hxK)
+    have hxIJ : x ∉ Ideal.pi I ⊔ (U : Filter ι).piIdeal A := by
+      rw [Filter.mem_pi_sup_piIdeal]
+      exact Ultrafilter.compl_mem_iff_notMem.mp
+        (Filter.mem_of_superset hT fun i hi => (hbad i hi).2)
+    exact hxIJ ((hJ.eq_of_le hKproper hJK).symm ▸ hxKJ)
+  · intro hM
+    refine Ideal.isMaximal_iff.mpr ⟨(Ideal.ne_top_iff_one _).mp
+      ((pi_sup_piIdeal_ne_top_iff A I U).mpr
+        (Filter.mem_of_superset hM fun i hi => hi.ne_top)), ?_⟩
+    intro L f hJL hf hfL
+    have hnf : {i | f i ∉ I i} ∈ U :=
+      Ultrafilter.compl_mem_iff_notMem.mpr
+        (fun h => hf ((Filter.mem_pi_sup_piIdeal I (U : Filter ι) f).mpr h))
+    let T : Set ι := {i | (I i).IsMaximal ∧ f i ∉ I i}
+    have hT : T ∈ U := Filter.inter_mem hM hnf
+    have hw (i) : ∃ a b : A i, (i ∈ T → b ∈ I i) ∧ a * f i + b = 1 := by
+      by_cases hi : i ∈ T
+      · obtain ⟨a, b, hb, heq⟩ := hi.1.exists_inv hi.2
+        exact ⟨a, b, fun _ => hb, heq⟩
+      · exact ⟨0, 1, fun h => (hi h).elim, by simp⟩
+    choose a b hb hab using hw
+    -- Only membership in the sum is asserted for b, not in the coordinate ideal.
+    have hbJ : b ∈ Ideal.pi I ⊔ (U : Filter ι).piIdeal A :=
+      (Filter.mem_pi_sup_piIdeal I (U : Filter ι) b).mpr
+        (Filter.mem_of_superset hT hb)
+    have hone : a * f + b = (1 : Π i, A i) := funext hab
+    rw [← hone]
+    exact L.add_mem (L.mul_mem_left a hfL) (hJL hbJ)
 
 instance piIdeal_isPrime [∀ i, Nontrivial (A i)] [∀ i, NoZeroDivisors (A i)]
     (U : Ultrafilter ι) : (U.piIdeal A).IsPrime where

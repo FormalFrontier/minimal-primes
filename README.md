@@ -41,6 +41,13 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   of its complement unless `D` is an ultrafilter. Zero fibres and improper
   filters are allowed.
   ([examples](MinimalPrimesTest/RingTheory/Ideal/PiFilter.lean)).
+- **Ultrafilter coordinate-locus criteria**
+  ([module](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean)). For dependent
+  semirings `R i` and left ideals `I i`, `Ultrafilter.isPrime_pi_sup_piIdeal_iff`
+  and `Ultrafilter.isMaximal_pi_sup_piIdeal_iff` characterize the sum
+  `Ideal.pi I ⊔ (U : Filter ι).piIdeal R` as prime or maximal exactly when the
+  respective coordinate locus belongs to `U`. The criteria need no commutativity,
+  nontrivial-factor or subtractivity assumption.
 - **Prime ideals of arbitrary products of semifields**
   ([module](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean)). For any dependent
   family `K : ι → Type v` of semifields, `PrimeSpectrum.piEquivUltrafilter K`
