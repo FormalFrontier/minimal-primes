@@ -7,22 +7,25 @@ module
 public import Mathlib.Order.Filter.Germ.Basic
 
 /-!
-# Injectivity of varying application on germs
+# Varying application and pointed fibres on germs
 
 A family of functions acts on Mathlib's existing germs by `Filter.Germ.map₂` specialized
 to evaluation. This action is injective exactly when the functions are eventually
-injective. The filter and all three universes are arbitrary; in particular, neither
-properness nor an inhabitant of the domain is required.
+injective. It reflects a specified constant germ if the coordinate functions eventually
+reflect the specified points; the converse requires only eventual point preservation.
+The filters and universes are arbitrary. No properness assumption is needed.
 
 ## References
 
 The carrier, quotient induction, evaluation and eventual-equality interfaces are
 Mathlib's filter-germ API, formalized by Yury Kudryashov and Abhimanyu Pallavi Sudhir.
+The pointed-fibre argument generalizes the annihilator witnesses in
+`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors` and uses `Filter.skolem`.
 -/
 
 @[expose] public section
 
-universe u v w
+universe u v w z
 
 namespace Filter.Germ
 
@@ -58,5 +61,76 @@ theorem injective_map₂_apply_coe_iff (D : Filter ι) (F : ι → A → B) :
     have heq : ∀ᶠ i in D, F i (a i) = F i (b i) := by
       simpa only [map₂_coe, coe_eq, Filter.EventuallyEq] using hab
     exact (h.and heq).mono fun _ hi => hi.1 hi.2
+
+/-- Evaluation after mapping a curried operation agrees with its binary germ map. -/
+theorem map₂_apply_map {C : Type z} (D : Filter ι) (op : A → B → C)
+    (a : Germ D A) (b : Germ D B) :
+    map₂ (fun (φ : B → C) (x : B) => φ x) (map op a) b = map₂ op a b := by
+  exact inductionOn₂ a b fun _ _ => rfl
+
+/-- Binary mapping of multiplication agrees with the stock product of germs. -/
+@[simp]
+theorem map₂_mul [Mul A] (D : Filter ι) (x y : Germ D A) :
+    map₂ (fun (a b : A) => a * b) x y = x * y := by
+  refine inductionOn₂ x y ?_
+  intro f g
+  rw [map₂_coe, ← coe_mul]
+  rfl
+
+/-- Equality of a represented germ with a constant is eventual equality to that point. -/
+@[simp]
+theorem coe_eq_const (D : Filter ι) (f : ι → A) (a : A) :
+    (f : Germ D A) = const a ↔ ∀ᶠ i in D, f i = a := by
+  change (f : Germ D A) = ((fun _ : ι => a) : Germ D A) ↔ _
+  exact coe_eq
+
+/-- The constant zero germ agrees with the stock zero on germs. -/
+@[simp]
+theorem const_zero [Zero A] (D : Filter ι) :
+    const (0 : A) = (0 : Germ D A) := by
+  change ((fun _ : ι => (0 : A)) : Germ D A) = 0
+  exact coe_zero
+
+/-- Eventual reflection of a pointed fibre implies reflection of the constant germs.
+No point-preservation law is needed in this direction. -/
+theorem forall_map₂_apply_eq_const_imp_of_eventually (D : Filter ι)
+    (F : ι → A → B) (a₀ : A) (b₀ : B)
+    (h : ∀ᶠ i in D, ∀ a, F i a = b₀ → a = a₀) :
+    ∀ x : Germ D A,
+      map₂ (fun (φ : A → B) (a : A) => φ a) (F : Germ D (A → B)) x = const b₀ →
+        x = const a₀ := by
+  intro x
+  refine inductionOn x ?_
+  intro g hg
+  apply (coe_eq_const D g a₀).mpr
+  have heq : ∀ᶠ i in D, F i (g i) = b₀ := by
+    simpa only [map₂_coe, coe_eq_const] using hg
+  exact (h.and heq).mono fun _ hi => hi.1 _ hi.2
+
+/-- Under eventual point preservation, varying application reflects a constant germ
+exactly when the coordinate functions eventually reflect that point. -/
+theorem forall_map₂_apply_eq_const_imp_iff (D : Filter ι) (F : ι → A → B)
+    (a₀ : A) (b₀ : B) (h₀ : ∀ᶠ i in D, F i a₀ = b₀) :
+    (∀ x : Germ D A,
+      map₂ (fun (φ : A → B) (a : A) => φ a) (F : Germ D (A → B)) x = const b₀ →
+        x = const a₀) ↔ ∀ᶠ i in D, ∀ a, F i a = b₀ → a = a₀ := by
+  classical
+  constructor
+  · intro h
+    -- At a bad coordinate choose a non-basepoint in the fibre; otherwise use a₀.
+    have hw : ∀ᶠ i in D, ∃ a : A,
+        F i a = b₀ ∧ (a = a₀ → ∀ a', F i a' = b₀ → a' = a₀) := by
+      filter_upwards [h₀] with i hi
+      by_cases href : ∀ a, F i a = b₀ → a = a₀
+      · exact ⟨a₀, hi, fun _ => href⟩
+      · obtain ⟨a, ha, hne⟩ : ∃ a, F i a = b₀ ∧ a ≠ a₀ := by
+          simpa only [not_forall, not_imp, exists_prop] using href
+        exact ⟨a, ha, fun heq => (hne heq).elim⟩
+    let : Nonempty A := ⟨a₀⟩
+    obtain ⟨g, hg⟩ := Filter.skolem.mp hw
+    have heq : (g : Germ D A) = const a₀ := h _ (by
+      simpa only [map₂_coe, coe_eq_const] using hg.mono fun _ hi => hi.1)
+    exact (hg.and ((coe_eq_const D g a₀).mp heq)).mono fun _ hi => hi.1.2 hi.2
+  · exact forall_map₂_apply_eq_const_imp_of_eventually D F a₀ b₀
 
 end Filter.Germ

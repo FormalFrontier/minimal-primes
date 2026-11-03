@@ -13,6 +13,7 @@ public import MinimalPrimesTest.Order.FiniteHeightChain
 public import MinimalPrimesTest.Order.Filter.Germ.Center
 public import MinimalPrimesTest.Order.Filter.Germ.Map
 public import MinimalPrimesTest.Order.Filter.Germ.Reduced
+public import MinimalPrimesTest.Order.Filter.Germ.SMul
 public import MinimalPrimesTest.Order.Filter.Product
 public import MinimalPrimesTest.Order.Filter.Product.Reduced
 public import MinimalPrimesTest.Order.Filter.Product.Regular

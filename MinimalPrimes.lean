@@ -15,6 +15,7 @@ public import MinimalPrimes.Order.Filter.Germ.Map
 public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Reduced
+public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.Order.Filter.Product.Regular
@@ -82,9 +83,13 @@ or the value type being reduced.
 The monoid-germ leaf characterizes invertibility by the representative's filter-large
 unit locus, for arbitrary filters and potentially noncommutative monoids.
 The germ-map leaf characterizes injectivity of varying pointwise application by eventual
-injectivity of the fibre maps, without properness or inhabitedness assumptions.
+injectivity of the fibre maps, without properness or inhabitedness assumptions. Its pointed
+fibre criterion needs only eventual preservation of the specified points for the converse.
+The germ-scalar leaf specializes zero-reflection to a selected zero-preserving action,
+without scalar-zero or additive assumptions.
 The non-zero-divisor leaf characterizes intrinsic left, right and two-sided
-non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with zero.
+non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with zero,
+and gives the scalar submonoid criterion under an explicit eventual zero-preservation law.
 The germ-center leaf characterizes the full intrinsic magma center by eventual
 coordinate centrality, with a submonoid-center bridge requiring only a two-sided identity.
 Import a leaf directly for a smaller API.
