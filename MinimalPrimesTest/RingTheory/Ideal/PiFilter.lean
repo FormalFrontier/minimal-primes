@@ -32,6 +32,19 @@ example {ι : Type u} (A : ι → Type v) [∀ i, Semiring (A i)] (s : Set ι) (
     f ∈ (principal s).piIdeal A ↔ ∀ i ∈ s, f i = 0 :=
   Filter.mem_piIdeal_principal A s f
 
+-- A principal filter tests only the first coordinate, unlike the coordinate product ideal.
+example :
+    (![0, 1] : Fin 2 → ℕ) ∈
+        Ideal.pi (fun _ : Fin 2 => (⊥ : Ideal ℕ)) ⊔
+          (principal {0} : Filter (Fin 2)).piIdeal (fun _ => ℕ) ∧
+      (![0, 1] : Fin 2 → ℕ) ∉ Ideal.pi (fun _ : Fin 2 => (⊥ : Ideal ℕ)) := by
+  constructor
+  · rw [Filter.mem_pi_sup_piIdeal]
+    simp
+  · intro h
+    have h₁ := (Ideal.mem_pi _ _).mp h 1
+    simp at h₁
+
 example {ι : Type u} (R : Type v) [Semiring R] (F : Filter ι) :
     F.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) F) :=
   Filter.piIdeal_eq_ker_coeRingHom R F

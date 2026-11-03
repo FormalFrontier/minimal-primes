@@ -7,6 +7,7 @@ module
 public import Mathlib.Algebra.Ring.Pi
 public import Mathlib.Order.Filter.Cofinite
 public import MinimalPrimes.Order.Filter.Product
+public import Mathlib.RingTheory.Ideal.Basic
 public import Mathlib.RingTheory.Ideal.Maps
 
 /-!
@@ -69,6 +70,35 @@ def piIdeal (F : Filter ι) : Ideal (Π i, A i) where
 @[simp]
 theorem mem_piIdeal (F : Filter ι) (f : Π i, A i) :
     f ∈ F.piIdeal A ↔ {i | f i = 0} ∈ F := Iff.rfl
+
+/-- Membership in the sum of a coordinate product ideal and a filter ideal is
+coordinatewise ideal membership on a set belonging to the filter. -/
+theorem mem_pi_sup_piIdeal {R : ι → Type v} [∀ i, Semiring (R i)]
+    (I : ∀ i, Ideal (R i)) (D : Filter ι) (f : ∀ i, R i) :
+    f ∈ Ideal.pi I ⊔ D.piIdeal R ↔ {i | f i ∈ I i} ∈ D := by
+  classical
+  rw [Submodule.mem_sup]
+  constructor
+  · rintro ⟨a, ha, b, hb, rfl⟩
+    exact Filter.mem_of_superset ((mem_piIdeal R D b).mp hb) fun i hi => by
+      change b i = 0 at hi
+      change a i + b i ∈ I i
+      simpa only [hi, add_zero] using (Ideal.mem_pi I a).mp ha i
+  · intro hf
+    refine ⟨(fun i => if f i ∈ I i then f i else 0), ?_,
+      (fun i => if f i ∈ I i then 0 else f i), ?_, ?_⟩
+    · rw [Ideal.mem_pi]
+      intro i
+      split_ifs with hi
+      · exact hi
+      · exact (I i).zero_mem
+    · rw [mem_piIdeal]
+      exact Filter.mem_of_superset hf fun i hi => by
+        change f i ∈ I i at hi
+        change (if f i ∈ I i then 0 else f i) = 0
+        simp [hi]
+    · ext i
+      by_cases hi : f i ∈ I i <;> simp [hi]
 
 /-- The zero-set construction reverses the native filter order. -/
 theorem piIdeal_antitone : Antitone (piIdeal A) := by
