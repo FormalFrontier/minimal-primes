@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import MinimalPrimes.RingTheory.Frobenius.Reduced
 public import MinimalPrimes.IrreducibleComponents
 public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars

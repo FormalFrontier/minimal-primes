@@ -8,6 +8,17 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Reduced ranges of iterated Frobenius
+
+For a commutative semiring of exponential characteristic `p`, the original image
+of the `n`th Frobenius iterate is reduced exactly when every nilpotent element
+has zero `p ^ n`th power. If the semiring is Noetherian and `p` is prime,
+all sufficiently high iterates have reduced images. The
+[reduced-image API](MinimalPrimes/RingTheory/Frobenius/Reduced.lean) also gives the
+corresponding original subring-range statement for a given commutative ring.
+No field, perfectness, or reducedness of the ambient semiring is assumed.
+
+
 The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
 and the linked module documentation for statements, examples, proof ideas and Mathlib dependencies.
 
