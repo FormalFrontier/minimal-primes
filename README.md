@@ -8,6 +8,19 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Centers of dependent filter products
+
+For any filter and an independently universed family with multiplication, a section
+represents an element of the full intrinsic center exactly when it is central
+eventually. With a two-sided identity in each fibre,
+[`Filter.Product.centerEquiv`](MinimalPrimes/Order/Filter/Product/Center.lean)
+identifies the product of the fibre centers with the center of the product.
+Neither associativity nor a proper filter is required. The representative API
+selects a total center-valued section agreeing eventually, not canonically at
+ignored indices. The [varying-family client](MinimalPrimesTest/Order/Filter/Germ/Center.lean)
+uses retained fibres of sizes four and sixteen with nonassociative multiplication;
+the existing constant-germ API and its client remain available.
+
 ### Reduced filter germs
 
 For independent index and value universes, any filter `D`, and a value type `M`
@@ -421,6 +434,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness of constant-fibre germs with only zero and natural-number powers. |
 | [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Regular`](MinimalPrimes/Order/Filter/Product/Regular.lean) | Left, right and two-sided regularity at fibrewise multiplication, characterized by eventual regularity. |
+| [`MinimalPrimes.Order.Filter.Product.Center`](MinimalPrimes/Order/Filter/Product/Center.lean) | Full intrinsic centers at fibrewise multiplication; the equivalence of fibre-center products and product centers needs only two-sided identities. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |

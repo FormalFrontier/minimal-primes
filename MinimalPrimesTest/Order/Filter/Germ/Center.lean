@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import MinimalPrimes.Order.Filter.Germ.Center
+public import MinimalPrimes.Order.Filter.Product.Center
 import Mathlib.Data.Fintype.Fin
 import Mathlib.Tactic.FinCases
 
@@ -111,5 +112,80 @@ theorem liftedVaryingValue_retained :
   intro i
   rw [← congrFun heq i]
   exact (liftedVaryingValue i).property
+
+/-- A section of genuinely varying fibres, using the same four-element multiplication. -/
+def varyingSection (i : Fin 3) : Fin (i.val + 1) → Fin 4 :=
+  fun _ => varyingValue i
+
+/-- The two retained fibres have different cardinalities. -/
+theorem varyingSection_fibre_card :
+    Fintype.card (Fin 1 → Fin 4) = 4 ∧ Fintype.card (Fin 2 → Fin 4) = 16 := by
+  decide
+
+/-- The dependent section is central in the product but not pointwise central.
+The two retained fibres have different sizes and retain nonassociative multiplication. -/
+theorem varyingSection_central_product :
+    (varyingSection : (Filter.principal ({0, 1} : Set (Fin 3))).Product
+        (fun i => Fin (i.val + 1) → Fin 4)) ∈
+      Submonoid.center ((Filter.principal ({0, 1} : Set (Fin 3))).Product
+        (fun i => Fin (i.val + 1) → Fin 4)) ∧
+      ¬ (∀ i, varyingSection i ∈ Set.center (Fin (i.val + 1) → Fin 4)) ∧
+      ¬ (∀ a b c : Fin 1 → Fin 4, (a * b) * c = a * (b * c)) := by
+  have hc := (Germ.mem_submonoid_center_coe_iff _ _).1 varyingValue_central_germ.1
+  rw [Filter.eventually_principal] at hc
+  refine ⟨?_, ?_, ?_⟩
+  · apply (Product.mem_submonoid_center_coe_iff _ varyingSection).2
+    rw [Filter.eventually_principal]
+    intro i hi
+    change varyingSection i ∈ Set.center (Fin (i.val + 1) → Fin 4)
+    rw [Set.center_pi]
+    intro j _
+    exact hc i hi
+  · intro h
+    have hb := congrFun ((h 2).comm (fun _ => (3 : Fin 4))).eq 0
+    change (2 : Fin 4) = 3 at hb
+    exact (by decide : (2 : Fin 4) ≠ 3) hb
+  · intro h
+    have hb := congrFun (h (fun _ => 2) (fun _ => 2) (fun _ => 2)) 0
+    exact varyingValue_central_germ.2.2.2.2 hb
+
+/-- The product does not collapse: the all-zero and all-one sections are distinct. -/
+theorem varyingSection_product_nontrivial :
+    ((fun i : Fin 3 => (0 : Fin (i.val + 1) → Fin 4)) :
+        (Filter.principal ({0, 1} : Set (Fin 3))).Product
+          (fun i => Fin (i.val + 1) → Fin 4)) ≠
+      ((fun i : Fin 3 => (1 : Fin (i.val + 1) → Fin 4)) :
+        (Filter.principal ({0, 1} : Set (Fin 3))).Product
+          (fun i => Fin (i.val + 1) → Fin 4)) := by
+  intro h
+  have he := (Product.coe_eq _ _).1 h
+  rw [Filter.eventually_principal] at he
+  have hb := congrFun (he 0 (by simp)) 0
+  exact (by decide : (0 : Fin 4) ≠ 1) hb
+
+/-- A total fibre-center-valued lift of the genuinely dependent central section. -/
+noncomputable def liftedVaryingSection (i : Fin 3) :
+    ↥(Submonoid.center (Fin (i.val + 1) → Fin 4)) :=
+  Product.centerRepresentative (Filter.principal ({0, 1} : Set (Fin 3)))
+    ⟨(varyingSection : (Filter.principal ({0, 1} : Set (Fin 3))).Product
+      (fun i => Fin (i.val + 1) → Fin 4)), varyingSection_central_product.1⟩ i
+
+/-- The dependent center-valued lift preserves both observed fibres, but cannot
+preserve the ignored noncentral value everywhere. No particular ignored value is asserted. -/
+theorem liftedVaryingSection_retained :
+    (liftedVaryingSection 0).val = (fun _ => 0) ∧
+      (liftedVaryingSection 1).val = (fun _ => 1) ∧
+      (fun i => (liftedVaryingSection i : Fin (i.val + 1) → Fin 4)) ≠ varyingSection := by
+  have h := Product.centerRepresentative_eventuallyEq
+    (Filter.principal ({0, 1} : Set (Fin 3))) varyingSection varyingSection_central_product.1
+  change ∀ᶠ i in Filter.principal ({0, 1} : Set (Fin 3)),
+    (liftedVaryingSection i : Fin (i.val + 1) → Fin 4) = varyingSection i at h
+  rw [Filter.eventually_principal] at h
+  refine ⟨h 0 (by simp), h 1 (by simp), ?_⟩
+  intro heq
+  apply varyingSection_central_product.2.1
+  intro i
+  rw [← congrFun heq i]
+  exact (liftedVaryingSection i).property
 
 end MinimalPrimesTest.GermCenter

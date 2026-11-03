@@ -17,6 +17,7 @@ public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
+public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.Order.Filter.Product.Regular
 public import MinimalPrimes.Order.Filter.Product.Units
