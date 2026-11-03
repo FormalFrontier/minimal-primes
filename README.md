@@ -364,10 +364,15 @@ magma center exactly when its values are central eventually. All three
 `IsMulCentral` fields are retained, not only commutation. The companion
 `mem_submonoid_center_coe_iff` needs only `MulOneClass`, not associativity.
 The filter is arbitrary and the index and codomain universes are independent;
-no properness or inhabitedness assumptions are added.
+no properness or inhabitedness assumptions are added. At `MulOneClass`,
+`Filter.Germ.centerEquiv` identifies germs of center-valued functions with central
+germs, and `centerRepresentative` lifts a central germ to a total center-valued
+function agreeing with any supplied representative eventually.
 The [single finite client](MinimalPrimesTest/Order/Filter/Germ/Center.lean) uses a
 noncommutative, nonassociative multiplication and a genuinely varying central germ
-with an ignored noncentral fibre. See the [center guide](docs/FilterGermCenter.md)
+with an ignored noncentral fibre. Its total central lift preserves the two
+retained values but cannot agree everywhere with the original function.
+See the [center guide](docs/FilterGermCenter.md)
 for the interface and proof idea. This generic API is a Mathlib-upstream candidate.
 
 ## Build and audit

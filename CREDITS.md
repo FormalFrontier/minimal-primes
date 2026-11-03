@@ -107,6 +107,10 @@ Strickland and Yury Kudryashov. The varying-witness argument follows the existin
 multiplication-regularity pattern developed by Formal Frontier Agents, retaining
 all three intrinsic centrality fields. The four-element client and its varying
 representative are original finite data; no additional center or quotient is defined.
+The multiplicative center equivalence reuses the existing varying-application
+injectivity API and Mathlib's equivalence interfaces, formalized by Johannes Hölzl,
+Callum Sutton, Yury Kudryashov, Leonardo de Moura and Mario Carneiro. Its total
+central lift extends the same nonassociative client.
 
 AI agents developed the Lean code and examples.
 

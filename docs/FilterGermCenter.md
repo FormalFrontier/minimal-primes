@@ -27,7 +27,42 @@ With `[MulOneClass M]`, `Filter.Germ.mem_submonoid_center_coe_iff D f` gives
 the same criterion for `Submonoid.center`. Its proof uses the existing carrier
 identity `Submonoid.coe_center`; a two-sided identity is enough, with no
 associativity assumption. Neither endpoint adds a predicate, carrier, evaluator,
-or quotient construction. The two membership criteria are the public interface.
+or quotient construction. These criteria underlie the equivalence below.
+
+## Germs of centers and total central lifts
+
+At the same `MulOneClass` floor,
+
+```lean
+Filter.Germ.centerEquiv (M := M) D :
+  Filter.Germ D ↥(Submonoid.center M) ≃*
+    ↥(Submonoid.center (Filter.Germ D M))
+```
+
+is a canonical multiplicative equivalence. The two carriers and the equivalence
+lie in `Type (max u v)`. Its forward map is characterized by `coe_centerEquiv`:
+after forgetting the central subtype, it is `Filter.Germ.map Subtype.val`.
+`coe_centerEquiv_coe` gives the pointwise coercion equation on representatives.
+The ordinary `MulEquiv` API supplies multiplication, unit and inverse laws.
+
+`map_subtype_centerEquiv_symm` says that forgetting the subtype after taking the
+inverse recovers the original central germ. `centerEquiv_symm_eq_coe` identifies
+that inverse with any total center-valued function whose underlying germ is the
+given germ. Thus uniqueness is at the germ level, not at each index.
+
+For `z : ↥(Submonoid.center (Filter.Germ D M))`,
+`Filter.Germ.centerRepresentative D z` is a total function
+`ι → ↥(Submonoid.center M)`. Its germ is the inverse image of `z`, by
+`coe_centerRepresentative`. Given a representative `f` of a central germ,
+`centerRepresentative_eventuallyEq D f hf` says that the underlying selected
+function agrees with `f` eventually. Users need not unfold either construction.
+
+Surjectivity repairs exceptional values with the existing central unit. No extra
+default element, proper filter or nonempty index assumption is required. A
+selected representative is not canonical pointwise and need not take a prescribed
+value on ignored indices. Bottom and empty-index filters remain covered. An empty
+codomain cannot carry the supplied `MulOneClass`; this is not an extra assumption.
+At the top filter the representative agreement is pointwise.
 
 ## Why varying tests matter
 
@@ -61,12 +96,17 @@ The function on `Fin 3` with values `0, 1, 2`, at the principal filter generated
 by `{0, 1}`, represents a central germ. Its third value is noncentral, and the
 two distinct retained values prevent the germ from being constant. This single
 client exercises the nonassociative class floor and the eventual, rather than
-everywhere or constant, character of the criterion.
+everywhere or constant, character of the criterion. It also uses
+`centerRepresentative` to obtain `liftedVaryingValue`, a total function into the
+actual center. The retained values are still `0` and `1`. Since the original
+third value is noncentral, the total central lift cannot agree with it everywhere;
+no particular replacement value is asserted.
 
 ## Foundations and attribution
 
 The module builds on Mathlib's [intrinsic magma center](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Algebra/Group/Center.lean)
 by Eric Wieser and Jireh Loreaux, its [submonoid center](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/GroupTheory/Submonoid/Center.lean)
 by Eric Wieser, and the [germ API](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Order/Filter/Germ/Basic.lean)
-by Yury Kudryashov and Abhimanyu Pallavi Sudhir. See [CREDITS](../CREDITS.md).
+by Yury Kudryashov and Abhimanyu Pallavi Sudhir. Injectivity reuses the library's
+varying-application criterion in `Order/Filter/Germ/Map.lean`. See [CREDITS](../CREDITS.md).
 This generic germ API is a Mathlib-upstream candidate.
