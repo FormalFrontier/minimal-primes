@@ -87,6 +87,15 @@ Witness selection uses Mathlib's `Filter.skolem`. The bad-coordinate annihilator
 argument follows the corresponding regularity argument by Formal Frontier Agents;
 the proofs test all varying representatives, not just constant germs.
 
+The intrinsic germ-center criterion uses Mathlib's magma-center formalization by
+Eric Wieser and Jireh Loreaux, Eric Wieser's bundled submonoid center, and the germ
+representation, quotient induction and multiplication interfaces of Yury Kudryashov
+and Abhimanyu Pallavi Sudhir. Commutation uses the interfaces formalized by Neil
+Strickland and Yury Kudryashov. The varying-witness argument follows the existing
+multiplication-regularity pattern developed by Formal Frontier Agents, retaining
+all three intrinsic centrality fields. The four-element client and its varying
+representative are original finite data; no additional center or quotient is defined.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

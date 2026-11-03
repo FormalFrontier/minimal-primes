@@ -319,6 +319,20 @@ uses a constant-zero map at index zero and `k ↦ n + k` at positive indices: th
 induced germ action is injective despite its noninjective zero fibre.
 This generic criterion is a Mathlib-upstream candidate.
 
+### Intrinsic centers of filter germs
+
+[`Order/Filter/Germ/Center.lean`](MinimalPrimes/Order/Filter/Germ/Center.lean) proves
+`Filter.Germ.mem_center_coe_iff` at `Mul`: a represented germ belongs to the existing
+magma center exactly when its values are central eventually. All three
+`IsMulCentral` fields are retained, not only commutation. The companion
+`mem_submonoid_center_coe_iff` needs only `MulOneClass`, not associativity.
+The filter is arbitrary and the index and codomain universes are independent;
+no properness or inhabitedness assumptions are added.
+The [single finite client](MinimalPrimesTest/Order/Filter/Germ/Center.lean) uses a
+noncommutative, nonassociative multiplication and a genuinely varying central germ
+with an ignored noncentral fibre. See the [center guide](docs/FilterGermCenter.md)
+for the interface and proof idea. This generic API is a Mathlib-upstream candidate.
+
 ## Build and audit
 
 The toolchain is pinned in `lean-toolchain`; `lake-manifest.json` records the complete

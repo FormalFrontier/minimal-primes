@@ -10,6 +10,7 @@ public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
 public import MinimalPrimes.Order.FiniteHeightChain
+public import MinimalPrimes.Order.Filter.Germ.Center
 public import MinimalPrimes.Order.Filter.Germ.Map
 public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
@@ -77,5 +78,7 @@ The germ-map leaf characterizes injectivity of varying pointwise application by 
 injectivity of the fibre maps, without properness or inhabitedness assumptions.
 The non-zero-divisor leaf characterizes intrinsic left, right and two-sided
 non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with zero.
+The germ-center leaf characterizes the full intrinsic magma center by eventual
+coordinate centrality, with a submonoid-center bridge requiring only a two-sided identity.
 Import a leaf directly for a smaller API.
 -/
