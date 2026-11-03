@@ -77,6 +77,13 @@ natural-number cancellation interfaces. Related multiplication-regularity criter
 were developed by Formal Frontier Agents/Almanac; the general function criterion
 introduces no dependency on that specialization.
 
+The germ non-zero-divisor criteria use Mathlib's germ representation and multiplication
+APIs by Yury Kudryashov and Abhimanyu Pallavi Sudhir, and its non-zero-divisor
+submonoids and annihilator witnesses by Kenny Lau, Devon Tuma and Oliver Nash.
+Witness selection uses Mathlib's `Filter.skolem`. The bad-coordinate annihilator
+argument follows the corresponding regularity argument by Formal Frontier Agents;
+the proofs test all varying representatives, not just constant germs.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

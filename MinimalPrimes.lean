@@ -11,6 +11,7 @@ public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
 public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.Order.Filter.Germ.Map
+public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
@@ -74,5 +75,7 @@ The monoid-germ leaf characterizes invertibility by the representative's filter-
 unit locus, for arbitrary filters and potentially noncommutative monoids.
 The germ-map leaf characterizes injectivity of varying pointwise application by eventual
 injectivity of the fibre maps, without properness or inhabitedness assumptions.
+The non-zero-divisor leaf characterizes intrinsic left, right and two-sided
+non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with zero.
 Import a leaf directly for a smaller API.
 -/

@@ -180,6 +180,16 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   disconnectedness from the Hausdorff spectrum. For a **reduced, nontrivial
   commutative ring**, this bound and preconnectedness of its spectrum imply `IsField R`.
 
+### Non-zero-divisor loci of germs
+
+For an arbitrary filter `D` and a monoid with zero `M`, the
+[non-zero-divisor criteria](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean)
+identify intrinsic left, right and two-sided non-zero-divisors of `Filter.Germ D M`
+with eventual coordinate membership in the corresponding submonoids of `M`.
+The index and coefficient universes are independent; improper filters, empty indices
+and trivial monoids are included. These are zero-annihilator criteria, not full
+multiplicative cancellation criteria. The generic API is a Mathlib-upstream candidate.
+
 ### Topological dimension on open covers
 
 The [open-cover leaf](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) proves
@@ -327,6 +337,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
+| [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
@@ -366,6 +377,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The germ non-zero-divisor criteria use Mathlib's filter-germ, filter witness-selection
+  and monoid-with-zero non-zero-divisor APIs; see the module's references and
+  [CREDITS.md](CREDITS.md).
 - Mathlib's factorization, ideal, spectrum, localization and dimension APIs; exact
   pinned module references and the related `SchemeProperties` ring formulations
   are in the [guide](docs/Guide.md#references).
