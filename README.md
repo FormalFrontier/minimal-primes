@@ -34,6 +34,12 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   germ kernels, singly generated ideals, and compatibility with Mathlib's finite
   coordinate-ideal classification. Index and factor universes are independent;
   empty products are included without a nontrivial-product assumption.
+  For arbitrary semiring fibres, coordinate ideals `I i` and a filter `D`,
+  `Filter.pi_sup_piIdeal_eq_top_iff` says that `Ideal.pi I ⊔ D.piIdeal R` is
+  the whole ideal exactly when `{i | I i = ⊤} ∈ D`. The properness criterion
+  `Filter.pi_sup_piIdeal_ne_top_iff` is nonmembership of this set, not membership
+  of its complement unless `D` is an ultrafilter. Zero fibres and improper
+  filters are allowed.
   ([examples](MinimalPrimesTest/RingTheory/Ideal/PiFilter.lean)).
 - **Prime ideals of arbitrary products of semifields**
   ([module](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean)). For any dependent

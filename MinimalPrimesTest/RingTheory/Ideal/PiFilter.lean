@@ -6,6 +6,7 @@ module
 
 public import MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter
 public import Mathlib.Basic.NNReal.Defs
+public import Mathlib.Data.ZMod.Basic
 
 /-!
 # Clients of the product-ideal/filter correspondence
@@ -44,6 +45,40 @@ example :
   · intro h
     have h₁ := (Ideal.mem_pi _ _).mp h 1
     simp at h₁
+
+-- Properness at a non-ultrafilter is not membership of the complementary locus.
+example :
+    let I : Fin 2 → Ideal ℕ := ![⊥, ⊤]
+    Ideal.pi I ⊔ (⊤ : Filter (Fin 2)).piIdeal (fun _ => ℕ) ≠ ⊤ ∧
+      {i | I i ≠ ⊤} ∉ (⊤ : Filter (Fin 2)) := by
+  dsimp only
+  constructor
+  · rw [Filter.pi_sup_piIdeal_ne_top_iff, Filter.mem_top_iff_forall]
+    intro h
+    simpa using h 0
+  · rw [Filter.mem_top_iff_forall]
+    intro h
+    simpa using h 1
+
+-- A principal filter distinguishes the zero fibre from the nontrivial fibre.
+example :
+    let R : Bool → Type := fun b => ZMod (if b then 2 else 1)
+    Ideal.pi (fun b => (⊥ : Ideal (R b))) ⊔ (principal {false}).piIdeal R = ⊤ ∧
+      Ideal.pi (fun b => (⊥ : Ideal (R b))) ⊔ (principal {true}).piIdeal R ≠ ⊤ := by
+  dsimp only
+  constructor
+  · rw [Filter.pi_sup_piIdeal_eq_top_iff, Filter.mem_principal]
+    intro b hb
+    have hb' : b = false := by simpa using hb
+    subst b
+    apply (Ideal.eq_top_iff_one _).mpr
+    change (1 : ZMod 1) ∈ (⊥ : Ideal (ZMod 1))
+    rw [Subsingleton.elim (1 : ZMod 1) 0]
+    exact (⊥ : Ideal (ZMod 1)).zero_mem
+  · rw [Filter.pi_sup_piIdeal_ne_top_iff, Filter.mem_principal]
+    intro h
+    have htrue := h (by simp : true ∈ ({true} : Set Bool))
+    simp at htrue
 
 example {ι : Type u} (R : Type v) [Semiring R] (F : Filter ι) :
     F.piIdeal (fun _ : ι => R) = RingHom.ker (Filter.Germ.coeRingHom (R := R) F) :=

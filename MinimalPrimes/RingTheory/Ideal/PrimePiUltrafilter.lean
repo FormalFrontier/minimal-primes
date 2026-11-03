@@ -100,9 +100,14 @@ theorem piIdeal_map_comap_piRingHom {κ : Type w}
 of the ultrafilter. This criterion allows arbitrary semiring factors. -/
 theorem piIdeal_ne_top_iff (U : Ultrafilter ι) :
     U.piIdeal A ≠ ⊤ ↔ {i | Nontrivial (A i)} ∈ U := by
-  have hz : {i | (1 : Π i, A i) i = 0} = {i | Nontrivial (A i)}ᶜ := by
+  have hbot : Ideal.pi (fun i => (⊥ : Ideal (A i))) = ⊥ := by
+    ext f
+    simp only [Ideal.mem_pi, Ideal.mem_bot]
+    exact funext_iff.symm
+  have htop : {i | (⊥ : Ideal (A i)) = ⊤} = {i | Nontrivial (A i)}ᶜ := by
     ext i
-    change (1 : A i) = 0 ↔ ¬ Nontrivial (A i)
+    change (⊥ : Ideal (A i)) = ⊤ ↔ ¬ Nontrivial (A i)
+    rw [Ideal.eq_top_iff_one, Ideal.mem_bot]
     constructor
     · intro h hnt
       let := hnt
@@ -110,8 +115,8 @@ theorem piIdeal_ne_top_iff (U : Ultrafilter ι) :
     · intro h
       let : Subsingleton (A i) := not_nontrivial_iff_subsingleton.mp h
       exact Subsingleton.elim _ _
-  rw [Ideal.ne_top_iff_one, mem_piIdeal, hz]
-  exact Ultrafilter.compl_notMem_iff
+  simpa [hbot, piIdeal_eq_filter_piIdeal, htop] using
+    (Filter.pi_sup_piIdeal_ne_top_iff (fun i => (⊥ : Ideal (A i))) (U : Filter ι))
 
 instance piIdeal_isPrime [∀ i, Nontrivial (A i)] [∀ i, NoZeroDivisors (A i)]
     (U : Ultrafilter ι) : (U.piIdeal A).IsPrime where

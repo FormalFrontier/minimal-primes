@@ -29,6 +29,11 @@ and suprema with ideal suprema and infima. The infimum-to-supremum law uses the
 reversed-order adjunction with `Ideal.piFilter`; the other law follows from zero-set
 membership. The proofs reuse Mathlib's Galois-connection and filter/submodule lattice APIs.
 
+The sum of a coordinate product ideal and a filter ideal is the whole ideal exactly
+when the set of coordinates with whole ideal belongs to the filter. Its properness
+criterion is nonmembership of this set; membership of the complement is equivalent
+only for ultrafilters. Both criteria hold for arbitrary dependent semiring families.
+
 The zero-set tests, disjoint-piece sum and pointwise inverse argument generalize
 the original prime/ultrafilter construction by Formal Frontier Agents in
 `MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`. The constructions use Mathlib's
@@ -99,6 +104,23 @@ theorem mem_pi_sup_piIdeal {R : ι → Type v} [∀ i, Semiring (R i)]
         simp [hi]
     · ext i
       by_cases hi : f i ∈ I i <;> simp [hi]
+
+/-- The sum of a coordinate product ideal and a filter ideal is the whole ideal exactly
+when the coordinates with whole ideal form a member of the filter. -/
+theorem pi_sup_piIdeal_eq_top_iff {R : ι → Type v} [∀ i, Semiring (R i)]
+    (I : ∀ i, Ideal (R i)) (D : Filter ι) :
+    (Ideal.pi I ⊔ D.piIdeal R = ⊤) ↔ {i | I i = ⊤} ∈ D := by
+  have htop : {i | (1 : ∀ i, R i) i ∈ I i} = {i | I i = ⊤} := by
+    ext i
+    exact (Ideal.eq_top_iff_one (I i)).symm
+  rw [Ideal.eq_top_iff_one, mem_pi_sup_piIdeal, htop]
+
+/-- The sum of a coordinate product ideal and a filter ideal is proper exactly
+when the coordinates with whole ideal do not form a member of the filter. -/
+theorem pi_sup_piIdeal_ne_top_iff {R : ι → Type v} [∀ i, Semiring (R i)]
+    (I : ∀ i, Ideal (R i)) (D : Filter ι) :
+    (Ideal.pi I ⊔ D.piIdeal R ≠ ⊤) ↔ {i | I i = ⊤} ∉ D :=
+  not_congr (pi_sup_piIdeal_eq_top_iff I D)
 
 /-- The zero-set construction reverses the native filter order. -/
 theorem piIdeal_antitone : Antitone (piIdeal A) := by

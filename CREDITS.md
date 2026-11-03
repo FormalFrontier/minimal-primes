@@ -52,6 +52,9 @@ The all-ideal/filter correspondence generalizes that predecessor's zero-set test
 disjoint-piece sum and pointwise-inverse argument: the constructors work for
 semirings, and the classification for division semirings uses Mathlib's left ideals.
 Its finite-product comparison and germ-kernel client reuse Mathlib's existing APIs.
+The coordinate-ideal sum criterion applies the existing membership law to one and
+uses Mathlib's ideal one-test; the ultrafilter properness result specializes this
+criterion using Mathlib's ultrafilter complement law.
 The topological extension follows that classification and uses Reid Barton's Mathlib
 ultrafilter Stone topology (whose general Stone–Čech construction also credits
 Marius Stekelenburg), Johan Commelin's prime-spectrum topology and basic-open basis,
