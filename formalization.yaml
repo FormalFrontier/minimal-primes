@@ -14,8 +14,10 @@ project:
     bridges, and finite-coordinate and infinite non-coordinate controls. The same
     equivalence is a homeomorphism for the Zariski and existing Stone topologies,
     with both basis pullback laws and dense coordinate primes.
-    For arbitrary filters and independently universed dependent semiring fibres,
-    equips the existing total-section Filter.Product with semiring operations,
+    For arbitrary filters and independently universed dependent monoids with zero,
+    the total-section filter product is reduced exactly when its reduced fibres
+    form a filter member. For dependent semiring fibres, equips the existing
+    total-section Filter.Product with semiring operations,
     fibrewise maps and principal-filter restriction equivalences. Ultrafilters give
     division semirings and semifields with pointwise inversion. The section-map
     kernels are the existing zero-set ideals, compatibly with constant-family germs.

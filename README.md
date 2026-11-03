@@ -28,6 +28,17 @@ all sufficiently high iterates have reduced images. The
 corresponding original subring-range statement for a given commutative ring.
 No field, perfectness, or reducedness of the ambient semiring is assumed.
 
+### Reduced dependent filter products
+
+For an arbitrary filter and an independently universed dependent family of
+monoids with zero, the filter product is reduced exactly when its reduced
+fibres form a member of the filter. The
+[criterion](MinimalPrimes/Order/Filter/Product/Reduced.lean) uses a uniform
+square-zero test, not an exchange of a varying nilpotence exponent with
+eventual equality. No addition, commutativity, proper-filter or nontriviality
+hypothesis is needed.
+
+### Other headline results
 
 The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
 and the linked module documentation for statements, examples, proof ideas and Mathlib dependencies.

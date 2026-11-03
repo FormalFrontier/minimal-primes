@@ -16,6 +16,7 @@ public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.Units
+public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
