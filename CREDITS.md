@@ -87,6 +87,10 @@ Witness selection uses Mathlib's `Filter.skolem`. The bad-coordinate annihilator
 argument follows the corresponding regularity argument by Formal Frontier Agents;
 the proofs test all varying representatives, not just constant germs.
 
+Constant-germ reducedness uses Mathlib's quotient, power and eventual-equality
+interfaces, and Johan Commelin's zero-and-power definitions of nilpotence and
+reducedness.
+
 The intrinsic germ-center criterion uses Mathlib's magma-center formalization by
 Eric Wieser and Jireh Loreaux, Eric Wieser's bundled submonoid center, and the germ
 representation, quotient induction and multiplication interfaces of Yury Kudryashov

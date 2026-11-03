@@ -14,6 +14,7 @@ public import MinimalPrimes.Order.Filter.Germ.Center
 public import MinimalPrimes.Order.Filter.Germ.Map
 public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
+public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
@@ -72,6 +73,9 @@ and the reduced, nontrivial, preconnected-spectrum field criterion.
 The germ-regularity leaf characterizes intrinsic left, right and two-sided regularity
 by eventual regularity of representatives, for arbitrary filters and codomains with
 only multiplication.
+The germ-reducedness leaf needs only zero and natural-number powers: reducedness is
+equivalent to eventual reducedness of the value type, or to the filter being bottom
+or the value type being reduced.
 The monoid-germ leaf characterizes invertibility by the representative's filter-large
 unit locus, for arbitrary filters and potentially noncommutative monoids.
 The germ-map leaf characterizes injectivity of varying pointwise application by eventual
