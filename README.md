@@ -284,6 +284,18 @@ kernel with the existing zero-set ideals, retaining the constant-germ kernel res
 No semiring ideal-quotient isomorphism is asserted. The generic Product API is a
 Mathlib-upstream candidate; these ideal bridges remain specific to this library.
 
+### Varying application on germs
+
+[`Order/Filter/Germ/Map.lean`](MinimalPrimes/Order/Filter/Germ/Map.lean) proves
+`Filter.Germ.injective_map₂_apply_coe_iff`: the existing `Germ.map₂` specialized to
+evaluation by a family `F : ι → A → B` is injective exactly when `F i` is injective
+eventually. Index, domain and codomain universes are independent. No algebra,
+proper-filter or inhabitedness assumption is imposed, including at empty types.
+The [cofinite-sequence example](MinimalPrimesTest/Order/Filter/Germ/Map.lean)
+uses a constant-zero map at index zero and `k ↦ n + k` at positive indices: the
+induced germ action is injective despite its noninjective zero fibre.
+This generic criterion is a Mathlib-upstream candidate.
+
 ## Build and audit
 
 The toolchain is pinned in `lean-toolchain`; `lake-manifest.json` records the complete
@@ -314,6 +326,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
+| [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |

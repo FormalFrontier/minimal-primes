@@ -68,6 +68,15 @@ Kudryashov; the quotient algebra and descended maps reuse Antoine Chambert-Loir'
 ring-congruence interfaces. Maximality transports ultrafilter extremality through
 the existing division-semiring ideal/filter correspondence.
 
+The varying-application injectivity criterion uses the existing germ carrier,
+`Germ.map₂`, quotient induction and eventual-equality API of Yury Kudryashov and
+Abhimanyu Pallavi Sudhir in Mathlib. Its proof chooses fibrewise collision witnesses
+and applies injectivity on the existing quotient; it defines no additional carrier
+or descended map. The cofinite example uses Mathlib's eventual-inequality and
+natural-number cancellation interfaces. Related multiplication-regularity criteria
+were developed by Formal Frontier Agents/Almanac; the general function criterion
+introduces no dependency on that specialization.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
