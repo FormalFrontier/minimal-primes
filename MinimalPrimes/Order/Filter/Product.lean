@@ -8,12 +8,18 @@ module
 public import Mathlib.Algebra.Ring.Pi
 public import Mathlib.Order.Filter.FilterProduct
 public import Mathlib.RingTheory.Congruence.Hom
+public import MinimalPrimes.GroupTheory.Congruence.MonoidWithZero
 
 /-!
 # Algebra on dependent reduced products
 
 The carrier is Mathlib's `Filter.Product`: dependent total sections modulo eventual
-equality. `Filter.productRingCon` refines its exact setoid, so the existing
+equality. `Filter.productCon` refines its exact setoid and gives monoid and
+monoid-with-zero structures without additive assumptions. `Filter.Product.coeMulHom`
+is the canonical section homomorphism. Use the existing `Con.mk'` and `Con.lift`
+APIs for the multiplicative quotient.
+
+With addition, `Filter.productRingCon` extends this same congruence. The existing
 `RingCon` quotient structures and universal property apply without a second quotient.
 Use `RingCon.mk'`, `RingCon.mk'_surjective`, `RingCon.eq`, `RingCon.lift`,
 `RingCon.lift_coe` and `RingCon.lift_unique` directly. In particular, the canonical
@@ -32,6 +38,9 @@ The carrier, quotient operations and universal property reuse Mathlib's
 argument generalizes the pointwise inversion argument in Mathlib's
 `Order.Filter.FilterProduct`, originally by Abhimanyu Pallavi Sudhir and Yury
 Kudryashov. The constant-family construction remains the existing `Filter.Germ`.
+The multiplicative quotient construction follows Amelia Livingston's `Con`
+formalization and Johan Commelin's surjective transports. Pointwise section data
+reuse the Pi formalization by Simon Hudon, Patrick Massot and Eric Wieser.
 -/
 
 @[expose] public section
@@ -44,12 +53,33 @@ namespace Filter
 
 variable {ι : Type u}
 
+/-- The dependent-product relation is eventual equality of sections,
+without algebraic assumptions. -/
+@[simp]
+theorem productSetoid_apply (F : Filter ι) (K : ι → Type v) (f g : ∀ i, K i) :
+    productSetoid F K f g ↔ ∀ᶠ i in F, f i = g i := Iff.rfl
+
+/-- Eventual equality of dependent sections is a multiplicative congruence. -/
+abbrev productCon (F : Filter ι) (K : ι → Type v) [∀ i, Mul (K i)] :
+    Con (∀ i, K i) where
+  toSetoid := productSetoid F K
+  mul' := fun hfg hkl => (hfg.and hkl).mono fun _ h => congrArg₂ (· * ·) h.1 h.2
+
+/-- The multiplicative congruence uses the existing dependent-product setoid. -/
+@[simp]
+theorem productCon_toSetoid (F : Filter ι) (K : ι → Type v) [∀ i, Mul (K i)] :
+    (productCon F K).toSetoid = productSetoid F K := rfl
+
+/-- The multiplicative congruence relates exactly the eventually equal sections. -/
+theorem productCon_apply (F : Filter ι) (K : ι → Type v) [∀ i, Mul (K i)]
+    (f g : ∀ i, K i) :
+    productCon F K f g ↔ ∀ᶠ i in F, f i = g i := Iff.rfl
+
 /-- Eventual equality of dependent sections is an additive and multiplicative congruence. -/
 def productRingCon (F : Filter ι) (K : ι → Type v) [∀ i, Add (K i)] [∀ i, Mul (K i)] :
     RingCon (∀ i, K i) where
-  toSetoid := productSetoid F K
+  toCon := productCon F K
   add' := fun hfg hkl => (hfg.and hkl).mono fun _ h => congrArg₂ (· + ·) h.1 h.2
-  mul' := fun hfg hkl => (hfg.and hkl).mono fun _ h => congrArg₂ (· * ·) h.1 h.2
 
 /-- The congruence uses exactly the existing dependent-product setoid. -/
 @[simp]
@@ -67,6 +97,66 @@ namespace Product
 
 variable {F : Filter ι} {K : ι → Type v}
 
+/-- Two sections have the same class precisely when they are eventually equal. -/
+theorem coe_eq (f g : ∀ i, K i) :
+    (f : F.Product K) = (g : F.Product K) ↔ ∀ᶠ i in F, f i = g i := by
+  simp only [Quotient.eq', productSetoid_apply]
+
+/-- Pointwise monoid operations descend on the dependent-product carrier. -/
+instance instMonoid [∀ i, Monoid (K i)] : Monoid (F.Product K) :=
+  Con.monoid (productCon F K)
+
+/-- Pointwise monoid-with-zero operations descend on the dependent-product carrier. -/
+instance instMonoidWithZero [∀ i, MonoidWithZero (K i)] : MonoidWithZero (F.Product K) :=
+  Con.monoidWithZero (productCon F K)
+
+/-- The canonical projection from sections to the reduced product as a monoid homomorphism. -/
+def coeMulHom (F : Filter ι) [∀ i, Monoid (K i)] : (∀ i, K i) →* F.Product K :=
+  (productCon F K).mk'
+
+/-- The section homomorphism is the existing coefficient projection. -/
+@[simp]
+theorem coeMulHom_apply [∀ i, Monoid (K i)] (f : ∀ i, K i) :
+    coeMulHom F f = (f : F.Product K) := rfl
+
+/-- The constant section with value one represents one. -/
+@[simp]
+theorem coe_one [∀ i, Monoid (K i)] :
+    ((1 : ∀ i, K i) : F.Product K) = (1 : F.Product K) := rfl
+
+/-- Multiplication of representatives is pointwise multiplication. -/
+@[simp]
+theorem coe_mul [∀ i, Monoid (K i)] (f g : ∀ i, K i) :
+    ((f * g : ∀ i, K i) : F.Product K) =
+      ((· * ·) : F.Product K → F.Product K → F.Product K)
+        (f : F.Product K) (g : F.Product K) := rfl
+
+/-- Natural powers of representatives are pointwise powers. -/
+@[simp]
+theorem coe_pow [∀ i, Monoid (K i)] (f : ∀ i, K i) (n : ℕ) :
+    ((f ^ n : ∀ i, K i) : F.Product K) =
+      ((· ^ ·) : F.Product K → ℕ → F.Product K) (f : F.Product K) n := rfl
+
+/-- The constant section with value zero represents zero. -/
+@[simp]
+theorem coe_zero [∀ i, MonoidWithZero (K i)] :
+    ((0 : ∀ i, K i) : F.Product K) = (0 : F.Product K) := rfl
+
+/-- An eventual-equality-invariant monoid homomorphism factors uniquely through
+    the dependent filter product. -/
+theorem existsUnique_monoidHom [∀ i, Monoid (K i)] {P : Type w} [MulOneClass P]
+    (h : (∀ i, K i) →* P)
+    (hh : ∀ {f g : ∀ i, K i}, (∀ᶠ i in F, f i = g i) → h f = h g) :
+    ∃! g : F.Product K →* P, g.comp (coeMulHom F) = h := by
+  have hker : productCon F K ≤ Con.ker h := by
+    intro f g hfg
+    exact (Con.ker_apply (f := h)).2 (hh ((productCon_apply F K f g).1 hfg))
+  refine ⟨Con.lift (productCon F K) h hker, ?_, ?_⟩
+  · exact Con.lift_comp_mk' hker
+  · intro g hg
+    apply Con.hom_ext (c := productCon F K)
+    exact hg.trans (Con.lift_comp_mk' (c := productCon F K) (f := h) hker).symm
+
 /-- Pointwise semiring operations descend on the existing dependent-product carrier. -/
 instance instSemiring [∀ i, Semiring (K i)] : Semiring (F.Product K) :=
   inferInstanceAs (Semiring (productRingCon F K).Quotient)
@@ -74,6 +164,11 @@ instance instSemiring [∀ i, Semiring (K i)] : Semiring (F.Product K) :=
 /-- Commutative fibres give the corresponding commutative reduced product. -/
 instance instCommSemiring [∀ i, CommSemiring (K i)] : CommSemiring (F.Product K) :=
   inferInstanceAs (CommSemiring (productRingCon F K).Quotient)
+
+/-- With semiring fibres, the section monoid homomorphism is the multiplicative part
+of the section ring homomorphism. -/
+theorem coeMulHom_eq_mk'_toMonoidHom [∀ i, Semiring (K i)] :
+    coeMulHom F = (productRingCon F K).mk'.toMonoidHom := rfl
 
 /-- A section represents zero precisely when its zero set belongs to the filter. -/
 @[simp]
@@ -240,6 +335,10 @@ instance instSemifield [∀ i, Semifield (K i)] : Semifield ((U : Filter ι).Pro
 end Ultrafilter
 
 end Product
+
+/-- On constant families the section monoid homomorphism is the existing germ homomorphism. -/
+theorem productCon_mk'_eq_coeMulHom (F : Filter ι) (R : Type v) [Monoid R] :
+    (productCon F (fun _ : ι => R)).mk' = Germ.coeMulHom F := rfl
 
 /-- On constant families the section homomorphism is the existing germ homomorphism. -/
 theorem productRingCon_mk'_eq_coeRingHom (F : Filter ι) (R : Type v) [Semiring R] :
