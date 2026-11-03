@@ -9,6 +9,7 @@ public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
 public import MinimalPrimes.Order.FiniteHeightChain
+public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.RingTheory.Ideal.FiniteHeightChain
 public import MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization
@@ -63,5 +64,7 @@ their stock residue fields with dependent reduced products over the section ring
 compatibly with fibrewise field homomorphisms.
 The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
 and the reduced, nontrivial, preconnected-spectrum field criterion.
+The monoid-germ leaf characterizes invertibility by the representative's filter-large
+unit locus, for arbitrary filters and potentially noncommutative monoids.
 Import a leaf directly for a smaller API.
 -/
