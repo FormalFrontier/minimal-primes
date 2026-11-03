@@ -46,6 +46,33 @@ theorem eventually_forall_iff_forall_section (s : ∀ i, R i) :
     choose f hf using hex
     exact (h f).mono fun i hi => hf i hi
 
+/-- A family of maps reflects eventual equality of total sections exactly when
+there is no total source section or the coordinate maps are eventually injective.
+The emptiness disjunct concerns the whole dependent function sort: an empty fibre
+ignored by the filter still prevents every total source section. -/
+theorem forall_eventually_eq_of_map_eq_iff {K : ι → Sort v} {L : ι → Sort w}
+    (D : Filter ι) (φ : ∀ i, K i → L i) :
+    (∀ f g : ∀ i, K i, (∀ᶠ i in D, φ i (f i) = φ i (g i)) → ∀ᶠ i in D, f i = g i) ↔
+      IsEmpty (∀ i, K i) ∨ ∀ᶠ i in D, Function.Injective (φ i) := by
+  constructor
+  · intro h
+    rcases isEmpty_or_nonempty (∀ i, K i) with hK | ⟨s⟩
+    · exact Or.inl hK
+    · obtain ⟨s⟩ := s
+      right
+      let R (i : ι) := Σ' a : K i, Σ' b : K i, φ i a = φ i b
+      have hR : ∀ᶠ i in D, ∀ p : R i, p.1 = p.2.1 := by
+        apply (eventually_forall_iff_forall_section (D := D)
+          (P := fun i (p : R i) => p.1 = p.2.1)
+          (fun i => ⟨s i, ⟨s i, rfl⟩⟩)).2
+        intro p
+        exact h (fun i => (p i).1) (fun i => (p i).2.1)
+          (Eventually.of_forall fun i => (p i).2.2)
+      exact hR.mono fun i hi a b hab => hi ⟨a, ⟨b, hab⟩⟩
+  · rintro (hK | hφ) f g hfg
+    · exact (hK.false f).elim
+    · exact (hφ.and hfg).mono fun i hi => hi.1 hi.2
+
 end Filter
 
 namespace Filter
