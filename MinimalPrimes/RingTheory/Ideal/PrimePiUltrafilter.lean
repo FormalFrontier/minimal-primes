@@ -126,10 +126,10 @@ theorem piIdeal_ne_top_iff (U : Ultrafilter ι) :
 
 private theorem pi_sup_piIdeal_ne_top_iff (I : ∀ i, Ideal (A i)) (U : Ultrafilter ι) :
     Ideal.pi I ⊔ (U : Filter ι).piIdeal A ≠ ⊤ ↔ {i | I i ≠ ⊤} ∈ U := by
-  have hsets : {i | (1 : Π i, A i) i ∈ I i} = {i | I i ≠ ⊤}ᶜ := by
+  have hsets : {i | I i = ⊤} = {i | I i ≠ ⊤}ᶜ := by
     ext i
-    simp only [Pi.one_apply, Set.mem_ofPred_eq, mem_compl_iff, not_not, Ideal.eq_top_iff_one]
-  rw [Ideal.ne_top_iff_one, Filter.mem_pi_sup_piIdeal, hsets]
+    simp only [Set.mem_ofPred_eq, mem_compl_iff, not_not]
+  rw [Filter.pi_sup_piIdeal_ne_top_iff, hsets]
   exact Ultrafilter.compl_notMem_iff
 
 /-- The sum of a coordinate ideal and an ultrafilter ideal is prime exactly when
