@@ -14,10 +14,11 @@ public import MinimalPrimes.GroupTheory.Congruence.MonoidWithZero
 # Algebra on dependent reduced products
 
 The carrier is Mathlib's `Filter.Product`: dependent total sections modulo eventual
-equality. `Filter.productCon` refines its exact setoid and gives monoid and
-monoid-with-zero structures without additive assumptions. `Filter.Product.coeMulHom`
-is the canonical section homomorphism. Use the existing `Con.mk'` and `Con.lift`
-APIs for the multiplicative quotient.
+equality. `Filter.productCon` refines its exact setoid and descends multiplication,
+unital multiplication, monoid and monoid-with-zero structures without additive
+assumptions. The class of the pointwise one section needs only `One` on each fibre.
+`Filter.Product.coeMulHom` is the canonical section homomorphism for `MulOneClass`
+fibres. Use the existing `Con.mk'` and `Con.lift` APIs for the multiplicative quotient.
 
 With addition, `Filter.productRingCon` extends this same congruence. The existing
 `RingCon` quotient structures and universal property apply without a second quotient.
@@ -102,6 +103,18 @@ theorem coe_eq (f g : ∀ i, K i) :
     (f : F.Product K) = (g : F.Product K) ↔ ∀ᶠ i in F, f i = g i := by
   simp only [Quotient.eq', productSetoid_apply]
 
+/-- Pointwise multiplication descends on the dependent-product carrier. -/
+instance instMul [∀ i, Mul (K i)] : Mul (F.Product K) :=
+  Con.hasMul (productCon F K)
+
+/-- The pointwise section with value one represents one in the dependent product. -/
+instance instOne [∀ i, One (K i)] : One (F.Product K) where
+  one := ((1 : ∀ i, K i) : F.Product K)
+
+/-- Pointwise multiplication with a two-sided unit descends on the dependent-product carrier. -/
+instance instMulOneClass [∀ i, MulOneClass (K i)] : MulOneClass (F.Product K) :=
+  Con.mulOneClass (productCon F K)
+
 /-- Pointwise monoid operations descend on the dependent-product carrier. -/
 instance instMonoid [∀ i, Monoid (K i)] : Monoid (F.Product K) :=
   Con.monoid (productCon F K)
@@ -110,23 +123,24 @@ instance instMonoid [∀ i, Monoid (K i)] : Monoid (F.Product K) :=
 instance instMonoidWithZero [∀ i, MonoidWithZero (K i)] : MonoidWithZero (F.Product K) :=
   Con.monoidWithZero (productCon F K)
 
-/-- The canonical projection from sections to the reduced product as a monoid homomorphism. -/
-def coeMulHom (F : Filter ι) [∀ i, Monoid (K i)] : (∀ i, K i) →* F.Product K :=
+/-- The canonical projection from sections to the reduced product preserves multiplication
+and one. -/
+def coeMulHom (F : Filter ι) [∀ i, MulOneClass (K i)] : (∀ i, K i) →* F.Product K :=
   (productCon F K).mk'
 
 /-- The section homomorphism is the existing coefficient projection. -/
 @[simp]
-theorem coeMulHom_apply [∀ i, Monoid (K i)] (f : ∀ i, K i) :
+theorem coeMulHom_apply [∀ i, MulOneClass (K i)] (f : ∀ i, K i) :
     coeMulHom F f = (f : F.Product K) := rfl
 
 /-- The constant section with value one represents one. -/
 @[simp]
-theorem coe_one [∀ i, Monoid (K i)] :
+theorem coe_one [∀ i, One (K i)] :
     ((1 : ∀ i, K i) : F.Product K) = (1 : F.Product K) := rfl
 
 /-- Multiplication of representatives is pointwise multiplication. -/
 @[simp]
-theorem coe_mul [∀ i, Monoid (K i)] (f g : ∀ i, K i) :
+theorem coe_mul [∀ i, Mul (K i)] (f g : ∀ i, K i) :
     ((f * g : ∀ i, K i) : F.Product K) =
       ((· * ·) : F.Product K → F.Product K → F.Product K)
         (f : F.Product K) (g : F.Product K) := rfl
@@ -142,9 +156,9 @@ theorem coe_pow [∀ i, Monoid (K i)] (f : ∀ i, K i) (n : ℕ) :
 theorem coe_zero [∀ i, MonoidWithZero (K i)] :
     ((0 : ∀ i, K i) : F.Product K) = (0 : F.Product K) := rfl
 
-/-- An eventual-equality-invariant monoid homomorphism factors uniquely through
-    the dependent filter product. -/
-theorem existsUnique_monoidHom [∀ i, Monoid (K i)] {P : Type w} [MulOneClass P]
+/-- An eventual-equality-invariant homomorphism preserving multiplication and one factors
+uniquely through the dependent filter product. -/
+theorem existsUnique_monoidHom [∀ i, MulOneClass (K i)] {P : Type w} [MulOneClass P]
     (h : (∀ i, K i) →* P)
     (hh : ∀ {f g : ∀ i, K i}, (∀ᶠ i in F, f i = g i) → h f = h g) :
     ∃! g : F.Product K →* P, g.comp (coeMulHom F) = h := by

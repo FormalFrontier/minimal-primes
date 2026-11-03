@@ -38,6 +38,17 @@ square-zero test, not an exchange of a varying nilpotence exponent with
 eventual equality. No addition, commutativity, proper-filter or nontriviality
 hypothesis is needed.
 
+### Regular elements of dependent filter products
+
+For an arbitrary filter `D` and an independently universed family `K` with only
+fibrewise multiplication, a total section represents a left-regular, right-regular,
+or regular element of `D.Product K` exactly when its values have that property
+eventually. The [criteria](MinimalPrimes/Order/Filter/Product/Regular.lean) require
+neither associativity, an identity, nor a proper filter. The existing
+[Germ criteria](MinimalPrimes/Order/Filter/Germ/Regular.lean) are their constant-family
+specializations. The [varying finite example](MinimalPrimesTest/Order/Filter/Product/Regular.lean)
+separates left and right regularity in noncommutative magmas with no identity.
+
 ### Other headline results
 
 The following interfaces are implemented in this library. See the [reader guide](docs/Guide.md)
@@ -408,6 +419,8 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness of constant-fibre germs with only zero and natural-number powers. |
+| [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
+| [`MinimalPrimes.Order.Filter.Product.Regular`](MinimalPrimes/Order/Filter/Product/Regular.lean) | Left, right and two-sided regularity at fibrewise multiplication, characterized by eventual regularity. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |

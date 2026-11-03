@@ -19,5 +19,6 @@ name = "MinimalPrimes"
 
 [[lean_lib]]
 name = "MinimalPrimesTest"
+leanOptions = { weak.linter.privateModule = false }
 roots = ["MinimalPrimesTest", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]
 globs = ["MinimalPrimesTest", "MinimalPrimesTest.+", "MinimalPrimesIntegralDimensionModels", "MinimalPrimesTypeTests.IntegralDimension"]

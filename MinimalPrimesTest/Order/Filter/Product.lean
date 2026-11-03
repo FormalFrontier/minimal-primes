@@ -11,9 +11,11 @@ public import Mathlib.Algebra.GroupWithZero.WithZero
 /-!
 # Multiplicative dependent products
 
-The structure comparisons check full data, including natural powers, along the named
-semiring and ultrafilter constructions. Varying endomorphism monoids then exercise
-composition without addition, commutativity or inverses. The unit-locus criterion
+The weak operations agree with their multiplicative-congruence records and, on constant
+families, with the existing germ records. The stronger structure comparisons check full
+data, including natural powers, along the semiring and ultrafilter constructions.
+Varying endomorphism monoids then exercise composition without addition, commutativity
+or inverses. The unit-locus criterion
 distinguishes identity sections from constant endomorphisms and the top filter from
 the bottom filter in this same family. Adjoining zero gives nonzero elements without
 right inverses even after taking the top-filter product.
@@ -27,9 +29,112 @@ universe u v
 
 namespace FilterProductExamples
 
+section WeakData
+
+variable {ι : Type u} {K : ι → Type v} (F : Filter ι)
+
+-- Multiplication is the congruence operation without an identity or associativity.
+example [∀ i, Mul (K i)] :
+    (inferInstance : Mul (F.Product K)) = Con.hasMul (productCon F K) := rfl
+
+-- The nullary operation needs only the pointwise unit section, not multiplication.
+example [∀ i, One (K i)] :
+    (inferInstance : One (F.Product K)) =
+      { one := ((1 : ∀ i, K i) : F.Product K) } := rfl
+
+-- When multiplication is available, this is the full existing congruence One record.
+example [∀ i, Mul (K i)] [∀ i, One (K i)] :
+    (inferInstance : One (F.Product K)) = Con.one (productCon F K) := rfl
+
+-- The unital magma and each of its data parents agree with separate inference.
+example [∀ i, MulOneClass (K i)] :
+    ((inferInstance : MulOneClass (F.Product K)),
+      (Product.instMulOneClass (F := F) (K := K)).toMul,
+      (Product.instMulOneClass (F := F) (K := K)).toOne,
+      (Product.instMulOneClass (F := F) (K := K)).toMulOne) =
+    (Con.mulOneClass (productCon F K),
+      (inferInstance : Mul (F.Product K)),
+      (inferInstance : One (F.Product K)),
+      (inferInstance : MulOne (F.Product K))) := rfl
+
+end WeakData
+
+section ConstantData
+
+variable {ι : Type u} (F : Filter ι) (R : Type v)
+
+-- The relation, quotient carrier and section coercion agree before imposing algebra.
+example :
+    productSetoid F (fun _ : ι => R) = germSetoid F R ∧
+      F.Product (fun _ : ι => R) = Germ F R ∧
+      (fun f : ι → R => (f : F.Product (fun _ : ι => R))) = Germ.ofFun (l := F) :=
+  ⟨rfl, rfl, rfl⟩
+
+example [Mul R] :
+    (inferInstance : Mul (F.Product (fun _ : ι => R))) =
+      Germ.instMul (l := F) (M := R) := rfl
+
+example [One R] :
+    (inferInstance : One (F.Product (fun _ : ι => R))) =
+      Germ.instOne (l := F) (M := R) := rfl
+
+example [MulOneClass R] :
+    (inferInstance : MulOneClass (F.Product (fun _ : ι => R))) =
+      Germ.instMulOneClass (l := F) (M := R) := rfl
+
+end ConstantData
+
 section Coherence
 
 variable {ι : Type u} {K : ι → Type v} (F : Filter ι)
+
+-- Full records retain their congruence providers, while the public weak instances agree
+-- with the monoid parents. The full parent comparisons below also retain the power data.
+example [∀ i, Monoid (K i)] :
+    ((inferInstance : Monoid (F.Product K)),
+      (Product.instMonoid (F := F) (K := K)).toMulOneClass,
+      (inferInstance : Mul (F.Product K)),
+      (inferInstance : One (F.Product K)),
+      (inferInstance : MulOneClass (F.Product K)),
+      (inferInstance : NPow (F.Product K))) =
+    (Con.monoid (productCon F K),
+      Product.instMulOneClass (F := F) (K := K),
+      Product.instMul (F := F) (K := K),
+      Product.instOne (F := F) (K := K),
+      Product.instMulOneClass (F := F) (K := K),
+      (Con.monoid (productCon F K)).toNPow) := rfl
+
+example [∀ i, MonoidWithZero (K i)] :
+    ((inferInstance : MonoidWithZero (F.Product K)),
+      (inferInstance : Mul (F.Product K)),
+      (inferInstance : One (F.Product K)),
+      (inferInstance : MulOneClass (F.Product K)),
+      (inferInstance : Zero (F.Product K))) =
+    (Con.monoidWithZero (productCon F K),
+      Product.instMul (F := F) (K := K),
+      Product.instOne (F := F) (K := K),
+      Product.instMulOneClass (F := F) (K := K),
+      Con.zero (productCon F K)) := rfl
+
+example [∀ i, Semiring (K i)] :
+    ((inferInstance : Semiring (F.Product K)),
+      (inferInstance : Mul (F.Product K)),
+      (inferInstance : One (F.Product K)),
+      (inferInstance : MulOneClass (F.Product K))) =
+    (inferInstanceAs (Semiring (productRingCon F K).Quotient),
+      Product.instMul (F := F) (K := K),
+      Product.instOne (F := F) (K := K),
+      Product.instMulOneClass (F := F) (K := K)) := rfl
+
+example [∀ i, CommSemiring (K i)] :
+    ((inferInstance : CommSemiring (F.Product K)),
+      (inferInstance : Mul (F.Product K)),
+      (inferInstance : One (F.Product K)),
+      (inferInstance : MulOneClass (F.Product K))) =
+    (inferInstanceAs (CommSemiring (productRingCon F K).Quotient),
+      Product.instMul (F := F) (K := K),
+      Product.instOne (F := F) (K := K),
+      Product.instMulOneClass (F := F) (K := K)) := rfl
 
 /-- The product's monoid-with-zero structure restricts to its monoid structure. -/
 theorem monoidWithZero_toMonoid [∀ i, MonoidWithZero (K i)] :
@@ -65,6 +170,19 @@ example (R : Type v) [Monoid R] :
       Germ.instMonoid (l := F) (M := R) := rfl
 
 variable (U : Ultrafilter ι)
+
+-- Public inference retains both ultrafilter records and the pointwise inverse operation.
+example [∀ i, DivisionSemiring (K i)] :
+    ((inferInstance : DivisionSemiring ((U : Filter ι).Product K)),
+      (inferInstance : Inv ((U : Filter ι).Product K))) =
+    (Product.instDivisionSemiring (K := K) U,
+      Product.instInv (F := (U : Filter ι)) (K := K)) := rfl
+
+example [∀ i, Semifield (K i)] :
+    ((inferInstance : Semifield ((U : Filter ι).Product K)),
+      (inferInstance : Inv ((U : Filter ι).Product K))) =
+    (Product.instSemifield (K := K) U,
+      Product.instInv (F := (U : Filter ι)) (K := K)) := rfl
 
 example [∀ i, DivisionSemiring (K i)] :
     (Product.instDivisionSemiring (K := K) U).toSemiring =
@@ -146,9 +264,10 @@ private theorem leftConstant_no_right_inverse : ¬ ∃ q : (⊤ : Filter ℕ).Pr
   have he₀ : e (Product.coeMulHom (K := EndFamily) (⊤ : Filter ℕ) leftConstant) =
       leftConstant 0 :=
     congrArg (fun h : (∀ n, EndFamily n) →* EndFamily 0 => h leftConstant) he
+  have he_one : e (1 : (⊤ : Filter ℕ).Product EndFamily) = 1 := e.map_one'
   rintro ⟨q, hq⟩
   have h₀ : leftConstant 0 * e q = 1 := by
-    simpa only [map_mul, map_one, he₀] using congrArg e hq
+    simpa only [map_mul, he_one, he₀] using congrArg e hq
   exact (by decide : (0 : Fin 2) ≠ 1) (congrFun h₀ 1)
 
 -- The same nonunit section becomes a unit at bottom; the identity is a unit already at top.
@@ -186,9 +305,11 @@ example :
         (⊤ : Filter ℕ) withZeroLeft) = withZeroLeft 0 :=
       congrArg (fun h : (∀ n, WithZero (EndFamily n)) →* WithZero (EndFamily 0) =>
         h withZeroLeft) he
+    have he_one : e (1 : (⊤ : Filter ℕ).Product (fun n => WithZero (EndFamily n))) = 1 :=
+      e.map_one'
     rintro ⟨q, hq⟩
     have h₀ : (leftConstant 0 : WithZero (EndFamily 0)) * e q = 1 := by
-      simpa only [map_mul, map_one, he₀, withZeroLeft] using congrArg e hq
+      simpa only [map_mul, he_one, he₀, withZeroLeft] using congrArg e hq
     have hn : ∀ z : WithZero (EndFamily 0), (leftConstant 0 : WithZero (EndFamily 0)) * z ≠ 1 := by
       refine WithZero.recZeroCoe ?_ ?_
       · simpa only [mul_zero] using (zero_ne_one : (0 : WithZero (EndFamily 0)) ≠ 1)
