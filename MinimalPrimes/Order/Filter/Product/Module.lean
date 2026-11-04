@@ -114,6 +114,15 @@ theorem coe_zero_add [∀ i, AddZeroClass (M i)] :
     ((0 : ∀ i, M i) : F.Product M) = (0 : F.Product M) :=
   (productAddCon F M).coe_zero
 
+/-- The represented section of fibre zeros is the zero of the named additive
+reduced-product record. Only additive zero classes are needed. -/
+@[simp]
+theorem zeroPoint_eq_zero_add [∀ i, AddZeroClass (M i)] :
+    zeroPoint F M = (0 : F.Product M) := by
+  exact
+    ((coe_eq_zeroPoint_iff F (0 : ∀ i, M i)).2
+      (Filter.Eventually.of_forall fun _ => rfl)).symm.trans (coe_zero_add F M)
+
 end Zero
 
 section AddCommMonoid

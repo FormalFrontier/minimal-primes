@@ -22,6 +22,7 @@ public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Basis
 public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
+public import MinimalPrimes.Order.Filter.Product.Exact
 public import MinimalPrimes.Order.Filter.Product.Faithful
 public import MinimalPrimes.Order.Filter.Product.Map
 public import MinimalPrimes.Order.Filter.Product.Module
@@ -141,8 +142,14 @@ fibre criterion needs only eventual preservation of the specified points for the
 The dependent product-map leaf gives the class-free canonical coordinate map, its
 identity/composition/uniqueness and exact onto API, and selected-section reflection.
 Its zero-only specialization uses the image of the same chosen zero section, without
-installing another product zero instance. The germ pointed criterion is its
-constant-family bridge through the shared dependent section theorem.
+installing another product zero instance. Exactness of two coordinate maps is
+characterized by eventual exactness of the whole fibre pair, for arbitrary functions
+with target zeros and a nonempty total source section type. The target zero is the
+represented zero section. A target AddZeroClass bridge uses the existing named
+additive product zero for the same arbitrary functions. In particular, given fibre
+linear maps use the zero inherited from the given additive product record, with
+source zeros supplying the section and no extra inhabitation hypothesis. The germ pointed
+criterion is the constant-family bridge through the shared dependent section theorem.
 The dependent-semimodule leaf equips additive reduced products with the binary quotient
 action of the given varying fibre modules, over the existing scalar reduced product.
 Its named data have representative and opaque-vector map laws and constant-germ

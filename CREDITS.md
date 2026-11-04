@@ -229,6 +229,13 @@ Pi-module interfaces of Simon Hudon and Patrick Massot. It retains the given fib
 bases and the existing whole coordinate equivalence, without a new quotient,
 coordinate or basis-choice construction.
 
+The dependent-product exactness interface uses Antoine Chambert-Loir's
+`Function.Exact` predicate in Mathlib, the existing Formal Frontier coordinate
+maps and dependent-section criteria, and the named additive reduced-product
+record and its representative-zero equation. Constant-family agreement uses the
+existing germ-map and zero-point comparisons, based on Mathlib's germ interfaces
+credited above. No new quotient or bundled-map construction is introduced.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

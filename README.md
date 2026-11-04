@@ -58,6 +58,37 @@ empty `J`, bottom filters and zero semirings are included. No commutativity,
 faithfulness, properness or nontriviality hypothesis is imposed. A family of
 unbounded varying ranks is not an instance of this common finite-index construction.
 
+### Exactness of dependent reduced-product maps
+
+For arbitrary functions `f i : X i → Y i` and `g i : Y i → Z i` in independent
+universes, an arbitrary filter `F`, given `Zero (Z i)` records and
+`Nonempty (∀ i, X i)`,
+[`Filter.Product.map_exact_iff`](MinimalPrimes/Order/Filter/Product/Exact.lean)
+characterizes `Function.Exact` of the two existing `Product.map` functions by
+`∀ᶠ i in F, Function.Exact (f i) (g i)`. This is one eventual locus of **whole
+fibre exactness**, not exactness at every index or separately eventual tests on
+fixed values. The selected target zero is exactly `Product.zeroPoint F Z`, the
+represented section of the given fibre zeros; no global zero instance is added.
+Neither function needs to preserve zero or any algebraic operation.
+
+A total source section is essential: an empty source fibre outside the filter's
+support still prevents all total source sections. No independent middle-section
+hypothesis is needed, since the first map sends a source section to one.
+`Filter.Product.map_exact_iff_of_addZeroClass` instead uses the existing named
+additive product zero, still for arbitrary functions and only target
+`AddZeroClass` records. `Product.zeroPoint_eq_zero_add` supplies this alignment.
+In particular, given linear maps between semimodules over given, possibly
+noncommutative, fibre semirings can be used as functions while retaining all the
+given additive and module records. The target zero is inherited from
+`Product.addCommMonoid F P`, and fibre source zeros discharge the section
+condition. No bundled product linear map, finite basis, properness,
+nontriviality, additive inverses or further inhabitation hypothesis is needed.
+Bottom filters, empty indices and zero semirings remain included.
+
+For constant families, `Product.map_const_eq_germ_map` and
+`Product.zeroPoint_eq_germ_zero` identify these functions and the target zero
+with Mathlib's germ maps and zero.
+
 ### Coordinate maps and zero-reflection of dependent filter products
 
 For any filter `D` and independently universed dependent type families `R` and `S`,
@@ -746,6 +777,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
+| [`MinimalPrimes.Order.Filter.Product.Exact`](MinimalPrimes/Order/Filter/Product/Exact.lean) | Exactness of arbitrary coordinate maps iff eventual whole-fibre exactness, with target zeros and a total source section; named additive-zero alignment. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
 | [`MinimalPrimes.Order.Filter.Product.Basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) | Given common finite bases, characteristic vector/coefficient equations and standard finite-coordinate alignment. |
