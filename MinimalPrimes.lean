@@ -28,6 +28,7 @@ public import MinimalPrimes.Order.Filter.Product.Faithful
 public import MinimalPrimes.Order.Filter.Product.Finite
 public import MinimalPrimes.Order.Filter.Product.FinitePresentation
 public import MinimalPrimes.Order.Filter.Product.Map
+public import MinimalPrimes.Order.Filter.Product.Matrix
 public import MinimalPrimes.Order.Filter.Product.Module
 public import MinimalPrimes.Order.Filter.Product.Torsion
 public import MinimalPrimes.Order.Filter.Product.Nilpotent
@@ -173,6 +174,11 @@ non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with
 and gives the scalar submonoid criterion under an explicit eventual zero-preservation law.
 The germ-center leaf characterizes the full intrinsic magma center by eventual
 coordinate centrality, with a submonoid-center bridge requiring only a two-sided identity.
+The matrix leaf constructs the ring equivalence for finite square matrices over
+dependent reduced products, with the given semirings and stock matrix operations.
+Representative and all-point entry equations characterize both directions, and
+invertibility of a represented matrix is equivalent to the eventual unit locus of
+those same fibre matrices.
 The finite-product comparison is surjective for arbitrary coordinate types and is an
 equivalence for finite coordinates, with representative, inverse and naturality laws.
 Import a leaf directly for a smaller API.

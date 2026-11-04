@@ -242,6 +242,19 @@ and Johan Commelin's module-finiteness interfaces, together with the existing
 Formal Frontier dependent Product semimodule, varying-map and Pi comparison.
 They introduce no new quotient, basis or representative-choice construction.
 
+The finite square-matrix comparison composes the existing Formal Frontier dependent
+Product finite-Pi equivalence with Mathlib's `Equiv.piCongrRight` and `Matrix.of`.
+Its matrix algebra interfaces are Mathlib's `Matrix.piRingEquiv`, `RingHom.mapMatrix`
+and stock matrix semiring, developed by Ellen Arlt, Blair Shi, Sean Leather,
+Mario Carneiro, Johan Commelin and Lu-Ming Zhang. Equivalence composition uses the
+interfaces of Leonardo de Moura and Mario Carneiro. The unit criterion
+reuses the dependent-product unit-locus formalization credited above and Mathlib's
+unit transport under multiplicative equivalences; it introduces no inverse-selection
+construction. These are academic and formalization credits, not a grant of rights
+to any separate source expression. The matrix leaf contains original project code
+and API composition; no substantial third-party source expression or source-book
+assets are copied.
+
 The uniform finite-presentation criterion uses Andrew Yang's Mathlib
 `Module.FinitePresentation` and finite-free exact-sequence formulation,
 and Formal Frontier's [coherent-module library](https://github.com/FormalFrontier/coherent-modules)

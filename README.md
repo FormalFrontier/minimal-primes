@@ -77,6 +77,23 @@ represented actions using only vector zeros. These zeros provide total sections,
 not zero-preservation laws. Bottom filters, empty indices and zero fibres remain
 included, with independent scalar and vector universes.
 
+### Matrix rings over dependent reduced products
+
+For an arbitrary filter `F`, given semirings `R i` and a fixed index type `J` with
+`Fintype J` and `DecidableEq J`, the
+[matrix leaf](MinimalPrimes/Order/Filter/Product/Matrix.lean) constructs
+`Filter.Product.matrixRingEquiv` between `F.Product (fun i => Matrix J J (R i))`
+and `Matrix J J (F.Product R)`. Its underlying equivalence composes the existing
+finite-Pi equivalences. The source and target retain the given semirings and stock
+matrix records: multiplication is a finite row-column sum, not pointwise entry
+multiplication. Representative and all-point entry equations in both directions
+form its characteristic interface. `Filter.Product.isUnit_matrix_coe_iff` states
+invertibility of a represented matrix exactly on the eventual unit locus of those
+same fibre matrices; it does not assert that each entry is a scalar unit.
+Index, coefficient and matrix-index universes are independent; empty matrices,
+empty index types, bottom filters and zero semirings are included. There are no
+commutativity, ring, field, properness or nontriviality hypotheses.
+
 ### Common finite bases of dependent reduced products
 
 For the same given semiring and semimodule records, a family of given bases
@@ -885,6 +902,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.Exact`](MinimalPrimes/Order/Filter/Product/Exact.lean) | Exactness of arbitrary coordinate maps iff eventual whole-fibre exactness, with target zeros and a total source section; named additive-zero alignment. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
+| [`MinimalPrimes.Order.Filter.Product.Matrix`](MinimalPrimes/Order/Filter/Product/Matrix.lean) | Finite square-matrix ring equivalence over dependent reduced products, with representative and all-point entry laws and the same-matrix unit criterion. |
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
 | [`MinimalPrimes.Order.Filter.Product.Basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) | Given common finite bases, characteristic vector/coefficient equations and standard finite-coordinate alignment. |
 | [`MinimalPrimes.Order.Filter.Product.Finite`](MinimalPrimes/Order/Filter/Product/Finite.lean) | Finite spanning by given vector germs and uniform finite generation. |
