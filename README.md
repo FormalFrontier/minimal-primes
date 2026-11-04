@@ -8,7 +8,7 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
-### Torsion-free semimodules over dependent reduced products
+### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,
 with given `Module (R i) (M i)` records and an arbitrary filter `F`,
@@ -29,7 +29,20 @@ fibre injectivity, and regular-scalar sections give reflection. No additive
 inverses, cancellation, domain, properness or nontriviality assumption is required.
 The [varying-family client](MinimalPrimesTest/Order/Filter/Product/Module.lean)
 applies the criterion to free semimodules of ranks `n + 1` over `ℕ × ZMod (n + 2)`
-along the cofinite filter.
+along the cofinite filter, and uses the faithfulness criterion for the same family.
+
+The [annihilator and faithfulness criteria](MinimalPrimes/Order/Filter/Product/Faithful.lean)
+retain these same given records. `Filter.Product.coe_mem_annihilator_iff` says that
+a represented scalar annihilates the whole semimodule exactly when its values
+annihilate the fibre semimodules eventually. `Filter.Product.faithfulSMul_iff`
+says that the action is faithful exactly when the given fibre actions are faithful
+eventually. Faithfulness compares **two scalars on all vectors**, unlike
+represented-scalar injectivity; a zero annihilator does not characterize it at this
+semiring floor. The weaker `faithfulSMul_smul_iff` needs only given fibre actions
+and scalar/vector zeros, while `smul_coe_eq_smul_coe_iff` detects equality of two
+represented actions using only vector zeros. These zeros provide total sections,
+not zero-preservation laws. Bottom filters, empty indices and zero fibres remain
+included, with independent scalar and vector universes.
 
 ### Coordinate maps and zero-reflection of dependent filter products
 
@@ -593,6 +606,8 @@ there are no additional global instances. `module_toSMul` identifies the inherit
 action, and `smul_coe_eq_map` reads it on opaque vectors. `module_const_eq_germ`
 compares constant structure records with `Germ.instModule'` after explicit transport
 of both bases; `module_self_eq` applies only to standard given self-actions.
+[`Product/Faithful.lean`](MinimalPrimes/Order/Filter/Product/Faithful.lean) provides
+whole-module annihilator membership and faithful-action criteria for these data.
 
 [`Product/Units.lean`](MinimalPrimes/Order/Filter/Product/Units.lean) proves
 `Filter.Product.isUnit_coe_iff`: a represented element is a unit exactly when its
@@ -702,6 +717,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
+| [`MinimalPrimes.Order.Filter.Product.Faithful`](MinimalPrimes/Order/Filter/Product/Faithful.lean) | Whole-module annihilator membership and faithfulness iff their eventual fibre criteria, retaining the given actions. |
 | [`MinimalPrimes.Order.Filter.Product.Torsion`](MinimalPrimes/Order/Filter/Product/Torsion.lean) | Torsion-freeness iff eventual fibre torsion-freeness for the given semimodules; represented-scalar action injectivity. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.NoZeroDivisors`](MinimalPrimes/Order/Filter/Product/NoZeroDivisors.lean) | Weak zero-and-multiplication ultrafilter criterion; with absorbing zero, arbitrary-filter classification by eventual fibrewise no zero divisors and a bottom-or-atomic nontrivial-fibre trace. |

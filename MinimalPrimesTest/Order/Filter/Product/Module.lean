@@ -8,6 +8,7 @@ import Mathlib.Algebra.Module.Torsion.Pi
 import Mathlib.Algebra.Ring.Prod
 import Mathlib.Data.ZMod.Defs
 import Mathlib.Order.Filter.Cofinite
+import MinimalPrimes.Order.Filter.Product.Faithful
 import MinimalPrimes.Order.Filter.Product.Torsion
 
 /-!
@@ -20,6 +21,8 @@ replace the fibre modules when scalar and vector carrier families specialize.
 A second client applies the torsion-free criterion along the cofinite filter to
 free pointwise semimodules of varying finite ranks over `ℕ × ZMod (n + 2)`.
 These scalar semirings have zero divisors, and the vectors need not form groups.
+The same varying family has faithful cofinite reduced-product action, by the
+faithfulness criterion and stock faithfulness of nonempty pointwise modules.
 -/
 
 universe u v w
@@ -50,4 +53,14 @@ private theorem cofinite_varying_free_isTorsionFree :
       (Product.addCommMonoid cofinite varyingVector)
       (Product.module cofinite varyingVector varyingScalar) := by
   apply (Product.isTorsionFree_iff cofinite varyingScalar varyingVector).mpr
+  exact Eventually.of_forall fun _ => inferInstance
+
+/-- The same varying positive-rank free semimodules have faithful cofinite
+reduced-product action, without requiring scalar domains or additive groups. -/
+private theorem cofinite_varying_free_faithfulSMul :
+    @FaithfulSMul
+      ((cofinite : Filter ℕ).Product varyingScalar)
+      ((cofinite : Filter ℕ).Product varyingVector)
+      (Product.module cofinite varyingVector varyingScalar).toSMul := by
+  apply (Product.faithfulSMul_iff cofinite varyingScalar varyingVector).mpr
   exact Eventually.of_forall fun _ => inferInstance

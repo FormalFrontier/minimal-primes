@@ -20,7 +20,9 @@ The structures `Filter.Product.addCommMonoid`, `Filter.Product.smul` and
 `Filter.Product.module` are named data, not global instances. This keeps the given
 fibre actions fixed even when the scalar and vector carrier families coincide.
 The representative equations and `smul_coe_eq_map` characterize the action on
-opaque quotient points. Constant structure records recover the two-germ action
+opaque quotient points. `smul_coe_eq_smul_coe_iff` detects equality of two represented
+scalar actions by eventual equality on every fibre vector; vector zeros supply
+only a total fallback section. Constant structure records recover the two-germ action
 in Mathlib, rather than its fixed-external-scalar action.
 
 ## References
@@ -174,6 +176,39 @@ theorem smul_coe_eq_map [∀ i, SMul (R i) (M i)] (r : ∀ i, R i) :
       ((· • ·) : F.Product R → F.Product M → F.Product M) (r : F.Product R) x) =
       map F (fun i m => r i • m) :=
   map_unique F _ _ (fun m => coe_smul F M R r m)
+
+/-- Two represented scalars act equally on every reduced-product vector exactly when
+their fibre actions agree on every vector eventually. Fibre zeros supply a total
+section; no preservation of zero by the actions is required. -/
+theorem smul_coe_eq_smul_coe_iff [z : ∀ i, Zero (M i)]
+    [σ : ∀ i, SMul (R i) (M i)] (r t : ∀ i, R i) :
+    ((fun x : F.Product M =>
+        @SMul.smul (F.Product R) (F.Product M) (@smul ι F M R σ)
+          (r : F.Product R) x) =
+      (fun x : F.Product M =>
+        @SMul.smul (F.Product R) (F.Product M) (@smul ι F M R σ)
+          (t : F.Product R) x)) ↔
+      ∀ᶠ i in F, ∀ m : M i,
+        @SMul.smul (R i) (M i) (σ i) (r i) m =
+          @SMul.smul (R i) (M i) (σ i) (t i) m := by
+  constructor
+  · intro h
+    apply (Filter.eventually_forall_iff_forall_section
+      (D := F)
+      (P := fun i m =>
+        @SMul.smul (R i) (M i) (σ i) (r i) m =
+          @SMul.smul (R i) (M i) (σ i) (t i) m)
+      (fun i => (0 : M i))).2
+    intro m
+    apply (coe_eq (F := F) _ _).1
+    exact (coe_smul F M R r m).symm.trans
+      ((congrFun h (m : F.Product M)).trans (coe_smul F M R t m))
+  · intro h
+    funext x
+    obtain ⟨m, rfl⟩ := coe_surjective F M x
+    exact (coe_smul F M R r m).trans
+      (((coe_eq (F := F) _ _).mpr (h.mono fun i hi => hi (m i))).trans
+        (coe_smul F M R t m).symm)
 
 end SMul
 

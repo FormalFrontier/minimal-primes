@@ -210,6 +210,10 @@ Regular scalar actions use Damiano Testa's regularity definitions, and the moder
 torsion-free class is Yaël Dillies's formalization. Their represented-scalar readout
 composes the existing Formal Frontier dependent coordinate-map injectivity theorem;
 no new quotient, representative-choice or collision engine is introduced.
+The dependent-product annihilator and faithfulness interfaces use Kenny Lau's
+Mathlib ideal and module-annihilator formalization and the faithful scalar-action
+interfaces of Chris Hughes and Yury Kudryashov, together with the existing Formal
+Frontier semimodule and dependent-section interfaces.
 
 AI agents developed the Lean code and examples.
 

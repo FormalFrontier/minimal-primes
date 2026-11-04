@@ -21,6 +21,7 @@ public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
+public import MinimalPrimes.Order.Filter.Product.Faithful
 public import MinimalPrimes.Order.Filter.Product.Map
 public import MinimalPrimes.Order.Filter.Product.Module
 public import MinimalPrimes.Order.Filter.Product.Torsion
@@ -137,8 +138,13 @@ constant-family bridge through the shared dependent section theorem.
 The dependent-semimodule leaf equips additive reduced products with the binary quotient
 action of the given varying fibre modules, over the existing scalar reduced product.
 Its named data have representative and opaque-vector map laws and constant-germ
-compatibility. Torsion-freeness of this semimodule is equivalent to eventual fibre
-torsion-freeness, by the coordinate-map injectivity and regular-scalar section criteria.
+compatibility. Equality of two represented scalar actions is equivalent to eventual
+equality on every fibre vector, using only the given actions and vector zeros.
+Whole-module annihilator membership and faithfulness of the given semimodule are
+equivalent to their eventual fibre criteria. Faithfulness distinguishes two scalars
+on all vectors and is not characterized by a zero annihilator at the semiring floor.
+Torsion-freeness of this semimodule is equivalent to eventual fibre torsion-freeness,
+by the coordinate-map injectivity and regular-scalar section criteria.
 The germ-scalar leaf specializes zero-reflection to a selected zero-preserving action,
 without scalar-zero or additive assumptions.
 The non-zero-divisor leaf characterizes intrinsic left, right and two-sided
