@@ -13,6 +13,7 @@ public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.Order.Filter.Germ.Center
 public import MinimalPrimes.Order.Filter.Germ.Map
 public import MinimalPrimes.Order.Filter.Germ.NonZeroDivisors
+public import MinimalPrimes.Order.Filter.Germ.NoZeroDivisors
 public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.SMul
@@ -21,6 +22,7 @@ public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
 public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import MinimalPrimes.Order.Filter.Product.Nontrivial
+public import MinimalPrimes.Order.Filter.Product.NoZeroDivisors
 public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.Order.Filter.Product.Regular
 public import MinimalPrimes.Order.Filter.Product.Units
@@ -87,6 +89,10 @@ tending in both directions give equivalences using the same forward pullback.
 The dependent-product nontriviality leaf characterizes nontriviality by existence
 of a total section and frequent nontriviality of the fibres, without algebraic
 structure or properness assumptions.
+The ultrafilter no-zero-divisor leaves use only zero and multiplication: no zero
+divisors in a dependent product is equivalent to eventual no-zero-divisor fibres,
+with canonical monoid-with-zero and constant-germ specializations. The germ bridge
+identifies the existing zero and multiplication for arbitrary filters.
 The germ-reducedness leaf needs only zero and natural-number powers: reducedness is
 equivalent to eventual reducedness of the value type, or to the filter being bottom
 or the value type being reduced.

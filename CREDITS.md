@@ -96,6 +96,16 @@ Witness selection uses Mathlib's `Filter.skolem`. The bad-coordinate annihilator
 argument follows the corresponding regularity argument by Formal Frontier Agents;
 the proofs test all varying representatives, not just constant germs.
 
+The ultrafilter-product no-zero-divisor criterion uses Johan Commelin's
+`NoZeroDivisors` class, the ultrafilter alternative developed by Johannes Hölzl,
+Jeremy Avigad and Yury Kudryashov, and the existing dependent-section reflection
+criterion by Formal Frontier Agents. Its quotient operations use Amelia Livingston's
+multiplicative congruences on the dependent filter-product carrier of Yury Kudryashov
+and Abhimanyu Pallavi Sudhir. The constant-germ criterion specializes the dependent
+result after identifying these congruence records with Mathlib's germ zero and
+binary-map multiplication; no second quotient or witness-selection construction
+is introduced.
+
 Constant-germ reducedness uses Mathlib's quotient, power and eventual-equality
 interfaces, and Johan Commelin's zero-and-power definitions of nilpotence and
 reducedness. The finite-member bound for eventual nilpotence uses Oliver Nash's
