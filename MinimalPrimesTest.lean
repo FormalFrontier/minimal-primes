@@ -17,6 +17,7 @@ public import MinimalPrimesTest.Order.Filter.Germ.Map
 public import MinimalPrimesTest.Order.Filter.Germ.Reduced
 public import MinimalPrimesTest.Order.Filter.Germ.SMul
 public import MinimalPrimesTest.Order.Filter.Product
+public import MinimalPrimesTest.Order.Filter.Product.CompTendsto
 public import MinimalPrimesTest.Order.Filter.Product.Reduced
 public import MinimalPrimesTest.Order.Filter.Product.Regular
 public import MinimalPrimesTest.PrincipalPrimeWitness

@@ -8,6 +8,20 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Reindexing dependent filter products
+
+For independently universed indices and fibres, a map `u : ι → κ` with
+`Tendsto u F G` induces
+[`Filter.Product.compTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean)
+from `G.Product R` to `F.Product (fun i => R (u i))`. It sends a section to its
+precomposition, respects identity and composition, and agrees with the existing
+`Filter.Germ.compTendsto` on constant families. No algebra, total-section existence
+or proper-filter assumption is needed. An index equivalence tending in both
+directions gives `Filter.Product.compTendstoEquiv`, whose inverse uses canonical
+dependent Pi reindexing. The [dependent Bool client](MinimalPrimesTest/Order/Filter/Product/CompTendsto.lean)
+exhibits an injective, non-surjective diagonal and the failure of injectivity
+under one-way convergence even with proper filters.
+
 ### Centers of dependent filter products
 
 For any filter and an independently universed family with multiplication, a section
