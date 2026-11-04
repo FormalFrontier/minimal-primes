@@ -180,6 +180,9 @@ The dimension-at-most-two unique-factorization classification builds on Mathlib'
 nonzero-prime prime-element extraction and finite strict-chain dimension bound.
 Its ideals, prime spectrum and relation series are the existing Mathlib objects;
 these earlier formalizations supply the factorization and dimension interfaces.
+The irreducible-generator dimension criterion is formulated using Mathlib's
+`Irreducible.dvd_symm` for monoids, singleton-span inclusion and divisibility for
+commutative semirings, and the order-theoretic finite-chain dimension criterion.
 
 AI agents developed the Lean code and examples.
 

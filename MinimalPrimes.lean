@@ -37,6 +37,7 @@ public import MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter
 public import MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter
 public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange
+public import MinimalPrimes.RingTheory.KrullDimension.Basic
 public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.KrullDimension.UniqueFactorizationDomain
@@ -65,6 +66,8 @@ The principal-prime height leaf bounds height by one under well-founded strict d
 with height one for regular prime generators and, in particular, prime elements in domains.
 In unique factorization semirings of dimension at most two, every nonzero nonmaximal
 prime is irreducible-principal, giving the zero, irreducible-principal or maximal classification.
+Conversely, irreducible generators for all nonzero nonmaximal prime ideals bound the
+Krull dimension of a commutative semiring by two, without unique factorization.
 The finite-product leaf classifies minimal primes over arbitrary ideals by labelled
 coordinate minimal primes, and transports evaluation comaps at arbitrary index types.
 The minimal-prime multiplier leaf clears an element of a minimal prime into the radical
