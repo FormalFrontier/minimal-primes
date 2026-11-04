@@ -203,18 +203,28 @@ neither associativity, an identity, nor a proper filter. The existing
 specializations. The [varying finite example](MinimalPrimesTest/Order/Filter/Product/Regular.lean)
 separates left and right regularity in noncommutative magmas with no identity.
 
-### Pullback embeddings of maximal spectra
+### Integral pullback of maximal spectra
 
-For a surjective homomorphism `f : R →+* S` of commutative rings in independent
+For an integral homomorphism `f : R →+* S` of commutative rings in independent
 universes,
-[`MaximalSpectrum.comapEmbeddingOfSurjective`](MinimalPrimes/RingTheory/Spectrum/Maximal/Map.lean)
-embeds `MaximalSpectrum S` into `MaximalSpectrum R` by ideal contraction. Its image
-is exactly the maximal ideals containing `RingHom.ker f`. The API gives the
-underlying-ideal equation, agreement with prime-spectrum pullback, identity and
-contravariant composition. Zero rings are allowed; no domain, Jacobson or
-Noetherian assumption is imposed. The
+[`MaximalSpectrum.comapOfIsIntegral`](MinimalPrimes/RingTheory/Spectrum/Maximal/Map.lean)
+maps `MaximalSpectrum S` to `MaximalSpectrum R` by ideal contraction. Its image
+is exactly the maximal ideals containing `RingHom.ker f`, and it is surjective
+when `f` is injective. The API gives the underlying-ideal equation, agreement
+with prime-spectrum pullback, identity and contravariant composition.
+
+For the existing Zariski topologies, this function is
+[continuous and closed](MinimalPrimes/RingTheory/Spectrum/Maximal/Topology.lean).
+It sends the maximal-spectrum trace of `V(I)` to the trace of `V(I.comap f)`
+for every ideal `I` of `S`. Zero rings are allowed; no chosen algebra structure,
+domain, Jacobson, Noetherian or finite-type assumption is imposed. Integral
+pullback need not be injective, even when the ring homomorphism is injective.
+
+For surjective `f`, the same function is the embedding
+`MaximalSpectrum.comapEmbeddingOfSurjective`, with all the same compatibility
+laws. The
 [product-projection client](MinimalPrimesTest/RingTheory/Spectrum/Maximal/Map.lean)
-uses the embedding to transport infinitude of the maximal spectrum from a factor
+uses this embedding to transport infinitude of the maximal spectrum from a factor
 to the product ring with `Infinite.of_injective`.
 
 ### Other headline results
@@ -623,7 +633,8 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
-| [`MinimalPrimes.RingTheory.Spectrum.Maximal.Map`](MinimalPrimes/RingTheory/Spectrum/Maximal/Map.lean) | Canonical pullback embedding along a surjective ring homomorphism, functoriality and kernel-range criterion. |
+| [`MinimalPrimes.RingTheory.Spectrum.Maximal.Map`](MinimalPrimes/RingTheory/Spectrum/Maximal/Map.lean) | Integral pullback, functoriality, kernel-range criterion, surjectivity for injections and the shared surjective-map embedding. |
+| [`MinimalPrimes.RingTheory.Spectrum.Maximal.Topology`](MinimalPrimes/RingTheory/Spectrum/Maximal/Topology.lean) | Integral pullback is continuous and closed; its kernel-zero-locus range and images of ideal zero-locus traces. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter`](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean) | Stone homeomorphism for arbitrary dependent products of semifields, basis transport and dense coordinate primes. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |

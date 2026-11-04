@@ -4,25 +4,32 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.RingTheory.Ideal.GoingUp
 public import Mathlib.RingTheory.Spectrum.Maximal.Basic
 public import Mathlib.RingTheory.Spectrum.Prime.RingHom
 
 /-!
-# Pullback embeddings of maximal spectra
+# Pullback of maximal spectra along integral homomorphisms
 
-A surjective homomorphism of commutative rings induces the canonical embedding
-`MaximalSpectrum.comapEmbeddingOfSurjective` by contraction of ideals. Its image
-consists exactly of the maximal ideals containing the kernel. The embedding agrees
-with prime-spectrum pullback and respects identity and contravariant composition.
+An integral homomorphism of commutative rings induces the canonical function
+`MaximalSpectrum.comapOfIsIntegral` by contraction of ideals. Its image consists
+exactly of the maximal ideals containing the kernel, and it is surjective when
+the ring homomorphism is injective. It agrees with prime-spectrum pullback and
+respects identity and contravariant composition.
 
-No nontriviality hypothesis is required: the maximal spectrum of the zero ring is
-empty. The ring hypothesis is essential for contraction to preserve maximality
-under a surjection; this does not hold for arbitrary commutative semirings.
+For surjective ring homomorphisms, the same function gives the embedding
+`MaximalSpectrum.comapEmbeddingOfSurjective`. No nontriviality hypothesis is
+required: the maximal spectrum of the zero ring is empty. The ring hypothesis
+is essential even for contraction under a surjection; maximality need not be
+preserved for arbitrary commutative semirings.
 
 ## References
 
-This construction restricts Mathlib's ideal order embedding and ideal correspondence
-for surjective homomorphisms in `Mathlib.RingTheory.Ideal.Maps`, using the existing
+The integral construction uses Mathlib's maximality theorem
+`Ideal.isMaximal_comap_of_isIntegral_of_isMaximal` and its kernel-containment
+lying-over theorem `Ideal.exists_ideal_over_maximal_of_isIntegral` in
+`Mathlib.RingTheory.Ideal.GoingUp`. The surjective embedding restricts Mathlib's
+ideal order embedding in `Mathlib.RingTheory.Ideal.Maps`. Both use the existing
 maximal spectrum and prime-spectrum pullback interfaces.
 -/
 
@@ -35,12 +42,81 @@ namespace MaximalSpectrum
 variable {R : Type u} {S : Type v} {T : Type w}
 variable [CommRing R] [CommRing S] [CommRing T]
 
+/-- Contraction of maximal ideals along an integral ring homomorphism. -/
+def comapOfIsIntegral (f : R →+* S) (hf : f.IsIntegral) :
+    MaximalSpectrum S → MaximalSpectrum R :=
+  fun x => ⟨Ideal.comap f x.asIdeal,
+    Ideal.isMaximal_comap_of_isIntegral_of_isMaximal f hf x.asIdeal⟩
+
+/-- The underlying ideal of integral pullback is its contraction. -/
+@[simp]
+theorem comapOfIsIntegral_asIdeal (f : R →+* S) (hf : f.IsIntegral)
+    (x : MaximalSpectrum S) :
+    (comapOfIsIntegral f hf x).asIdeal = Ideal.comap f x.asIdeal :=
+  rfl
+
+/-- Integral maximal-spectrum pullback agrees with prime-spectrum pullback. -/
+@[simp]
+theorem toPrimeSpectrum_comapOfIsIntegral (f : R →+* S) (hf : f.IsIntegral)
+    (x : MaximalSpectrum S) :
+    (comapOfIsIntegral f hf x).toPrimeSpectrum =
+      PrimeSpectrum.comap f x.toPrimeSpectrum :=
+  rfl
+
+/-- Integral pullback along the identity is the identity function. -/
+@[simp]
+theorem comapOfIsIntegral_id :
+    comapOfIsIntegral (RingHom.id R)
+      ((RingHom.id R).isIntegral_of_surjective Function.surjective_id) =
+        (fun x : MaximalSpectrum R => x) :=
+  rfl
+
+/-- Integral pullback reverses composition of ring homomorphisms. -/
+@[simp]
+theorem comapOfIsIntegral_comp (f : R →+* S) (g : S →+* T)
+    (hf : f.IsIntegral) (hg : g.IsIntegral) :
+    comapOfIsIntegral (g.comp f) (RingHom.IsIntegral.trans f g hf hg) =
+      (comapOfIsIntegral f hf).comp (comapOfIsIntegral g hg) :=
+  rfl
+
+/-- A maximal ideal is an integral pullback exactly when it contains the kernel.
+This uses Mathlib's maximal lying-over theorem with kernel containment. -/
+theorem mem_range_comapOfIsIntegral (f : R →+* S) (hf : f.IsIntegral)
+    (M : MaximalSpectrum R) :
+    M ∈ Set.range (comapOfIsIntegral f hf) ↔ RingHom.ker f ≤ M.asIdeal := by
+  constructor
+  · rintro ⟨x, rfl⟩
+    exact Ideal.ker_le_comap f
+  · intro hM
+    let : Algebra R S := f.toAlgebra
+    let : Algebra.IsIntegral R S := ⟨hf⟩
+    obtain ⟨Q, hQ, hQM⟩ :=
+      Ideal.exists_ideal_over_maximal_of_isIntegral (S := S) M.asIdeal hM
+    refine ⟨⟨Q, hQ⟩, ?_⟩
+    apply MaximalSpectrum.ext
+    exact hQM
+
+/-- Contraction along an injective integral homomorphism is surjective on maximal spectra. -/
+theorem surjective_comapOfIsIntegral (f : R →+* S) (hf : f.IsIntegral)
+    (hinj : Function.Injective f) : Function.Surjective (comapOfIsIntegral f hf) := by
+  intro M
+  apply (mem_range_comapOfIsIntegral f hf M).2
+  rw [(RingHom.injective_iff_ker_eq_bot f).mp hinj]
+  exact bot_le
+
 /-- Contraction along a surjective ring homomorphism, as an embedding of maximal spectra. -/
 def comapEmbeddingOfSurjective (f : R →+* S) (hf : Function.Surjective f) :
     MaximalSpectrum S ↪ MaximalSpectrum R where
-  toFun x := ⟨Ideal.comap f x.asIdeal, Ideal.comap_isMaximal_of_surjective f hf⟩
+  toFun := comapOfIsIntegral f (f.isIntegral_of_surjective hf)
   inj' _ _ h := MaximalSpectrum.ext <|
     (Ideal.orderEmbeddingOfSurjective f hf).injective (congrArg asIdeal h)
+
+/-- The surjective pullback embedding has the integral pullback as its underlying function. -/
+@[simp]
+theorem coe_comapEmbeddingOfSurjective (f : R →+* S) (hf : Function.Surjective f) :
+    (comapEmbeddingOfSurjective f hf : MaximalSpectrum S → MaximalSpectrum R) =
+      comapOfIsIntegral f (f.isIntegral_of_surjective hf) :=
+  rfl
 
 /-- The underlying ideal of a pulled-back maximal-spectrum point is its contraction. -/
 @[simp]
@@ -75,14 +151,7 @@ theorem comapEmbeddingOfSurjective_comp (f : R →+* S) (g : S →+* T)
 /-- A maximal ideal is a pullback exactly when it contains the kernel. -/
 theorem mem_range_comapEmbeddingOfSurjective (f : R →+* S) (hf : Function.Surjective f)
     (M : MaximalSpectrum R) :
-    M ∈ Set.range (comapEmbeddingOfSurjective f hf) ↔ RingHom.ker f ≤ M.asIdeal := by
-  constructor
-  · rintro ⟨x, rfl⟩
-    exact Ideal.ker_le_comap f
-  · intro hM
-    refine ⟨⟨M.asIdeal.map f, Ideal.IsMaximal.map_of_surjective_of_ker_le hf hM⟩, ?_⟩
-    apply MaximalSpectrum.ext
-    exact congrArg Subtype.val <|
-      (Ideal.relIsoOfSurjective f hf).apply_symm_apply ⟨M.asIdeal, hM⟩
+    M ∈ Set.range (comapEmbeddingOfSurjective f hf) ↔ RingHom.ker f ≤ M.asIdeal :=
+  mem_range_comapOfIsIntegral f (f.isIntegral_of_surjective hf) M
 
 end MaximalSpectrum

@@ -159,11 +159,17 @@ Carneiro. The existing filter-product carrier and pullback remain those describe
 in the module references; no second quotient is introduced.
 
 The maximal-spectrum pullback restricts Mathlib's ideal order embedding, contraction
-maximality and ideal correspondence for surjective homomorphisms. It uses David
-Kurniadi Angdinata's maximal-spectrum formalization and the prime-spectrum pullback
-formalization of Johan Commelin, Filippo A. E. Nuccio and Andrew Yang. The canonical
-restriction and infinitude-transfer approach follows the mathematical argument
-developed by Formal Frontier Agents.
+maximality and ideal correspondence for surjective homomorphisms. Its integral
+extension uses the maximality and kernel-containment lying-over theorems in Anne
+Baanen and Yongle Hu's `Mathlib.RingTheory.Ideal.GoingUp`, including the prime-over-ideal
+and reverse-maximality theorems for images of ideal zero loci. It uses David Kurniadi
+Angdinata's maximal-spectrum formalization and the prime-spectrum pullback
+formalization of Johan Commelin, Filippo A. E. Nuccio and Andrew Yang. Continuity and
+closedness use the existing induced Zariski topology and Mathlib's integral
+prime-spectrum closed-map theorem in Johan Commelin's prime-spectrum topology module;
+identity, composition and the surjective specialization reuse Mathlib's ring-map
+integrality witnesses. The canonical restriction and infinitude-transfer approach
+follows the mathematical argument developed by Formal Frontier Agents.
 
 AI agents developed the Lean code and examples.
 

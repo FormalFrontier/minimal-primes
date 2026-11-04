@@ -42,6 +42,7 @@ public import MinimalPrimes.RingTheory.KrullDimension.Integral
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
 public import MinimalPrimes.RingTheory.Spectrum.Maximal.Map
+public import MinimalPrimes.RingTheory.Spectrum.Maximal.Topology
 public import MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter
 public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 public import MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange
@@ -81,8 +82,10 @@ and density of coordinate primes. Ultrafilter zero-set ideals are maximal alread
 for division semiring fibres; for field fibres, the residue-field leaf identifies
 their stock residue fields with dependent reduced products over the section ring,
 compatibly with fibrewise field homomorphisms.
-The maximal-spectrum leaf embeds maximal spectra contravariantly along surjective ring
-homomorphisms, with image the maximal ideals containing the kernel.
+The maximal-spectrum leaves give continuous, closed pullback along integral ring
+homomorphisms, with image the maximal ideals containing the kernel and surjectivity
+for injective homomorphisms. They describe images of ideal zero-locus traces and retain
+the pullback embedding along surjective ring homomorphisms as the same function.
 The zero-dimensional spectrum leaf provides clopenness of basic opens, Hausdorffness
 and the reduced, nontrivial, preconnected-spectrum field criterion.
 The germ-regularity leaf characterizes intrinsic left, right and two-sided regularity
