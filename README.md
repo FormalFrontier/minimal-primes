@@ -390,6 +390,19 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   element, `Ring.krullDimLE_two_of_forall_exists_irreducible_span_eq` gives
   `Ring.KrullDimLE 2 R`. No domain, unique factorization, ring or Noetherian
   assumption is required, and irreducible elements need not be prime.
+- **Finite dimension bounds after deleting boundary points**
+  ([module](MinimalPrimes/Order/KrullDimension.lean)). For any preorder `α : Type u`
+  and `n : ℕ`, `Order.krullDimLE_succ_iff_not_isMin` states
+  `Order.KrullDimLE (n + 1) α ↔ Order.KrullDimLE n {x : α // ¬ IsMin x}`.
+  The dual theorem `Order.krullDimLE_succ_iff_not_isMax` gives the same equivalence
+  after deleting maximal points. Their composition,
+  `Order.krullDimLE_add_two_iff_not_isMin_not_isMax`, states
+  `Order.KrullDimLE (n + 2) α ↔
+  Order.KrullDimLE n {x : α // ¬ IsMin x ∧ ¬ IsMax x}`.
+  Both predicates refer to the **original preorder**, and the subtypes carry its
+  inherited order. No antisymmetry, inhabitation, bottom, top, finite-carrier or
+  chain-condition assumption is needed. These are finite-bound equivalences,
+  not unconditional exact dimension subtraction; empty types and antichains are included.
 - **Comparison in dimension at most two**
   ([order](MinimalPrimes/Order/KrullDimension.lean),
   [prime ideals](MinimalPrimes/RingTheory/KrullDimension/Basic.lean)). In a preorder
@@ -668,7 +681,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
-| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Reverse comparison between nonminimal and nonmaximal points in dimension at most two. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Finite-bound equivalences after deleting original minimal, maximal or both boundary points; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |

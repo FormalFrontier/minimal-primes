@@ -187,6 +187,13 @@ The dimension-two comparison interfaces use Mathlib's order Krull dimension,
 height/coheight and minimal/maximal-point predicates, and its canonical prime spectrum.
 The semiring formulation uses Andrew Yang's minimal-prime avoidance of non-zero-divisors
 in Mathlib.
+The finite-bound boundary-deletion family uses the order Krull dimension formalization
+of Jujian Zhang, Fangming Li and Joachim Breitner, and the relation-series interfaces
+of Jujian Zhang and Fangming Li in Mathlib. The one-boundary characterization relates
+finite strict chains by adjoining a predecessor or deleting the first point; the
+maximal-boundary version follows by order duality. The two-boundary formulation uses
+Mathlib's ambient extremum predicates and inherited subtype orders, with upward closure
+of the nonminimal locus identifying its maximal points with ambient maximal points.
 
 The dependent semimodule data use Amelia Livingston's additive congruence quotient
 machinery, Eric Wieser's ring-congruence factories, Johannes Hölzl's quotient maps,
