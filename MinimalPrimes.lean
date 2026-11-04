@@ -18,6 +18,7 @@ public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Center
+public import MinimalPrimes.Order.Filter.Product.Nontrivial
 public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.Order.Filter.Product.Regular
 public import MinimalPrimes.Order.Filter.Product.Units
@@ -78,6 +79,9 @@ and the reduced, nontrivial, preconnected-spectrum field criterion.
 The germ-regularity leaf characterizes intrinsic left, right and two-sided regularity
 by eventual regularity of representatives, for arbitrary filters and codomains with
 only multiplication.
+The dependent-product nontriviality leaf characterizes nontriviality by existence
+of a total section and frequent nontriviality of the fibres, without algebraic
+structure or properness assumptions.
 The germ-reducedness leaf needs only zero and natural-number powers: reducedness is
 equivalent to eventual reducedness of the value type, or to the filter being bottom
 or the value type being reduced.

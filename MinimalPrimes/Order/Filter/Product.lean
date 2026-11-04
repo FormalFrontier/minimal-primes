@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Ring.Pi
 public import Mathlib.Order.Filter.FilterProduct
 public import Mathlib.RingTheory.Congruence.Hom
 public import MinimalPrimes.GroupTheory.Congruence.MonoidWithZero
+public import MinimalPrimes.Order.Filter.Product.Nontrivial
 
 /-!
 # Algebra on dependent reduced products
@@ -194,25 +195,12 @@ theorem coe_eq_zero [∀ i, Semiring (K i)] (f : ∀ i, K i) :
 /-- The reduced product is trivial exactly when the filter concentrates on trivial fibres. -/
 theorem subsingleton_iff [∀ i, Semiring (K i)] :
     Subsingleton (F.Product K) ↔ {i | (0 : K i) = 1} ∈ F := by
+  rw [subsingleton_iff_of_nonempty (F := F) (K := K) ⟨0⟩]
   constructor
   · intro h
-    have := h
-    exact Quotient.eq''.1 (Subsingleton.elim (0 : F.Product K) 1)
+    exact h.mono fun i hi => @Subsingleton.elim (K i) hi 0 1
   · intro h
-    have h' : ∀ᶠ i in F, (0 : K i) = 1 := h
-    constructor
-    intro x y
-    refine Quotient.inductionOn₂' x y ?_
-    intro f g
-    apply Quotient.sound
-    exact h'.mono fun i hi => by
-      calc
-        f i = f i * 1 := (mul_one _).symm
-        _ = f i * 0 := congrArg (f i * ·) hi.symm
-        _ = 0 := mul_zero _
-        _ = g i * 0 := (mul_zero _).symm
-        _ = g i * 1 := congrArg (g i * ·) hi
-        _ = g i := mul_one _
+    exact Filter.Eventually.mono h fun _ hi => subsingleton_of_zero_eq_one hi
 
 /-- The improper filter gives a trivial semiring, including for an empty index type. -/
 instance instSubsingletonBot [∀ i, Semiring (K i)] :
@@ -231,11 +219,12 @@ theorem mk'_top_bijective [∀ i, Semiring (K i)] :
 
 /-- Properness and nontriviality of every fibre imply nontriviality of the quotient. -/
 instance instNontrivial [∀ i, Semiring (K i)] [∀ i, Nontrivial (K i)] [NeBot F] :
-    Nontrivial (F.Product K) where
-  exists_pair_ne := ⟨0, 1, fun h => by
-    have h' : ∀ᶠ i in F, (0 : K i) = 1 := Quotient.eq''.1 h
-    obtain ⟨i, hi⟩ := h'.exists
-    exact zero_ne_one hi⟩
+    Nontrivial (F.Product K) := by
+  apply not_subsingleton_iff_nontrivial.mp
+  intro h
+  obtain ⟨i, hi⟩ := Filter.Eventually.exists
+    ((subsingleton_iff (F := F) (K := K)).mp h)
+  exact zero_ne_one hi
 
 /-- Pointwise inversion respects eventual equality for every filter. -/
 instance instInv [∀ i, Inv (K i)] : Inv (F.Product K) where

@@ -21,6 +21,8 @@ project:
     fibrewise maps and principal-filter restriction equivalences. Ultrafilters give
     division semirings and semifields with pointwise inversion. The section-map
     kernels are the existing zero-set ideals, compatibly with constant-family germs.
+    For arbitrary dependent type families, the total-section filter product is
+    nontrivial exactly when a total section exists and nontrivial fibres occur frequently.
     Associated primes also transport along compatible algebra maps. In commutative
     rings with well-founded DvdNotUnit, prime generators give principal ideals of height
     at most one, with height one for non-zero-divisors and for prime elements in domains.
@@ -57,6 +59,14 @@ highlights:
     declarations:
       - declaration: Ideal.piIdeal_piFilter
         file: MinimalPrimes/RingTheory/Ideal/PiFilter.lean
+  - title: Nontrivial dependent reduced products
+    statement: >-
+      For every filter and independently universed dependent type family, the total-section
+      reduced product is nontrivial exactly when a total section exists and nontrivial
+      fibres occur frequently.
+    declarations:
+      - declaration: Filter.Product.nontrivial_iff
+        file: MinimalPrimes/Order/Filter/Product/Nontrivial.lean
 
 sources:
   - title: Foundations of Algebraic Geometry

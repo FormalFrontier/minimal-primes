@@ -31,6 +31,19 @@ Equivalently, `D = ⊥` or `M` is reduced. No power laws or properness assumptio
 are needed. The same module characterizes nilpotence by one exponent whose
 power is zero eventually, and supplies reducedness for germs of reduced values.
 
+### Nontrivial dependent reduced products
+
+For an arbitrary filter `D` and an independently universed dependent type family `R`,
+[`Filter.Product.nontrivial_iff`](MinimalPrimes/Order/Filter/Product/Nontrivial.lean)
+characterizes nontriviality of the existing total-section product by
+`Nonempty (∀ i, R i)` and frequent nontriviality of the fibres. No algebraic,
+fibre-inhabitation or proper-filter hypothesis is required. The section condition is
+essential: an empty fibre outside the filter's support still makes the product empty.
+The same module gives nonemptiness and subsingleton criteria, and the constant-family
+characterization for `Filter.Germ`. The
+[varying-fibre clients](MinimalPrimesTest/FilterProductNontrivial.lean) contrast a
+trivial default fibre with an empty off-support fibre.
+
 ### Reduced ranges of iterated Frobenius
 
 For a commutative semiring of exponential characteristic `p`, the original image

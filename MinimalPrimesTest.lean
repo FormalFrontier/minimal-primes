@@ -7,6 +7,7 @@ module
 public import MinimalPrimesIntegralDimensionModels
 public import MinimalPrimesTest.AssociatedPrincipal
 public import MinimalPrimesTest.AssociatedRestrictScalars
+public import MinimalPrimesTest.FilterProductNontrivial
 public import MinimalPrimesTest.NatSix
 public import MinimalPrimesTest.ResidueFieldPiUltrafilter
 public import MinimalPrimesTest.Order.FiniteHeightChain
