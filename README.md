@@ -8,6 +8,22 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Directed unions: chain cardinality and order dimension
+
+For an inclusion-directed family `s : ι → Set α`, with independent carrier and
+index universes and an arbitrary index `ι : Sort v`,
+[`Set.chainHeight_iUnion_of_directed`](MinimalPrimes/Order/ChainHeight.lean)
+identifies the `ENat` chain height of the union with the supremum of the piece
+heights for **any relation** on `α`. With only a preorder on `α`,
+[`Order.krullDim_iUnion_of_directed`](MinimalPrimes/Order/KrullDimension.lean)
+gives the analogous equality for the induced subtype orders in `WithBot ℕ∞`.
+The relation invariant counts vertices; order dimension counts strict steps.
+Empty unions have values zero and bottom respectively, and infinite suprema
+need not be attained by a piece. No nonemptiness, antisymmetry or finite-height
+assumption is required. The proofs capture finite chain witnesses in one piece;
+they do not select a longest or infinite chain. These are relation-height and
+induced-order formulas, not topological subspace dimension formulas.
+
 ### Chain cardinalities of lexicographic products
 
 For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
@@ -858,9 +874,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality multiplication for lexicographic set products under local first irreflexivity, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
-| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Full `WithBot ℕ∞` bounds with shifts one or two and finite-bound equivalences after deleting original minimal, maximal or both boundary points; reverse comparison in dimension at most two. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |
@@ -926,6 +942,10 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The directed-union formulas combine Mathlib's finite chain witnesses and strict
+  relation series with its directed-range and finite-set containment APIs; see the
+  [chain-height](MinimalPrimes/Order/ChainHeight.lean) and
+  [order-dimension](MinimalPrimes/Order/KrullDimension.lean) module references.
 - The lexicographic chain-cardinality proof builds on Mathlib's chain-height API
   (Andrew Yang and Vlad Tsyrklevich), relation embeddings (Mario Carneiro and
   contributors), set-cardinality and finite-union cardinality lemmas, and ENat

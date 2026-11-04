@@ -5,9 +5,11 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Order.Directed
 public import Mathlib.Order.KrullDimension
 
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Lattice.Order
 import Mathlib.Order.Fin.Tuple
 import Mathlib.Order.Minimal
@@ -30,6 +32,10 @@ pieces retain the ambient preorder, and the index type and carrier have independ
 universes. The equalities include empty unions, whose dimension is bottom, and
 infinite suprema that are not attained by a piece. They concern order dimension,
 not the topological dimension of an arbitrary subspace.
+
+The same supremum formula holds for inclusion-directed unions of arbitrary subsets.
+Here too all subtypes inherit the given ambient preorder, with no antisymmetry,
+nonemptiness or finite-dimensionality requirement.
 
 For any preorder, the dimension of its nonminimal or nonmaximal locus, plus one,
 is at most the ambient dimension. The dimension of the original interior, plus
@@ -66,6 +72,12 @@ with Mathlib's bottom, zero- and one-dimensional criteria and extended-natural a
 The cover equalities use its height and coheight restriction and indexed-supremum formulas.
 The product formulas use its finite-chain induction, fixed-coordinate maps and gluing,
 height suprema, order equivalences and extended-natural sum formulas.
+For directed unions, the finite ambient-value range of each strict series fits in one piece;
+restricting those same values preserves its length and the inherited order. This uses the
+defining `WithBot ℕ∞` supremum, without a nonemptiness premise or a longest chain.
+The directed-family predicate is from `Mathlib.Order.Directed` (Johannes Hölzl and Yaël Dillies),
+and finite containment and finite ranges are from `Mathlib.Data.Set.Finite.Lattice` and
+`Mathlib.Data.Set.Finite.Range` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
 -/
 
 @[expose] public section
@@ -277,6 +289,42 @@ theorem Order.krullDim_iUnion_of_isLowerSet
   change Order.krullDim ({x : α // x ∈ ⋃ i, s i})ᵒᵈ =
     ⨆ i, Order.krullDim ({x : α // x ∈ s i})ᵒᵈ at h
   simpa only [Order.krullDim_orderDual] using h
+
+/-- The order dimension of an inclusion-directed union is the supremum of the dimensions
+of its pieces. All subtypes inherit the given ambient preorder. The formula includes empty
+unions, of dimension bottom, and infinite suprema not attained by any piece. -/
+theorem Order.krullDim_iUnion_of_directed
+    {α : Type u} [Preorder α] {ι : Sort v}
+    (s : ι → Set α) (hs : Directed (· ⊆ ·) s) :
+    Order.krullDim (⋃ i, s i) = ⨆ i, Order.krullDim (s i) := by
+  apply le_antisymm
+  · change (⨆ p : LTSeries (⋃ i, s i), (p.length : WithBot ℕ∞)) ≤ _
+    refine iSup_le fun p ↦ ?_
+    -- Capture ambient values, keeping the same series length and inherited order.
+    let f : Fin (p.length + 1) → α := fun j ↦ (p j).1
+    have hf : (Set.range f).Finite := Set.finite_range f
+    have hfU : Set.range f ⊆ ⋃ i, s i := by
+      rintro x ⟨j, rfl⟩
+      exact (p j).property
+    obtain ⟨i₀, _⟩ := Set.mem_iUnion.mp p.head.property
+    have hn : (Set.range s).Nonempty := ⟨s i₀, ⟨i₀, rfl⟩⟩
+    have hfS : Set.range f ⊆ ⋃₀ Set.range s := by
+      simpa only [Set.sUnion_range] using hfU
+    obtain ⟨t, ht, hft⟩ :=
+      DirectedOn.exists_mem_subset_of_finite_of_subset_sUnion
+        hn hs.directedOn_range hf hfS
+    obtain ⟨i, rfl⟩ := ht
+    let q : LTSeries (s i) :=
+      LTSeries.mk p.length (fun j ↦ ⟨f j, hft ⟨j, rfl⟩⟩)
+        (fun _ _ hjk ↦ p.strictMono hjk)
+    have hq : (p.length : WithBot ℕ∞) ≤ Order.krullDim (s i) :=
+      Order.LTSeries.length_le_krullDim q
+    exact le_iSup_of_le i hq
+  · refine iSup_le fun i ↦ ?_
+    exact Order.krullDim_le_of_strictMono
+      (fun x : s i ↦
+        (⟨x.1, Set.mem_iUnion.mpr ⟨i, x.2⟩⟩ : ⋃ j, s j))
+      (fun _ _ h ↦ h)
 
 /-- The height of a pair in the pointwise product preorder is the sum of its
 coordinate heights, including infinite heights. -/

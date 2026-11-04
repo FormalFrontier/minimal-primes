@@ -5,11 +5,12 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Data.Prod.Lex
+public import Mathlib.Order.Directed
 public import Mathlib.Order.Height
 import Mathlib.Data.Set.Card.Arithmetic
 
 /-!
-# Chain heights of lexicographic products
+# Chain heights of lexicographic products and directed unions
 
 `Set.chainHeight` is the supremum in `ENat` of the cardinalities of subsets whose distinct
 points are pairwise comparable for a given relation. It counts vertices, not steps or ordinal
@@ -27,6 +28,10 @@ particular, the formula applies to arbitrary preorders without antisymmetry.
 Empty factors have chain height zero, including `0 * ⊤ = 0 = ⊤ * 0` in `ENat`. A height of `⊤`
 can arise from unbounded finite chain cardinalities without an infinite chain or a longest chain.
 
+For an inclusion-directed family of sets, the chain height of the union is the supremum of
+its pieces' chain heights. The relation is arbitrary, and the index may be any sort, including
+an empty one; in that case both sides are zero.
+
 ## Proof strategy
 
 Products of comparable subsets give the lower bound by cardinal multiplication and ENat suprema.
@@ -35,13 +40,19 @@ its fibres. The first projection is a comparable subset, and local first irrefle
 each fibre a comparable subset for the second relation. This argument never sorts a chain or
 assumes either relation is transitive.
 
+For directed unions, every finite positive chain-cardinality witness fits in one piece.
+A point of the witness supplies the local nonempty range needed by the finite-containment
+theorem; the zero bound requires no index. Testing all natural lower bounds also handles top.
+
 ## References
 
 The proof uses Mathlib's chain-height and finite-witness API in `Mathlib.Order.Height`
 (Andrew Yang and Vlad Tsyrklevich), relation embeddings in `Mathlib.Order.RelIso.Basic`
 (Mario Carneiro and contributors), finite-union cardinality bounds in
 `Mathlib.Data.Set.Card.Arithmetic` (Pim Otte), and its set-cardinality, lexicographic product
-and ENat supremum APIs.
+and ENat supremum APIs. The directed-family predicate is from `Mathlib.Order.Directed`
+(Johannes Hölzl and Yaël Dillies). Finite containment in directed unions uses
+`Mathlib.Data.Set.Finite.Lattice` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
 -/
 
 @[expose] public section
@@ -49,6 +60,40 @@ and ENat supremum APIs.
 universe u v
 
 namespace Set
+
+/-- The chain height of an inclusion-directed union is the supremum of the chain heights
+of its pieces. The relation need not be transitive or irreflexive, and the index may be empty. -/
+theorem chainHeight_iUnion_of_directed
+    {α : Type u} {ι : Sort v}
+    (s : ι → Set α) (r : α → α → Prop)
+    (hs : Directed (· ⊆ ·) s) :
+    (⋃ i, s i).chainHeight r = ⨆ i, (s i).chainHeight r := by
+  apply le_antisymm
+  · refine ENat.forall_natCast_le_iff_le.mp fun n hn ↦ ?_
+    cases n with
+    | zero => exact bot_le
+    | succ n =>
+      obtain ⟨t, hts, hcard, htchain⟩ :=
+        Set.exists_isChain_of_le_chainHeight (n + 1) hn
+      have htfin : t.Finite := Set.finite_of_encard_eq_coe hcard
+      have htne : t.Nonempty := Set.encard_pos.mp (by
+        rw [hcard]
+        exact ENat.natCast_lt_natCast.mpr (Nat.succ_pos n))
+      -- A positive witness supplies an index without a global inhabitation assumption.
+      obtain ⟨x, hx⟩ := htne
+      obtain ⟨i, _⟩ := Set.mem_iUnion.mp (hts hx)
+      have hrange : (Set.range s).Nonempty := ⟨s i, ⟨i, rfl⟩⟩
+      obtain ⟨a, ⟨j, rfl⟩, hta⟩ :=
+        DirectedOn.exists_mem_subset_of_finite_of_subset_sUnion
+          hrange hs.directedOn_range htfin (by rwa [Set.sUnion_range])
+      calc
+        ((n + 1 : ℕ) : ENat) = t.encard := hcard.symm
+        _ ≤ (s j).chainHeight r :=
+          Set.encard_le_chainHeight_of_isChain (s j) t hta htchain
+        _ ≤ ⨆ i, (s i).chainHeight r :=
+          le_iSup (fun i ↦ (s i).chainHeight r) j
+  · refine iSup_le fun i ↦ ?_
+    exact Set.chainHeight_mono r (s i) (⋃ i, s i) (Set.subset_iUnion s i)
 
 /-- Chain heights multiply for the lexicographic product of two sets when the first relation
 is irreflexive on the first set. Neither relation needs to be transitive, and the second relation
