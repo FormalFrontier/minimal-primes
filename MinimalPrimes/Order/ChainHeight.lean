@@ -5,28 +5,47 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Data.Prod.Lex
+public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.Height
 import Mathlib.Data.Set.Card.Arithmetic
 
 /-!
-# Chain heights of lexicographic products and directed unions
+# Chain heights of lexicographic products, sums and directed unions
 
 `Set.chainHeight` is the supremum in `ENat` of the cardinalities of subsets whose distinct
-points are pairwise comparable for a given relation. It counts vertices, not steps or ordinal
-ranks. Pairwise comparability does not imply transitivity or a linear ordering by the relation.
+points are pairwise comparable for a given relation. It counts vertices, not steps, dimensions
+or ordinal ranks. Pairwise comparability does not imply transitivity or a linear ordering by the
+relation.
 
 For the relation `Prod.Lex rα rβ`, comparison uses `rα` in the first coordinate or equality of
 first coordinates together with `rβ` in the second. The chain height of a product of sets is the
 product of their chain heights when `rα` is irreflexive on the first set. No condition is required
 on `rβ`, which may have loops. Loops of `rα` outside the first set are irrelevant.
 
-Transport by `toLex` gives the corresponding formula for the canonical less-than relation on
-`α ×ₗ β`. Only less-than structures and irreflexivity of the first relation are required; in
-particular, the formula applies to arbitrary preorders without antisymmetry.
+For `Sum.Lex rα rβ`, comparison within each tag uses the corresponding factor relation, and
+every left-tagged point precedes every right-tagged point. The chain height of the union of the
+two tagged images is the sum of the factor chain heights, with no relation laws required. In
+particular, loops and directed cycles are allowed in either factor. Unlike the product formula,
+the sum formula needs no first-irreflexivity hypothesis.
 
-Empty factors have chain height zero, including `0 * ⊤ = 0 = ⊤ * 0` in `ENat`. A height of `⊤`
-can arise from unbounded finite chain cardinalities without an infinite chain or a longest chain.
+Transport by `toLex` gives the corresponding formulas for the canonical less-than relations on
+`α ×ₗ β` and `α ⊕ₗ β`. The sum formula requires only the given less-than structures; the product
+formula additionally requires first irreflexivity. Neither formula requires antisymmetry or
+transitivity. The two factor types may lie in independent universes.
+
+Empty sets have chain height zero. Thus empty factors are absorbing for the product, including
+`0 * ⊤ = 0 = ⊤ * 0`, but contribute zero to the sum. A singleton has height one for any relation,
+so two singleton blocks have lexicographic-sum height two. More generally, two nonempty
+antichains have lexicographic-sum height two, whereas their disjoint sum under `Sum.LiftRel`
+has height one. The ordinary less-than instance on `α ⊕ β` uses this disjoint relation, not
+`Sum.Lex`.
+
+A height of `⊤` can arise from unbounded finite chain cardinalities without an infinite chain
+or a longest chain. For example, disjoint finite total chains of all positive finite sizes have
+height `⊤`, although each chain is finite. Appending a singleton block lexicographically still
+leaves every chain finite and gives height `⊤ + 1 = ⊤`. These are ENat cardinality formulas, not
+ordinal-addition or Krull-dimension formulas.
 
 For an inclusion-directed family of sets, the chain height of the union is the supremum of
 its pieces' chain heights. The relation is arbitrary, and the index may be any sort, including
@@ -40,6 +59,11 @@ its fibres. The first projection is a comparable subset, and local first irrefle
 each fibre a comparable subset for the second relation. This argument never sorts a chain or
 assumes either relation is transitive.
 
+For sums, the two tagged slices of a comparable subset are comparable for the respective factor
+relations. Their tagged images partition the subset, so their cardinalities add. Conversely,
+the tagged union of two factor chains is a chain because every cross pair compares. Taking the
+two suprema gives the addition formula without choosing a longest or infinite chain.
+
 For directed unions, every finite positive chain-cardinality witness fits in one piece.
 A point of the witness supplies the local nonempty range needed by the finite-containment
 theorem; the zero bound requires no index. Testing all natural lower bounds also handles top.
@@ -50,7 +74,10 @@ The proof uses Mathlib's chain-height and finite-witness API in `Mathlib.Order.H
 (Andrew Yang and Vlad Tsyrklevich), relation embeddings in `Mathlib.Order.RelIso.Basic`
 (Mario Carneiro and contributors), finite-union cardinality bounds in
 `Mathlib.Data.Set.Card.Arithmetic` (Pim Otte), and its set-cardinality, lexicographic product
-and ENat supremum APIs. The directed-family predicate is from `Mathlib.Order.Directed`
+and ENat supremum APIs. The sum formula uses the sum relation API in Lean's `Init.Data.Sum.Basic`
+(Mario Carneiro and Yury G. Kudryashov), the canonical lexicographic sum and relation isomorphism
+in `Mathlib.Data.Sum.Order` (Yaël Dillies), and Mathlib's tagged-set partition and
+disjoint-cardinality addition APIs. The directed-family predicate is from `Mathlib.Order.Directed`
 (Johannes Hölzl and Yaël Dillies). Finite containment in directed unions uses
 `Mathlib.Data.Set.Finite.Lattice` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
 -/
@@ -199,5 +226,73 @@ theorem chainHeight_toLex_prod
       chainHeight_eq_of_relIso (s ×ˢ t)
         (RelIso.ofOnFun (fun x y : α ×ₗ β => x < y) toLex)
     _ = _ := chainHeight_prod_lex _ _ s t (fun a _ => irrefl a)
+
+/-- Chain heights add for the union of the two tagged images under the lexicographic sum
+relation. The relations are arbitrary: neither irreflexivity nor transitivity is required, and
+either set or ambient type may be empty. -/
+theorem chainHeight_sum_lex
+    {α : Type u} {β : Type v} (rα : α → α → Prop) (rβ : β → β → Prop)
+    (s : Set α) (t : Set β) :
+    ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t).chainHeight
+        (Sum.Lex rα rβ) = s.chainHeight rα + t.chainHeight rβ := by
+  have hcard (a : Set α) (b : Set β) :
+      ((Sum.inl : α → α ⊕ β) '' a ∪ (Sum.inr : β → α ⊕ β) '' b).encard =
+        a.encard + b.encard := by
+    rw [Set.encard_union_eq Set.disjoint_image_inl_image_inr,
+      Sum.inl_injective.encard_image, Sum.inr_injective.encard_image]
+  apply le_antisymm
+  · rw [Set.chainHeight_eq_iSup]
+    refine iSup_le fun c ↦ ?_
+    have hleftsub : (Sum.inl : α → α ⊕ β) ⁻¹' c.1 ⊆ s := by
+      simpa only [Set.preimage_union, Set.preimage_image_eq s Sum.inl_injective,
+        Set.preimage_inl_image_inr, Set.union_empty] using
+        (Set.preimage_mono (f := (Sum.inl : α → α ⊕ β)) c.2.1)
+    have hrightsub : (Sum.inr : β → α ⊕ β) ⁻¹' c.1 ⊆ t := by
+      simpa only [Set.preimage_union, Set.preimage_image_eq t Sum.inr_injective,
+        Set.preimage_inr_image_inl, Set.empty_union] using
+        (Set.preimage_mono (f := (Sum.inr : β → α ⊕ β)) c.2.1)
+    calc
+      c.1.encard =
+          ((Sum.inl : α → α ⊕ β) '' (Sum.inl ⁻¹' c.1) ∪
+            (Sum.inr : β → α ⊕ β) '' (Sum.inr ⁻¹' c.1)).encard :=
+        congrArg Set.encard (Set.image_preimage_inl_union_image_preimage_inr c.1).symm
+      _ = (Sum.inl ⁻¹' c.1).encard + (Sum.inr ⁻¹' c.1).encard := hcard _ _
+      _ ≤ s.chainHeight rα + t.chainHeight rβ :=
+        add_le_add
+          (Set.encard_le_chainHeight_of_isChain s _ hleftsub
+            (c.2.2.preimage_relEmbedding (RelEmbedding.sumLexInl rα rβ)))
+          (Set.encard_le_chainHeight_of_isChain t _ hrightsub
+            (c.2.2.preimage_relEmbedding (RelEmbedding.sumLexInr rα rβ)))
+  · -- The empty chains inhabit the supremum indices even when the factors are empty.
+    have : Nonempty {a : Set α // a ⊆ s ∧ IsChain rα a} :=
+      ⟨⟨∅, Set.empty_subset s, IsChain.empty⟩⟩
+    have : Nonempty {b : Set β // b ⊆ t ∧ IsChain rβ b} :=
+      ⟨⟨∅, Set.empty_subset t, IsChain.empty⟩⟩
+    rw [Set.chainHeight_eq_iSup s rα, Set.chainHeight_eq_iSup t rβ]
+    refine ENat.iSup_add_iSup_le fun a b ↦ ?_
+    rw [← hcard a.1 b.1]
+    refine Set.encard_le_chainHeight_of_isChain _ _
+      (Set.union_subset_union (Set.image_mono a.2.1) (Set.image_mono b.2.1)) ?_
+    refine isChain_union.mpr
+      ⟨a.2.2.image (RelEmbedding.sumLexInl rα rβ),
+        b.2.2.image (RelEmbedding.sumLexInr rα rβ), ?_⟩
+    rintro _ ⟨x, _, rfl⟩ _ ⟨y, _, rfl⟩ _
+    exact Or.inl (Sum.Lex.sep x y)
+
+/-- Chain heights add for the image of the tagged union in the lexicographic sum type synonym.
+The less-than relation on the sum is the canonical `Sum.Lex.LT` induced by the given less-than
+structures on the factors. No irreflexivity, transitivity or nonemptiness is required. -/
+theorem chainHeight_toLex_sum
+    {α : Type u} {β : Type v} [LT α] [LT β] (s : Set α) (t : Set β) :
+    ((toLex : α ⊕ β → α ⊕ₗ β) ''
+      ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)).chainHeight
+        (fun x y : α ⊕ₗ β => x < y) =
+      s.chainHeight (fun x y : α => x < y) +
+        t.chainHeight (fun x y : β => x < y) := by
+  calc
+    _ = ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t).chainHeight
+        (Sum.Lex (fun x y : α => x < y) (fun x y : β => x < y)) :=
+      chainHeight_eq_of_relIso _ (Sum.Lex.toLexRelIsoLT (α := α) (β := β))
+    _ = _ := chainHeight_sum_lex _ _ s t
 
 end Set

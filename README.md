@@ -41,6 +41,24 @@ fibre counting for the upper bound, so it neither sorts a nontransitive comparab
 set nor assumes a longest chain exists. It does not assert the analogous formula
 for canonical weak `≤` in arbitrary preorders.
 
+### Chain cardinalities of lexicographic sums
+
+For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
+sets `s`, `t`, [`Set.chainHeight_sum_lex`](MinimalPrimes/Order/ChainHeight.lean)
+proves that the union of the two injection images has chain height
+`s.chainHeight rα + t.chainHeight rβ` for `Sum.Lex rα rβ`. Within each tag the
+factor relation is used, and every left-tagged point precedes every right-tagged
+point. No irreflexivity, transitivity, nonemptiness or finiteness is assumed.
+`Set.chainHeight_toLex_sum` transports the formula under `toLex` to the canonical
+less-than relation on `α ⊕ₗ β`, using only the given `LT` records on both factors.
+
+The heights count vertices in `ENat`: two singleton blocks, or two nonempty
+antichains, give height two. The disjoint relation `Sum.LiftRel`, used by ordinary
+Sum less-than, is different. Empty factors contribute zero, including beside top.
+The proof splits arbitrary chains into their tagged preimages and glues factor
+chains by the cross comparison; it neither sorts chains nor assumes their heights
+are attained. Unbounded finite chain cardinalities are included.
+
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,
@@ -891,7 +909,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
@@ -964,10 +982,12 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
   relation series with its directed-range and finite-set containment APIs; see the
   [chain-height](MinimalPrimes/Order/ChainHeight.lean) and
   [order-dimension](MinimalPrimes/Order/KrullDimension.lean) module references.
-- The lexicographic chain-cardinality proof builds on Mathlib's chain-height API
+- The lexicographic chain-cardinality proofs build on Mathlib's chain-height API
   (Andrew Yang and Vlad Tsyrklevich), relation embeddings (Mario Carneiro and
   contributors), set-cardinality and finite-union cardinality lemmas, and ENat
-  multiplication of suprema; see the
+  multiplication and addition of suprema. The sum formula also uses Lean's Sum
+  relation API (Mario Carneiro and Yury G. Kudryashov) and Mathlib's canonical
+  lexicographic sum (Yaël Dillies); see the
   [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
