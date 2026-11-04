@@ -14,15 +14,18 @@ A dependent filter product of monoids with zero is reduced exactly when the
 reduced fibres form a member of the filter. The criterion allows arbitrary
 filters, independently universed fibres and trivial monoids.
 
-The proof uses the fixed-square characterization of reducedness. Choosing
-square-zero witnesses on the nonreduced fibres avoids interchanging an
-unbounded nilpotence exponent with eventual equality.
+A section represents a nilpotent element exactly when one uniform exponent
+makes its power zero eventually. The reducedness proof uses the fixed-square
+characterization: choosing square-zero witnesses on the nonreduced fibres
+avoids interchanging an unbounded nilpotence exponent with eventual equality.
 
 ## References
 
 The uniform square criterion is Mathlib's `isReduced_iff_pow_one_lt` at exponent
-two. The quotient and its characteristic representative API are those of
-`Filter.Product`.
+two. The quotient, congruence transport, pointwise operations and nilpotence
+predicate use Mathlib's `Filter.Product`, `Con`, `Pi` and `IsNilpotent` APIs.
+The uniform-exponent criterion follows the constant-family analogue
+`Filter.Germ.isNilpotent_coe_iff` in `MinimalPrimes.Order.Filter.Germ.Reduced`.
 -/
 
 @[expose] public section
@@ -31,8 +34,24 @@ universe u v
 
 namespace Filter.Product
 
-variable {ι : Type u} {D : Filter ι} {R : ι → Type v}
+variable {ι : Type u} {D F : Filter ι} {R : ι → Type v}
 variable [∀ i, MonoidWithZero (R i)]
+
+/-- A section represents a nilpotent element exactly when one uniform exponent
+makes its power zero eventually. The exponent may be zero. -/
+@[simp]
+theorem isNilpotent_coe_iff (f : ∀ i, R i) :
+    @IsNilpotent (F.Product R) _ _ (f : F.Product R) ↔
+      ∃ n : ℕ, ∀ᶠ i in F, f i ^ n = 0 := by
+  have hzero : ((0 : ∀ i, R i) : F.Product R) = (0 : F.Product R) := coe_zero
+  constructor
+  · rintro ⟨n, hn⟩
+    refine ⟨n, (coe_eq (F := F) (f ^ n) 0).1 ?_⟩
+    exact (coe_pow (F := F) f n).trans (hn.trans hzero.symm)
+  · rintro ⟨n, hn⟩
+    refine ⟨n, ?_⟩
+    exact (coe_pow (F := F) f n).symm.trans
+      (((coe_eq (F := F) (f ^ n) 0).2 hn).trans hzero)
 
 /-- A dependent filter product is reduced exactly when its reduced fibres form
 a member of the filter. No properness or nontriviality assumption is needed. -/
@@ -66,18 +85,14 @@ theorem isReduced_iff : IsReduced (D.Product R) ↔ ∀ᶠ i in D, IsReduced (R 
         simpa only [f, dite_eq_right hbad] using (Classical.choose_spec (hw i hbad)).2
       exact hn hi
   · intro h
-    refine (isReduced_iff_pow_one_lt 2 one_lt_two).2 ?_
+    constructor
     intro q
     refine Quotient.inductionOn q ?_
     intro f hf
-    have he' : π (f ^ 2) = π 0 := by
-      calc
-        π (f ^ 2) = (π f) ^ 2 := map_pow π f 2
-        _ = 0 := hf
-        _ = π 0 := hzero.symm
-    have he : ∀ᶠ i in D, f i ^ 2 = 0 := (coe_eq (f ^ 2) 0).1 he'
-    have hz : ∀ᶠ i in D, f i = 0 := (h.and he).mono fun i hi =>
-      (isReduced_iff_pow_one_lt 2 one_lt_two).1 hi.1 _ hi.2
+    obtain ⟨n, hn⟩ := (isNilpotent_coe_iff f).1 hf
+    have hz : ∀ᶠ i in D, f i = 0 := (h.and hn).mono fun i hi => by
+      let _ := hi.1
+      exact eq_zero_of_pow_eq_zero hi.2
     exact ((coe_eq f 0).2 hz).trans hzero
 
 end Filter.Product

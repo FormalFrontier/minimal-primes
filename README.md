@@ -61,8 +61,10 @@ monoids with zero, the filter product is reduced exactly when its reduced
 fibres form a member of the filter. The
 [criterion](MinimalPrimes/Order/Filter/Product/Reduced.lean) uses a uniform
 square-zero test, not an exchange of a varying nilpotence exponent with
-eventual equality. No addition, commutativity, proper-filter or nontriviality
-hypothesis is needed.
+eventual equality. A representative is nilpotent exactly when one uniform
+natural-number exponent makes its power zero eventually; the exponent may be
+zero. No addition, commutativity, proper-filter or nontriviality hypothesis is
+needed.
 
 ### Regular elements of dependent filter products
 
