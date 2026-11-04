@@ -399,13 +399,15 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   Dimensions lie in `WithBot ℕ∞`, including zero rings and infinite dimension.
 - **Closed-locus dimension bound for ideals containing a non-zero-divisor**
   ([module](MinimalPrimes/RingTheory/KrullDimension/Basic.lean)). For a commutative
-  semiring `R`, a natural number `n` and `[Ring.KrullDimLE (n + 1) R]`,
-  `PrimeSpectrum.krullDimLE_zeroLocus_of_exists_mem_nonZeroDivisors` states that
-  `PrimeSpectrum.zeroLocus (J : Set R)` has order dimension at most `n` whenever
-  `∃ a ∈ J, a ∈ nonZeroDivisors R`. The canonical closed locus carries the inherited
-  spectrum order. No prime element, principal or prime ideal, domain, unique
+  semiring `R`, `PrimeSpectrum.krullDim_zeroLocus_add_one_le_of_exists_mem_nonZeroDivisors`
+  states that `Order.krullDim (PrimeSpectrum.zeroLocus (J : Set R)) + 1 ≤ ringKrullDim R`
+  whenever `∃ a ∈ J, a ∈ nonZeroDivisors R`. Addition is in `WithBot ℕ∞`, so empty loci
+  retain dimension bottom and infinite dimensions are included. The finite-bound API
+  `PrimeSpectrum.krullDimLE_zeroLocus_of_exists_mem_nonZeroDivisors` also gives dimension
+  at most `n` under `[Ring.KrullDimLE (n + 1) R]`. The canonical closed locus carries the
+  inherited spectrum order. No prime element, principal or prime ideal, domain, unique
   factorization, ring, Noetherian, properness or nonempty-locus assumption is imposed.
-  This is a finite upper bound, not equality or exact dimension subtraction.
+  Neither form asserts equality or exact dimension subtraction.
   For commutative rings, Mathlib's quotient-spectrum order isomorphism identifies
   the same locus with the spectrum of `R ⧸ J`; arbitrary semiring ideal quotients
   are not asserted.
@@ -749,7 +751,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Maximal ultrafilter ideals for division semirings; prime ideals of dependent products of semifields classified by ultrafilters. |
 | [`MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter`](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean) | Canonical residue-field/dependent-Product comparison over the section ring, with characteristic equations, uniqueness and fibrewise naturality. |
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
-| [`MinimalPrimes.RingTheory.KrullDimension.Basic`](MinimalPrimes/RingTheory/KrullDimension/Basic.lean) | Closed-locus finite dimension bound for ideals meeting the non-zero-divisors; prime non-zero-divisor generators in dimension at most two; dimension bound from irreducible generators. |
+| [`MinimalPrimes.RingTheory.KrullDimension.Basic`](MinimalPrimes/RingTheory/KrullDimension/Basic.lean) | Extended and finite closed-locus dimension bounds for ideals meeting the non-zero-divisors; prime non-zero-divisor generators in dimension at most two; dimension bound from irreducible generators. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
 | [`MinimalPrimes.RingTheory.KrullDimension.UniqueFactorizationDomain`](MinimalPrimes/RingTheory/KrullDimension/UniqueFactorizationDomain.lean) | Prime ideals in dimension-at-most-two unique factorization semirings are zero, irreducible-principal, or maximal. |

@@ -187,8 +187,10 @@ The dimension-two comparison interfaces use Mathlib's order Krull dimension,
 height/coheight and minimal/maximal-point predicates, and its canonical prime spectrum.
 The semiring formulation uses Andrew Yang's minimal-prime avoidance of non-zero-divisors
 in Mathlib. The regular-ideal closed-locus bound uses the same minimal-prime avoidance,
-this library's finite-bound boundary-deletion criterion, and Mathlib's canonical
-zero locus with its inherited spectrum order. Its ring specialization agrees with
+this library's nonminimal-locus dimension comparison and finite-bound criterion,
+and Mathlib's canonical zero locus with its inherited spectrum order. The extended
+inequality uses finite addition in `WithBot ℕ∞`, including bottom and infinite values.
+Its ring specialization agrees with
 Andrew Yang's quotient-dimension bounds through Mathlib's quotient-spectrum order
 isomorphism.
 The finite-bound boundary-deletion family uses the order Krull dimension formalization
