@@ -122,6 +122,14 @@ injectivity API and Mathlib's equivalence interfaces, formalized by Johannes Hö
 Callum Sutton, Yury Kudryashov, Leonardo de Moura and Mario Carneiro. Its total
 central lift extends the same nonassociative client.
 
+The dependent index-pullback properties reuse Mathlib's complete quotient-kernel
+injectivity criterion in `Data.Setoid.Basic`, by Amelia Livingston and Bryan Gin-ge
+Chen, and `eventually_map` in `Order.Filter.Map`, by Johannes Hölzl and Jeremy Avigad.
+Surjective representative lifting uses the dependent Pi equivalence in
+`Logic.Equiv.Basic`, by Leonardo de Moura and Mario Carneiro, and the canonical
+quotient representative API. The existing filter-product carrier and pullback
+remain those described in the module references; no second quotient is introduced.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

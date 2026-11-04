@@ -16,11 +16,14 @@ For independently universed indices and fibres, a map `u : ι → κ` with
 from `G.Product R` to `F.Product (fun i => R (u i))`. It sends a section to its
 precomposition, respects identity and composition, and agrees with the existing
 `Filter.Germ.compTendsto` on constant families. No algebra, total-section existence
-or proper-filter assumption is needed. An index equivalence tending in both
-directions gives `Filter.Product.compTendstoEquiv`, whose inverse uses canonical
+or proper-filter assumption is needed. Exact filter-image equality `Filter.map u F = G`
+makes this pullback injective (`compTendsto_injective_of_map_eq`), without injectivity
+of `u`. An index equivalence makes it surjective with only forward convergence
+(`compTendsto_surjective_of_equiv`), but not necessarily injective. Convergence in
+both directions gives `Filter.Product.compTendstoEquiv`, whose inverse uses canonical
 dependent Pi reindexing. The [dependent Bool client](MinimalPrimesTest/Order/Filter/Product/CompTendsto.lean)
-exhibits an injective, non-surjective diagonal and the failure of injectivity
-under one-way convergence even with proper filters.
+exhibits an injective, non-surjective diagonal and a surjective, non-injective
+one-way equivalence-index pullback with proper filters.
 
 ### Centers of dependent filter products
 

@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.Data.Setoid.Basic
 public import Mathlib.Logic.Equiv.Basic
 public import MinimalPrimes.Order.Filter.Product
 
@@ -15,18 +16,26 @@ with fibres `R (u i)` over `F`. `Filter.Product.compTendsto` descends this opera
 on Mathlib's existing quotient of total sections. Its representative equation,
 identity and composition laws require no algebra, section-existence or properness
 assumptions. On constant families it agrees with `Filter.Germ.compTendsto`.
+Exact filter-image equality makes pullback injective, without injectivity of the
+index map. An equivalence of indices makes pullback surjective with only the
+forward convergence assumption; it need not be injective.
 
 An equivalence of indices induces `Filter.Product.compTendstoEquiv` when both
 it and its inverse tend to the respective filters. Its forward operation is the
 same pullback. The inverse descends `Equiv.piCongrLeft`, including its dependent
-transport along `e.apply_symm_apply`. One-way convergence alone does not suffice.
+transport along `e.apply_symm_apply`. One-way convergence guarantees surjectivity,
+but does not in general suffice to descend this inverse to the quotient.
 
 ## References
 
 The carrier, section coercion and constant-family operation reuse Mathlib's
 `Order.Filter.Germ.Basic`, by Yury Kudryashov and Abhimanyu Pallavi Sudhir.
-The descent uses Mathlib's quotient API; the inverse reuses its Pi reindexing
-equivalence. This formalization was developed with AI assistance.
+The descent uses Mathlib's quotient API. Injectivity reuses the complete kernel
+criterion in `Data.Setoid.Basic`, by Amelia Livingston and Bryan Gin-ge Chen,
+and `eventually_map` in `Order.Filter.Map`, by Johannes Hölzl and Jeremy Avigad.
+Representative preimages and the inverse reuse the dependent Pi reindexing in
+`Logic.Equiv.Basic`, by Leonardo de Moura and Mario Carneiro. This formalization
+was developed with AI assistance.
 -/
 
 @[expose] public section
@@ -77,6 +86,37 @@ theorem compTendsto_unique (u : ι → κ) (hu : Tendsto u F G)
     T = fun x => x.compTendsto u hu := by
   funext x
   exact Quotient.inductionOn' x hT
+
+/-- Exact filter-image equality makes pullback injective, without any
+injectivity assumption on the index map or any section-existence assumption. -/
+theorem compTendsto_injective_of_map_eq (u : ι → κ) (hmap : Filter.map u F = G) :
+    Function.Injective (fun x : G.Product R => x.compTendsto u hmap.le) := by
+  let q : (∀ j, R j) → F.Product (fun i => R (u i)) := fun s =>
+    (((fun i : ι => s (u i)) : ∀ i, R (u i)) : F.Product (fun i => R (u i)))
+  have hle : productSetoid G R ≤ Setoid.ker q := by
+    intro s t hst
+    exact (coe_eq _ _).2 ((show Tendsto u F G from hmap.le).eventually hst)
+  have hq : Quotient.lift q hle = fun x : G.Product R => x.compTendsto u hmap.le :=
+    compTendsto_unique u hmap.le _ (fun _ => rfl)
+  rw [← hq]
+  apply (Setoid.lift_injective_iff_ker_eq_of_le hle).2
+  refine Setoid.ext fun s t => ?_
+  change q s = q t ↔ ∀ᶠ j in G, s j = t j
+  exact (coe_eq (fun i : ι => s (u i)) (fun i : ι => t (u i))).trans (by
+    rw [← hmap, Filter.eventually_map])
+
+/-- An index equivalence makes pullback surjective using only forward convergence.
+The representative preimage uses dependent Pi reindexing; it need not descend to
+a quotient inverse without reverse convergence. -/
+theorem compTendsto_surjective_of_equiv (e : ι ≃ κ) (he : Tendsto e F G) :
+    Function.Surjective (fun x : G.Product R => x.compTendsto e he) := by
+  intro x
+  obtain ⟨s, rfl⟩ : ∃ s : ∀ i, R (e i), (s : F.Product (fun i => R (e i))) = x :=
+    Quotient.mk_surjective x
+  refine ⟨((Equiv.piCongrLeft R e s) : G.Product R), ?_⟩
+  exact (coe_compTendsto (Equiv.piCongrLeft R e s) e he).trans
+    (congrArg (fun t : ∀ i, R (e i) => (t : F.Product (fun i => R (e i))))
+      ((Equiv.piCongrLeft R e).symm_apply_apply s))
 
 /-- For constant families, pullback is Mathlib's existing germ composition.
 The two carriers are definitionally equal; this lemma identifies the operations. -/

@@ -11,9 +11,10 @@ public import MinimalPrimes.Order.Filter.Product.CompTendsto
 
 Restriction to a constant Bool index gives a diagonal from a genuinely dependent
 product with two classes to the four-class top product. It is injective but not
-surjective. Even an index equivalence tending in one direction need not induce an
-injection, with both filters proper. The final check distinguishes an ignored empty
-fibre from an empty index type: the quotient still uses total sections.
+surjective. An index equivalence tending in one direction induces a surjection
+but need not induce an injection, even with both filters proper. The final check
+distinguishes an ignored empty fibre from an empty index type: the quotient still
+uses total sections.
 -/
 
 @[expose] public section
@@ -37,38 +38,39 @@ private def diagonal : (principal {false}).Product fibre →
 -- The source remembers only its Bool fibre, and the image misses the off-diagonal section.
 example : Function.Injective diagonal ∧ ¬ Function.Surjective diagonal := by
   constructor
-  · intro x y
-    refine Quotient.inductionOn₂' x y ?_
-    intro f g h
-    have hfalse : f false = g false :=
-      eventually_top.mp ((Product.coe_eq (fun _ => f false) (fun _ => g false)).mp h) false
-    apply Quotient.sound
-    intro j hj
-    have hj' : j = false := Set.mem_singleton_iff.mp hj
-    subst j
-    exact hfalse
+  · exact Product.compTendsto_injective_of_map_eq (R := fibre) (fun _ : Bool => false)
+      (by simp)
   · intro hsurj
-    obtain ⟨x, hx⟩ := hsurj ((fun b : Bool => b) : (⊤ : Filter Bool).Product (fun _ => Bool))
+    obtain ⟨x, hx⟩ := hsurj
+      (((fun b : Bool => b) : Bool → Bool) : (⊤ : Filter Bool).Product (fun _ => Bool))
     refine Quotient.inductionOn' x ?_ hx
     intro f hf
     have h := eventually_top.mp
       ((Product.coe_eq (fun _ => f false) (fun b : Bool => b)).mp hf)
     exact Bool.false_ne_true ((h false).symm.trans (h true))
 
--- Identity indices, but only one Tendsto direction: four classes collapse to two.
+-- Identity indices, but only one Tendsto direction: four classes collapse onto two.
 -- Both the top filter on Bool and the singleton principal filter are proper.
-example : ¬ Function.Injective
+example : Function.Surjective
     (fun x : (⊤ : Filter Bool).Product (fun _ => Bool) =>
-      x.compTendsto id (show Tendsto id (principal {false}) ⊤ from tendsto_top)) := by
-  intro hinj
-  have h := hinj (a₁ := ((fun b : Bool => b) : (⊤ : Filter Bool).Product (fun _ => Bool)))
-    (a₂ := ((fun _ : Bool => false) : (⊤ : Filter Bool).Product (fun _ => Bool)))
-    ((Product.coe_eq _ _).mpr (by
-      intro b hb
-      have hb' : b = false := Set.mem_singleton_iff.mp hb
-      subst b
-      rfl))
-  exact Bool.false_ne_true (eventually_top.mp ((Product.coe_eq _ _).mp h) true).symm
+      x.compTendsto id (show Tendsto id (principal {false}) ⊤ from tendsto_top)) ∧
+    ¬ Function.Injective
+      (fun x : (⊤ : Filter Bool).Product (fun _ => Bool) =>
+        x.compTendsto id (show Tendsto id (principal {false}) ⊤ from tendsto_top)) := by
+  constructor
+  · exact Product.compTendsto_surjective_of_equiv (Equiv.refl Bool) tendsto_top
+  · intro hinj
+    have h := hinj
+      (a₁ := (((fun b : Bool => b) : Bool → Bool) :
+        (⊤ : Filter Bool).Product (fun _ => Bool)))
+      (a₂ := (((fun _ : Bool => false) : Bool → Bool) :
+        (⊤ : Filter Bool).Product (fun _ => Bool)))
+      ((Product.coe_eq _ _).mpr (by
+        intro b hb
+        have hb' : b = false := Set.mem_singleton_iff.mp hb
+        subst b
+        rfl))
+    exact Bool.false_ne_true (eventually_top.mp ((Product.coe_eq _ _).mp h) true).symm
 
 private def emptyFibre : Bool → Type
   | false => Unit
