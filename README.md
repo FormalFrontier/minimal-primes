@@ -80,6 +80,21 @@ natural-number exponent makes its power zero eventually; the exponent may be
 zero. No addition, commutativity, proper-filter or nontriviality hypothesis is
 needed.
 
+If the filter contains a finite set, nilpotence of a represented section is
+also equivalent to eventual fibrewise nilpotence, by
+[`Filter.Product.isNilpotent_coe_iff_of_finite_mem`](MinimalPrimes/Order/Filter/Product/Reduced.lean).
+The whole index type need not be finite. The same module gives finite-index
+and finite-principal criteria; the latter tests exactly the values on the
+generating set, including the empty set. These results reuse the
+[finite-member exponent bound](MinimalPrimes/Order/Filter/Product/Nilpotent.lean).
+For **monoid-with-zero coefficients**, the
+[constant-germ specialization](MinimalPrimes/Order/Filter/Germ/Reduced.lean)
+uses the existing germ zero and power operations; the earlier germ results
+still need only zero and natural-number powers. The
+[dependent client](MinimalPrimesTest/Order/Filter/Product/Nilpotent.lean) gives
+a nonzero nilpotent quotient element on an infinite index type with varying
+nonadditive fibres.
+
 ### Regular elements of dependent filter products
 
 For an arbitrary filter `D` and an independently universed family `K` with only
@@ -465,7 +480,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
-| [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness of constant-fibre germs with only zero and natural-number powers. |
+| [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
+| [`MinimalPrimes.Order.Filter.Product.Nilpotent`](MinimalPrimes/Order/Filter/Product/Nilpotent.lean) | A uniform vanishing exponent for eventually nilpotent dependent sections when the filter contains a finite set. |
+| [`MinimalPrimes.Order.Filter.Product.Reduced`](MinimalPrimes/Order/Filter/Product/Reduced.lean) | Reducedness by the reduced-fibre locus; uniform-exponent nilpotence and finite-member, finite-index and finite-principal nilpotence criteria. |
 | [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Regular`](MinimalPrimes/Order/Filter/Product/Regular.lean) | Left, right and two-sided regularity at fibrewise multiplication, characterized by eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Center`](MinimalPrimes/Order/Filter/Product/Center.lean) | Full intrinsic centers at fibrewise multiplication; the equivalence of fibre-center products and product centers needs only two-sided identities. |
@@ -508,6 +525,11 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The finite-member nilpotence criteria compose the dependent-product and
+  constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
+  propagation of zero powers and finite-set order bounds; see the
+  [bound module](MinimalPrimes/Order/Filter/Product/Nilpotent.lean) and
+  [CREDITS.md](CREDITS.md).
 - The germ non-zero-divisor criteria use Mathlib's filter-germ, filter witness-selection
   and monoid-with-zero non-zero-divisor APIs; see the module's references and
   [CREDITS.md](CREDITS.md).

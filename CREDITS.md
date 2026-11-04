@@ -98,7 +98,16 @@ the proofs test all varying representatives, not just constant germs.
 
 Constant-germ reducedness uses Mathlib's quotient, power and eventual-equality
 interfaces, and Johan Commelin's zero-and-power definitions of nilpotence and
-reducedness.
+reducedness. The finite-member bound for eventual nilpotence uses Oliver Nash's
+nilpotency-class API, Mathlib's upward propagation of vanishing powers, and the
+finite-set order bounds developed by Peter Nelson, Yaël Dillies, Mario Carneiro
+and Kenny Lau. The dependent-product finite-member nilpotence criterion composes
+that shared bound with the uniform-exponent quotient criterion developed by
+Formal Frontier Agents, using the existing dependent Product algebra and coercion
+API. Its constant-germ specialization instead composes the same bound with the
+existing germ zero-and-power criterion; no carrier or operation comparison is
+needed. The finite-principal client uses Mathlib's `ZMod`, free monoids and
+`WithZero` formalizations.
 
 The intrinsic germ-center criterion uses Mathlib's magma-center formalization by
 Eric Wieser and Jireh Loreaux, Eric Wieser's bundled submonoid center, and the germ

@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import MinimalPrimes.Order.Filter.Product
+public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import Mathlib.RingTheory.Nilpotent.Basic
 
 /-!
@@ -15,9 +15,11 @@ reduced fibres form a member of the filter. The criterion allows arbitrary
 filters, independently universed fibres and trivial monoids.
 
 A section represents a nilpotent element exactly when one uniform exponent
-makes its power zero eventually. The reducedness proof uses the fixed-square
-characterization: choosing square-zero witnesses on the nonreduced fibres
-avoids interchanging an unbounded nilpotence exponent with eventual equality.
+makes its power zero eventually. When the filter contains a finite set, this is
+equivalent to eventual fibrewise nilpotence, even on an infinite index type.
+The reducedness proof uses the fixed-square characterization: choosing square-zero
+witnesses on the nonreduced fibres avoids interchanging an unbounded nilpotence
+exponent with eventual equality.
 
 ## References
 
@@ -26,6 +28,8 @@ two. The quotient, congruence transport, pointwise operations and nilpotence
 predicate use Mathlib's `Filter.Product`, `Con`, `Pi` and `IsNilpotent` APIs.
 The uniform-exponent criterion follows the constant-family analogue
 `Filter.Germ.isNilpotent_coe_iff` in `MinimalPrimes.Order.Filter.Germ.Reduced`.
+The finite-member criterion composes this uniform-exponent criterion with
+`Filter.Eventually.exists_pow_eq_zero_of_finite_mem`.
 -/
 
 @[expose] public section
@@ -52,6 +56,35 @@ theorem isNilpotent_coe_iff (f : ∀ i, R i) :
     refine ⟨n, ?_⟩
     exact (coe_pow (F := F) f n).symm.trans
       (((coe_eq (F := F) (f ^ n) 0).2 hn).trans hzero)
+
+/-- If a filter contains a finite set, a section represents a nilpotent element
+exactly when its values are nilpotent eventually. The index type may be infinite,
+and neither the filter nor the fibres need be nontrivial. -/
+theorem isNilpotent_coe_iff_of_finite_mem (f : ∀ i, R i) {s : Set ι}
+    (hs : s.Finite) (hsD : s ∈ D) :
+    @IsNilpotent (D.Product R) _ _ (f : D.Product R) ↔
+      ∀ᶠ i in D, IsNilpotent (f i) := by
+  rw [isNilpotent_coe_iff]
+  constructor
+  · rintro ⟨n, hn⟩
+    exact hn.mono fun i hi => ⟨n, hi⟩
+  · intro hf
+    exact hf.exists_pow_eq_zero_of_finite_mem hs hsD
+
+/-- On a finite index type, nilpotence of a represented section is equivalent to
+eventual fibrewise nilpotence for every filter, including the bottom filter. -/
+theorem isNilpotent_coe_iff_of_finite [Finite ι] (f : ∀ i, R i) :
+    @IsNilpotent (D.Product R) _ _ (f : D.Product R) ↔
+      ∀ᶠ i in D, IsNilpotent (f i) :=
+  isNilpotent_coe_iff_of_finite_mem f Set.finite_univ Filter.univ_mem
+
+/-- In the product at a finite principal filter, a section is nilpotent exactly
+when all its values on the generating set are nilpotent. The set may be empty. -/
+theorem isNilpotent_coe_principal_iff (f : ∀ i, R i) {s : Set ι} (hs : s.Finite) :
+    @IsNilpotent ((Filter.principal s).Product R) _ _ (f : (Filter.principal s).Product R) ↔
+      ∀ i ∈ s, IsNilpotent (f i) := by
+  rw [isNilpotent_coe_iff_of_finite_mem (D := Filter.principal s) f hs (by simp),
+    Filter.eventually_principal]
 
 /-- A dependent filter product is reduced exactly when its reduced fibres form
 a member of the filter. No properness or nontriviality assumption is needed. -/

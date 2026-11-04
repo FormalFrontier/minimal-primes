@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import Mathlib.Algebra.GroupWithZero.Basic
 public import Mathlib.Order.Filter.Germ.Basic
 
@@ -17,11 +18,16 @@ improper or the value type is reduced. No power laws or multiplication are neede
 A representative is nilpotent in the germ precisely when one natural-number
 exponent makes its power zero on a filter-large set. This does not mean merely
 that its values are eventually nilpotent with possibly different exponents.
+For monoid-with-zero coefficients and a filter containing a finite set, the two
+conditions are equivalent, by the shared finite-member exponent bound.
 
 ## References
 
 This uses Mathlib's filter-germ API of Yury Kudryashov and Abhimanyu Pallavi Sudhir,
 and the nilpotence and reducedness definitions in `Mathlib.Algebra.GroupWithZero.Basic`.
+The finite-member specialization uses
+`Filter.Eventually.exists_pow_eq_zero_of_finite_mem`; it does not require a
+comparison between the germ and dependent-product algebra structures.
 -/
 
 @[expose] public section
@@ -30,7 +36,11 @@ universe u v
 
 namespace Filter.Germ
 
-variable {ι : Type u} {M : Type v} [Zero M] [Pow M ℕ]
+variable {ι : Type u} {M : Type v}
+
+section ZeroPow
+
+variable [Zero M] [Pow M ℕ]
 
 /-- A representative is nilpotent in the germ exactly when one exponent makes
 its power zero eventually. The exponent may be zero. -/
@@ -95,5 +105,20 @@ instance instIsReduced (D : Filter ι) [IsReduced M] : IsReduced (Germ D M) :=
 theorem isReduced_iff (D : Filter ι) [NeBot D] :
     IsReduced (Germ D M) ↔ IsReduced M :=
   (isReduced_iff_eventually D).trans eventually_const
+
+end ZeroPow
+
+/-- For monoid-with-zero coefficients, if a filter contains a finite set, a germ
+is nilpotent exactly when its representative is nilpotent eventually. The index
+type may be infinite, and the filter may be bottom. -/
+theorem isNilpotent_coe_iff_of_finite_mem [MonoidWithZero M] (D : Filter ι) (f : ι → M)
+    {s : Set ι} (hs : s.Finite) (hsD : s ∈ D) :
+    IsNilpotent (f : Germ D M) ↔ ∀ᶠ i in D, IsNilpotent (f i) := by
+  rw [isNilpotent_coe_iff]
+  constructor
+  · rintro ⟨n, hn⟩
+    exact hn.mono fun i hi => ⟨n, hi⟩
+  · intro hf
+    exact hf.exists_pow_eq_zero_of_finite_mem hs hsD
 
 end Filter.Germ
