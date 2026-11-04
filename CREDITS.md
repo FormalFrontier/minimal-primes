@@ -176,6 +176,11 @@ identity, composition and the surjective specialization reuse Mathlib's ring-map
 integrality witnesses. The canonical restriction and infinitude-transfer approach
 follows the mathematical argument developed by Formal Frontier Agents.
 
+The dimension-at-most-two unique-factorization classification builds on Mathlib's
+nonzero-prime prime-element extraction and finite strict-chain dimension bound.
+Its ideals, prime spectrum and relation series are the existing Mathlib objects;
+these earlier formalizations supply the factorization and dimension interfaces.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

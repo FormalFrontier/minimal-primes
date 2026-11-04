@@ -39,6 +39,7 @@ public import MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers
 public import MinimalPrimes.RingTheory.Ideal.PositivePowerRange
 public import MinimalPrimes.RingTheory.KrullDimension.FieldExtension
 public import MinimalPrimes.RingTheory.KrullDimension.Integral
+public import MinimalPrimes.RingTheory.KrullDimension.UniqueFactorizationDomain
 public import MinimalPrimes.RingTheory.Localization.AtPrime
 public import MinimalPrimes.RingTheory.Localization.Reduced
 public import MinimalPrimes.RingTheory.Spectrum.Maximal.Map
@@ -62,6 +63,8 @@ lower intervals in preorders and stabilization of antitone prime chains with the
 all-index ideal infimum at a common index, using only finite initial height.
 The principal-prime height leaf bounds height by one under well-founded strict divisibility,
 with height one for regular prime generators and, in particular, prime elements in domains.
+In unique factorization semirings of dimension at most two, every nonzero nonmaximal
+prime is irreducible-principal, giving the zero, irreducible-principal or maximal classification.
 The finite-product leaf classifies minimal primes over arbitrary ideals by labelled
 coordinate minimal primes, and transports evaluation comaps at arbitrary index types.
 The minimal-prime multiplier leaf clears an element of a minimal prime into the radical

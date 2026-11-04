@@ -361,6 +361,13 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   `ringKrullDim S = ringKrullDim (R ⧸ RingHom.ker f)`. A faithful integral algebra
   has equal source and target dimensions using its given algebra structure.
   Dimensions lie in `WithBot ℕ∞`, including zero rings and infinite dimension.
+- **Prime ideals in dimension-two unique factorization semirings**
+  ([module](MinimalPrimes/RingTheory/KrullDimension/UniqueFactorizationDomain.lean)).
+  In a commutative semiring with `[UniqueFactorizationMonoid R]` and
+  `[Ring.KrullDimLE 2 R]`, every nonzero nonmaximal prime ideal is the span of
+  an irreducible element. Every prime is therefore zero, irreducible-principal,
+  or maximal; the alternatives may overlap. No ring, Noetherian, normalization
+  or global nontriviality hypothesis is required.
 - **When a prime localization is a field** ([module](MinimalPrimes/RingTheory/Localization/AtPrime.lean)).
   For commutative semirings `R`, `A` with their given `R`-algebra structure,
   any prime `q` and `[IsLocalization.AtPrime A q]` satisfy
@@ -639,6 +646,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
+| [`MinimalPrimes.RingTheory.KrullDimension.UniqueFactorizationDomain`](MinimalPrimes/RingTheory/KrullDimension/UniqueFactorizationDomain.lean) | Prime ideals in dimension-at-most-two unique factorization semirings are zero, irreducible-principal, or maximal. |
 | [`MinimalPrimes.RingTheory.Localization.AtPrime`](MinimalPrimes/RingTheory/Localization/AtPrime.lean) | Field criterion for prime localizations. |
 | [`MinimalPrimes.RingTheory.Localization.Reduced`](MinimalPrimes/RingTheory/Localization/Reduced.lean) | Reducedness preserved by localization. |
 | [`MinimalPrimes.RingTheory.RingHom.ULift`](MinimalPrimes/RingTheory/RingHom/ULift.lean) | Finite type preserved and reflected by canonical universe lifting of commutative-ring homomorphisms. |
