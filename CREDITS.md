@@ -198,6 +198,10 @@ finite strict chains by adjoining a predecessor or deleting the first point; the
 maximal-boundary version follows by order duality. The two-boundary formulation uses
 Mathlib's ambient extremum predicates and inherited subtype orders, with upward closure
 of the nonminimal locus identifying its maximal points with ambient maximal points.
+The full `WithBot ℕ∞` boundary inequalities combine these finite-bound interfaces
+with Mathlib's empty-order, zero- and one-dimensional criteria, order duality and
+extended-natural arithmetic. They are source-independent order results; no
+additional correspondence with the motivating algebraic-geometry exercises is asserted.
 
 The dependent semimodule data use Amelia Livingston's additive congruence quotient
 machinery, Eric Wieser's ring-congruence factories, Johannes Hölzl's quotient maps,

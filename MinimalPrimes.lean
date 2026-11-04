@@ -83,6 +83,10 @@ For every natural bound `n`, the order dimension leaf characterizes dimension at
 `n + 1` by dimension at most `n` after deleting the original minimal points, and dually
 for maximal points. Deleting both original boundaries gives the bound `n + 2` exactly
 when the inherited interior has dimension at most `n`, without antisymmetry or inhabitation.
+Without any finite bound, the nonminimal and nonmaximal loci each have dimension plus
+one at most the ambient dimension; the original interior has dimension plus two at
+most the ambient dimension. Addition is in `WithBot ℕ∞`, so an empty locus stays at
+bottom after either finite shift, and infinite dimension is included.
 The finite-product leaf classifies minimal primes over arbitrary ideals by labelled
 coordinate minimal primes, and transports evaluation comaps at arbitrary index types.
 The minimal-prime multiplier leaf clears an element of a minimal prime into the radical

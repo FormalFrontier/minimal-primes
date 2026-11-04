@@ -415,6 +415,21 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   element, `Ring.krullDimLE_two_of_forall_exists_irreducible_span_eq` gives
   `Ring.KrullDimLE 2 R`. No domain, unique factorization, ring or Noetherian
   assumption is required, and irreducible elements need not be prime.
+- **All-dimension bounds after deleting boundary points**
+  ([module](MinimalPrimes/Order/KrullDimension.lean)). For any preorder `α : Type u`,
+  `Order.krullDim_not_isMin_add_one_le` states
+  `Order.krullDim {x : α // ¬ IsMin x} + 1 ≤ Order.krullDim α`.
+  The dual `Order.krullDim_not_isMax_add_one_le` gives the same bound for the
+  nonmaximal locus. The original-interior bound
+  `Order.krullDim_not_isMin_not_isMax_add_two_le` states
+  `Order.krullDim {x : α // ¬ IsMin x ∧ ¬ IsMax x} + 2 ≤ Order.krullDim α`.
+  Both predicates are tested in the **original preorder**, with canonical inherited
+  subtype orders. Dimensions and addition lie in `WithBot ℕ∞`: `⊥ + k = ⊥` and
+  `⊤ + k = ⊤` for the finite shifts. There is no antisymmetry, inhabitation,
+  finite-dimension, finite-carrier or chain-condition assumption. The shifts are
+  sharp on two- and three-point chains. Empty types and antichains show why these
+  are not unconditional equalities; infinite dimension precludes a strict-drop
+  assertion. This generic order API is a Mathlib-upstream candidate.
 - **Finite dimension bounds after deleting boundary points**
   ([module](MinimalPrimes/Order/KrullDimension.lean)). For any preorder `α : Type u`
   and `n : ℕ`, `Order.krullDimLE_succ_iff_not_isMin` states
@@ -708,7 +723,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
-| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Finite-bound equivalences after deleting original minimal, maximal or both boundary points; reverse comparison in dimension at most two. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Full `WithBot ℕ∞` bounds with shifts one or two and finite-bound equivalences after deleting original minimal, maximal or both boundary points; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |

@@ -9,9 +9,15 @@ public import Mathlib.Order.KrullDimension
 import Mathlib.Order.Minimal
 
 /-!
-# Finite dimension bounds and boundary deletion
+# Krull dimension and boundary deletion
 
-For any preorder and natural number `n`, dimension at most `n + 1` is equivalent to
+For any preorder, the dimension of its nonminimal or nonmaximal locus, plus one,
+is at most the ambient dimension. The dimension of the original interior, plus
+two, is also at most the ambient dimension. These inequalities take values in
+`WithBot ℕ∞`, with no finite-dimensionality or nonemptiness hypothesis. Addition
+by a finite number leaves bottom at bottom and top at top.
+
+For any natural number `n`, dimension at most `n + 1` is equivalent to
 dimension at most `n` on the subtype of nonminimal points. Order duality gives the
 nonmaximal version. Deleting both original boundaries characterizes dimension at
 most `n + 2` by dimension at most `n` on the original interior.
@@ -22,9 +28,9 @@ all subtypes carry its inherited order. The nonminimal locus is upward closed by
 identifies the successive deletions with the subtype of points that are neither
 minimal nor maximal in the original preorder.
 
-These are finite-bound equivalences, not unconditional exact dimension subtraction.
-Empty preorders and antichains are included: deletion can give an empty subtype,
-whose Krull dimension is bottom.
+Neither the inequalities nor the finite-bound equivalences assert unconditional
+exact dimension subtraction or strict decrease. Empty preorders and antichains are
+included: deletion can give an empty subtype, whose Krull dimension is bottom.
 
 In dimension at most two, comparable elements are equivalent in the preorder if the
 lower element is not minimal and the upper element is not maximal. The conclusion
@@ -35,6 +41,8 @@ is a reverse inequality; equality requires antisymmetry.
 Mathlib's `Order.KrullDimension` supplies the dimension bound, order-dual invariance,
 height and coheight, and their relations to `IsMin` and `IsMax`. Its `Order.RelSeries`
 provides finite strict chains; `Order.Max` supplies the ambient boundary predicates.
+The full dimension inequalities use the finite-bound characterizations together
+with Mathlib's bottom, zero- and one-dimensional criteria and extended-natural arithmetic.
 -/
 
 @[expose] public section
@@ -132,3 +140,73 @@ theorem Order.krullDimLE_add_two_iff_not_isMin_not_isMax
   refine (Order.krullDimLE_succ_iff_not_isMin (α := α) (n + 1)).trans ?_
   refine (Order.krullDimLE_succ_iff_not_isMax (α := β) n).trans ?_
   simp only [Order.krullDimLE_iff, Order.krullDim_eq_of_orderIso e]
+
+/-- The dimension of the inherited nonminimal locus, plus one in `WithBot ℕ∞`, is at
+most the ambient dimension. Minimality is tested in the original preorder. -/
+theorem Order.krullDim_not_isMin_add_one_le
+    {α : Type u} [Preorder α] :
+    Order.krullDim {x : α // ¬ _root_.IsMin x} + 1 ≤ Order.krullDim α := by
+  cases hdim : Order.krullDim α with
+  | bot =>
+    have : IsEmpty α := Order.krullDim_eq_bot_iff.mp hdim
+    simp [Order.krullDim_eq_bot]
+  | coe d =>
+    cases d with
+    | top => exact le_top
+    | coe n =>
+      cases n with
+      | zero =>
+        -- Dimension zero forces the deletion locus to be empty, not just dimension zero.
+        have hmin := Order.krullDim_nonpos_iff_forall_isMin.mp hdim.le
+        have : IsEmpty {x : α // ¬ _root_.IsMin x} :=
+          ⟨fun x ↦ x.property (hmin x)⟩
+        simp [Order.krullDim_eq_bot]
+      | succ n =>
+        have hbound : Order.KrullDimLE (n + 1) α :=
+          (Order.krullDimLE_iff (n + 1) _).mpr hdim.le
+        have hdel := (Order.krullDimLE_succ_iff_not_isMin (α := α) n).mp hbound
+        have hle := (Order.krullDimLE_iff n _).mp hdel
+        simpa only [Nat.cast_add, Nat.cast_one, WithBot.coe_add, WithBot.coe_natCast,
+          WithBot.coe_one] using add_le_add_left hle (1 : WithBot ℕ∞)
+
+/-- The dimension of the inherited nonmaximal locus, plus one in `WithBot ℕ∞`, is at
+most the ambient dimension. Maximality is tested in the original preorder. -/
+theorem Order.krullDim_not_isMax_add_one_le
+    {α : Type u} [Preorder α] :
+    Order.krullDim {x : α // ¬ _root_.IsMax x} + 1 ≤ Order.krullDim α := by
+  have h := Order.krullDim_not_isMin_add_one_le (α := αᵒᵈ)
+  change Order.krullDim ({x : α // ¬ _root_.IsMax x})ᵒᵈ + 1 ≤
+    Order.krullDim αᵒᵈ at h
+  simpa only [Order.krullDim_orderDual] using h
+
+/-- The dimension of the inherited original interior, plus two in `WithBot ℕ∞`, is
+at most the ambient dimension. Both extrema are tested in the original preorder. -/
+theorem Order.krullDim_not_isMin_not_isMax_add_two_le
+    {α : Type u} [Preorder α] :
+    Order.krullDim {x : α // ¬ _root_.IsMin x ∧ ¬ _root_.IsMax x} + 2 ≤
+      Order.krullDim α := by
+  have hlow (h : Order.krullDim α ≤ 1) :
+      Order.krullDim {x : α // ¬ _root_.IsMin x ∧ ¬ _root_.IsMax x} = ⊥ := by
+    have : IsEmpty {x : α // ¬ _root_.IsMin x ∧ ¬ _root_.IsMax x} :=
+      ⟨fun x ↦ (Order.krullDim_le_one_iff.mp h x).elim x.property.1 x.property.2⟩
+    exact Order.krullDim_eq_bot
+  cases hdim : Order.krullDim α with
+  | bot =>
+    have : IsEmpty α := Order.krullDim_eq_bot_iff.mp hdim
+    simp [Order.krullDim_eq_bot]
+  | coe d =>
+    cases d with
+    | top => exact le_top
+    | coe n =>
+      rcases n with _ | _ | n
+      · simp [hlow (by simp [hdim])]
+      · simp [hlow (by simp [hdim])]
+      · have hbound : Order.KrullDimLE (n + 2) α :=
+          (Order.krullDimLE_iff (n + 2) _).mpr hdim.le
+        have hdel :=
+          (Order.krullDimLE_add_two_iff_not_isMin_not_isMax (α := α) n).mp hbound
+        have hle := (Order.krullDimLE_iff n _).mp hdel
+        simpa only [Nat.cast_add, Nat.cast_one, Nat.cast_ofNat, WithBot.coe_add,
+          WithBot.coe_natCast, WithBot.coe_one, WithBot.coe_ofNat, add_assoc,
+          one_add_one_eq_two] using
+          add_le_add_left hle (2 : WithBot ℕ∞)
