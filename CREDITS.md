@@ -150,6 +150,13 @@ dependent Pi equivalence in `Logic.Equiv.Basic`, by Leonardo de Moura and Mario
 Carneiro. The existing filter-product carrier and pullback remain those described
 in the module references; no second quotient is introduced.
 
+The maximal-spectrum pullback restricts Mathlib's ideal order embedding, contraction
+maximality and ideal correspondence for surjective homomorphisms. It uses David
+Kurniadi Angdinata's maximal-spectrum formalization and the prime-spectrum pullback
+formalization of Johan Commelin, Filippo A. E. Nuccio and Andrew Yang. The canonical
+restriction and infinitude-transfer approach follows the mathematical argument
+developed by Formal Frontier Agents.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,
