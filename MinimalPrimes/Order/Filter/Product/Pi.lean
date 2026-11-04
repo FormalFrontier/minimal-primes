@@ -5,17 +5,23 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Logic.Equiv.Defs
+public import Mathlib.Order.Filter.CardinalInter
 public import Mathlib.Order.Filter.Finite
+public import Mathlib.SetTheory.Cardinal.HasCardinalLT
 public import MinimalPrimes.Order.Filter.Product
 public import MinimalPrimes.Order.Filter.Product.Map
 
 /-!
-# Dependent reduced products and finite products
+# Dependent reduced products and small products
 
 Coordinate evaluation induces a comparison from the reduced product of a family
 of function types to the function type of the coordinate reduced products. This
-comparison is surjective for every coordinate index type. For finite coordinate
-indices it is bijective, giving `Filter.Product.piEquiv`.
+comparison is surjective for every coordinate index type. It is bijective when
+the coordinate type has cardinality less than a cardinal for which the filter is
+closed under smaller intersections, giving `Filter.Product.piEquivOfHasCardinalLT`.
+Countable completeness gives `Filter.Product.piEquivOfCountable` for countable
+coordinate types. For finite coordinate types no completeness assumption on the
+filter is needed, giving `Filter.Product.piEquiv`.
 
 The representative application and inverse laws describe the construction without
 unfolding a quotient. Naturality is with respect to arbitrary fibrewise functions,
@@ -23,7 +29,7 @@ with independent source and target universes. No algebraic structure, inhabited
 fibres or properness of the filter is required.
 
 The stock quotient-Pi construction uses the pointwise family of setoids. Here the
-source relation is uniform eventual equality of rows; the finite step converts
+source relation is uniform eventual equality of rows; intersection closure converts
 coordinatewise eventual equality to that relation. For families constant in the
 row index this specializes to the comparison between germs of functions and
 functions of germs.
@@ -32,8 +38,10 @@ functions of germs.
 
 The construction uses the existing dependent reduced-product carrier and fibrewise
 map. Its proofs reuse Mathlib's quotient representative and Pi-induction API,
-finite eventual quantification, and equivalence packaging. In particular, the
-representative choice in `Quotient.induction_on_pi` is not implemented again.
+eventual quantification, cardinal bounds, and equivalence packaging. The filter
+intersection and cardinal-size APIs are due to Yury Kudryashov, Josha Dekker and
+Joël Riou. In particular, the representative choice in `Quotient.induction_on_pi`
+is not implemented again.
 -/
 
 @[expose] public section
@@ -70,9 +78,11 @@ theorem piComparison_surjective : Function.Surjective (piComparison D R) := by
   funext j
   exact piComparison_coe D R f j
 
-/-- Finite coordinate quantification commutes with eventual equality, making the
-comparison injective without any assumption on the filter or fibres. -/
-theorem piComparison_injective [Finite κ] : Function.Injective (piComparison D R) := by
+/-- Intersection closure below `c` makes the comparison injective when the
+coordinate type has cardinality less than `c`, independently of its universe. -/
+theorem piComparison_injective_of_hasCardinalLT
+    {c : Cardinal.{u}} [CardinalInterFilter D c] (hκ : HasCardinalLT κ c) :
+    Function.Injective (piComparison D R) := by
   intro x y h
   obtain ⟨f, rfl⟩ := coe_surjective D (fun i => ∀ j, R i j) x
   obtain ⟨g, rfl⟩ := coe_surjective D (fun i => ∀ j, R i j) y
@@ -82,7 +92,23 @@ theorem piComparison_injective [Finite κ] : Function.Injective (piComparison D 
     apply (coe_eq (fun i => f i j) (fun i => g i j)).1
     exact (piComparison_coe D R f j).symm.trans
       ((congrFun h j).trans (piComparison_coe D R g j))
-  exact (Filter.eventually_all.mpr hcol).mono fun _ hi => funext hi
+  -- The range lives in the row universe even when the coordinates do not.
+  let s : κ → Set ι := fun j => {i | f i j = g i j}
+  let S : Set (Set ι) := Set.range s
+  have hS : HasCardinalLT S c :=
+    hκ.of_surjective (Set.rangeFactorization s) Set.rangeFactorization_surjective
+  have hsmall : Cardinal.mk S < c := (hasCardinalLT_iff_cardinal_mk_lt S c).1 hS
+  have hinter : ⋂₀ S ∈ D := (cardinal_sInter_mem hsmall).2 (by
+    rintro _ ⟨j, rfl⟩
+    exact hcol j)
+  exact Filter.mem_of_superset hinter fun i hi => funext fun j => hi (s j) ⟨j, rfl⟩
+
+/-- Finite coordinate quantification commutes with eventual equality, making the
+comparison injective without any assumption on the filter or fibres. -/
+theorem piComparison_injective [Finite κ] : Function.Injective (piComparison D R) := by
+  let := Filter.cardinalInterFilter_aleph0 D
+  exact piComparison_injective_of_hasCardinalLT D R
+    ((hasCardinalLT_aleph0_iff κ).2 inferInstance)
 
 /-- Reduced products preserve finite products of dependent fibre types. -/
 theorem piComparison_bijective [Finite κ] : Function.Bijective (piComparison D R) :=
@@ -146,6 +172,65 @@ theorem map_piEquiv_symm [Finite κ] (S : ι → κ → Type z)
   exact (piComparison_map D R S h ((piEquiv D R).symm y)).trans
     ((congrArg (fun q : ∀ j, D.Product (fun i => R i j) =>
       fun j => map D (fun i => h i j) (q j)) hR).trans hS.symm)
+
+/-- The equivalence between a reduced product of function types with fewer than
+`c` coordinates and the family of coordinate reduced products, for a filter
+closed under intersections of fewer than `c` sets. -/
+noncomputable def piEquivOfHasCardinalLT
+    {c : Cardinal.{u}} [CardinalInterFilter D c] (hκ : HasCardinalLT κ c) :
+    D.Product (fun i => ∀ j, R i j) ≃ ∀ j, D.Product (fun i => R i j) :=
+  Equiv.ofBijective (piComparison D R)
+    ⟨piComparison_injective_of_hasCardinalLT D R hκ, piComparison_surjective D R⟩
+
+/-- The forward function of the cardinal-bounded product equivalence is the comparison. -/
+@[simp]
+theorem piEquivOfHasCardinalLT_apply
+    {c : Cardinal.{u}} [CardinalInterFilter D c] (hκ : HasCardinalLT κ c)
+    (x : D.Product (fun i => ∀ j, R i j)) :
+    piEquivOfHasCardinalLT D R hκ x = piComparison D R x :=
+  rfl
+
+/-- On a finite coordinate type, the cardinal-bounded equivalence equals the
+finite-product equivalence as equivalence data. -/
+theorem piEquivOfHasCardinalLT_eq_piEquiv
+    {c : Cardinal.{u}} [CardinalInterFilter D c] (hκ : HasCardinalLT κ c) [Finite κ] :
+    piEquivOfHasCardinalLT D R hκ = piEquiv D R := by
+  apply Equiv.ext
+  intro x
+  rfl
+
+/-- Countable intersection closure makes the comparison injective for a
+countable coordinate type, independently of its universe. -/
+theorem piComparison_injective_of_countable [CountableInterFilter D] [Countable κ] :
+    Function.Injective (piComparison D R) := by
+  have hκ : HasCardinalLT κ (Cardinal.aleph 1 : Cardinal.{u}) := by
+    simpa only [HasCardinalLT, Cardinal.lift_aleph, Ordinal.lift_one,
+      Cardinal.lt_aleph_one_iff, Cardinal.lift_le_aleph0] using
+        (Cardinal.mk_le_aleph0_iff.2 (inferInstance : Countable κ))
+  exact piComparison_injective_of_hasCardinalLT D R hκ
+
+/-- The equivalence between a reduced product of function types on a countable
+coordinate type and the family of coordinate reduced products, for a countably
+complete filter. -/
+noncomputable def piEquivOfCountable [CountableInterFilter D] [Countable κ] :
+    D.Product (fun i => ∀ j, R i j) ≃ ∀ j, D.Product (fun i => R i j) :=
+  Equiv.ofBijective (piComparison D R)
+    ⟨piComparison_injective_of_countable D R, piComparison_surjective D R⟩
+
+/-- The forward function of the countable-product equivalence is the comparison. -/
+@[simp]
+theorem piEquivOfCountable_apply [CountableInterFilter D] [Countable κ]
+    (x : D.Product (fun i => ∀ j, R i j)) :
+    piEquivOfCountable D R x = piComparison D R x :=
+  rfl
+
+/-- On a finite coordinate type, the countable-product equivalence equals the
+finite-product equivalence as equivalence data. -/
+theorem piEquivOfCountable_eq_piEquiv [CountableInterFilter D] [Finite κ] :
+    piEquivOfCountable D R = piEquiv D R := by
+  apply Equiv.ext
+  intro x
+  rfl
 
 end Product
 end Filter

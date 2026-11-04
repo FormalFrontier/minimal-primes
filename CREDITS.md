@@ -80,13 +80,18 @@ natural-number cancellation interfaces. Related multiplication-regularity criter
 were developed by Formal Frontier Agents/Almanac; the general function criterion
 introduces no dependency on that specialization.
 
-The comparison with finite products uses the existing dependent reduced-product
+The comparison with small products uses the existing dependent reduced-product
 carrier and canonical fibrewise map. Representative choice and finite eventual
 quantification reuse Mathlib's quotient and finite-filter modules, credited to
 Johannes Hölzl and Jeremy Avigad; equivalence packaging uses the interfaces credited
-to Leonardo de Moura and Mario Carneiro. The germ/product antecedents are credited
-to Yury Kudryashov and Abhimanyu Pallavi Sudhir. The comparison, representative and
-naturality proofs define no additional quotient or representative-choice engine.
+to Leonardo de Moura and Mario Carneiro. The cardinal-small generalization of the
+original injectivity argument uses Josha Dekker's cardinal-intersection filter
+API, Yury Kudryashov's countable-intersection API and Joël Riou's `HasCardinalLT`
+surjection and finite-size bridges. The cardinal/countability normalization APIs
+are credited to Johannes Hölzl, Mario Carneiro, Floris van Doorn and Violeta
+Hernández Palacios. The germ/product antecedents are credited to Yury Kudryashov
+and Abhimanyu Pallavi Sudhir. The comparison, representative and naturality proofs
+define no additional quotient or representative-choice engine.
 
 The dependent-product unit-locus criterion generalizes the germ unit-locus proof by
 Formal Frontier Agents, retaining its constant-family API and the germ units

@@ -66,20 +66,29 @@ this using the existing section setoids and stock `Nontrivial` support. An empty
 fibre ignored by a filter still prevents total sections; eventual inhabitation
 cannot replace the empty-total-section alternative.
 
-### Finite products of dependent filter products
+### Small products of dependent filter products
 
-For an arbitrary filter `D` and `R : ι → κ → Type w`, with independent index and
-fibre universes, [`Filter.Product.piComparison`](MinimalPrimes/Order/Filter/Product/Pi.lean)
+For an arbitrary filter `D` and `R : ι → κ → Type w`, with independent row,
+coordinate and fibre universes, [`Filter.Product.piComparison`](MinimalPrimes/Order/Filter/Product/Pi.lean)
 maps the class of a matrix to its family of column classes. It is surjective for
-arbitrary `κ`; for `[Finite κ]`, `Filter.Product.piEquiv` is the corresponding
-equivalence. Its inverse transposes supplied global column representatives.
-Representative and naturality laws apply without unfolding a quotient; the forward
-naturality square needs no finiteness and permits an independent target universe.
-No algebra, inhabited fibres, properness or chosen finite enumeration is required.
-The [boundary examples](MinimalPrimesTest/Order/Filter/Product/Pi.lean) include
-varying fibres, empty coordinates and row indices, and bottom with empty global
-sections. A cofinite-Nat Boolean diagonal gives a specific infinite-coordinate
-failure of injectivity, not a claim that every infinite-coordinate comparison fails.
+arbitrary `κ`. If `[CardinalInterFilter D c]` and `HasCardinalLT κ c`, with `c` in
+the row universe, `Filter.Product.piEquivOfHasCardinalLT` makes this same comparison
+an equivalence. The bound is strict: the filter must be closed under intersections
+of fewer than `c` sets. Countable completeness and countable coordinates give
+`Filter.Product.piEquivOfCountable`; finite coordinates give the original
+`Filter.Product.piEquiv` for **every** filter. Both new equivalences agree with the
+finite one as equivalence data when the coordinates are finite.
+
+The inverse transposes supplied global column representatives. Generic equivalence
+identities and the forward readouts give the inverse laws; existing comparison
+naturality gives both naturality squares, with an independent target universe.
+No quotient unfolding, algebra, inhabited fibres, properness, common-universe
+assumption or chosen finite enumeration is required. The
+[examples](MinimalPrimesTest/Order/Filter/Product/Pi.lean) include infinite even
+principal rows with `Fin (i+j+2)` fibres and proper nonprincipal cocountable rows
+on `Set ℕ`, as well as empty indices and bottom with empty global sections.
+The cofinite-Nat Boolean diagonal remains a failure of injectivity: countable
+coordinates alone do not suffice.
 
 ### Centers of dependent filter products
 
@@ -620,7 +629,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Regular`](MinimalPrimes/Order/Filter/Product/Regular.lean) | Left, right and two-sided regularity at fibrewise multiplication, characterized by eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Center`](MinimalPrimes/Order/Filter/Product/Center.lean) | Full intrinsic centers at fibrewise multiplication; the equivalence of fibre-center products and product centers needs only two-sided identities. |
-| [`MinimalPrimes.Order.Filter.Product.Pi`](MinimalPrimes/Order/Filter/Product/Pi.lean) | Surjective comparison with coordinate reduced products, a finite-coordinate equivalence, and representative/inverse/naturality laws. |
+| [`MinimalPrimes.Order.Filter.Product.Pi`](MinimalPrimes/Order/Filter/Product/Pi.lean) | Surjective comparison with coordinate reduced products, cardinal-small and countable-complete equivalences, the unrestricted finite equivalence, and representative/inverse/naturality laws. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
