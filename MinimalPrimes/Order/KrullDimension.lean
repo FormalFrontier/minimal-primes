@@ -6,10 +6,19 @@ module
 
 public import Mathlib.Order.KrullDimension
 
+import Mathlib.Data.Set.Lattice.Order
 import Mathlib.Order.Minimal
+import Mathlib.Order.UpperLower.Basic
 
 /-!
-# Krull dimension and boundary deletion
+# Krull dimension, order covers, and boundary deletion
+
+The order dimension of an indexed union of upper sets is the supremum of the
+dimensions of its pieces. The order-dual statement holds for lower sets. The
+pieces retain the ambient preorder, and the index type and carrier have independent
+universes. The equalities include empty unions, whose dimension is bottom, and
+infinite suprema that are not attained by a piece. They concern order dimension,
+not the topological dimension of an arbitrary subspace.
 
 For any preorder, the dimension of its nonminimal or nonmaximal locus, plus one,
 is at most the ambient dimension. The dimension of the original interior, plus
@@ -43,11 +52,12 @@ height and coheight, and their relations to `IsMin` and `IsMax`. Its `Order.RelS
 provides finite strict chains; `Order.Max` supplies the ambient boundary predicates.
 The full dimension inequalities use the finite-bound characterizations together
 with Mathlib's bottom, zero- and one-dimensional criteria and extended-natural arithmetic.
+The cover equalities use its height and coheight restriction and indexed-supremum formulas.
 -/
 
 @[expose] public section
 
-universe u
+universe u v
 
 /-- In dimension at most two, a comparison from a nonminimal element to a nonmaximal
 element also holds in the reverse direction. -/
@@ -210,3 +220,45 @@ theorem Order.krullDim_not_isMin_not_isMax_add_two_le
           WithBot.coe_natCast, WithBot.coe_one, WithBot.coe_ofNat, add_assoc,
           one_add_one_eq_two] using
           add_le_add_left hle (2 : WithBot ℕ∞)
+
+/-- The order dimension of an indexed union of upper sets is the supremum of their
+order dimensions, including empty unions and infinite suprema. Every subtype has
+its inherited ambient order. -/
+theorem Order.krullDim_iUnion_of_isUpperSet
+    {α : Type u} [Preorder α] {ι : Sort v}
+    (s : ι → Set α) (hs : ∀ i, IsUpperSet (s i)) :
+    Order.krullDim (⋃ i, s i) = ⨆ i, Order.krullDim (s i) := by
+  have hdim (t : Set α) (ht : IsUpperSet t) :
+      Order.krullDim t = ⨆ x : t, (Order.coheight (x : α) : WithBot ℕ∞) := by
+    rw [Order.krullDim_eq_iSup_coheight]
+    apply iSup_congr
+    intro x
+    exact congrArg (fun d : ℕ∞ ↦ (d : WithBot ℕ∞))
+      (Order.coheight_eq_of_strictMono (fun y : t ↦ (y : α)) (fun _ _ h ↦ h)
+        (by
+          intro a b hab
+          exact ⟨⟨b, ht hab.le a.property⟩, hab, rfl⟩) x)
+  calc
+    Order.krullDim (⋃ i, s i) =
+        ⨆ x ∈ ⋃ i, s i, (Order.coheight x : WithBot ℕ∞) := by
+      rw [hdim _ (isUpperSet_iUnion hs)]
+      exact iSup_subtype'' _ (fun x ↦ (Order.coheight x : WithBot ℕ∞))
+    _ = ⨆ i, ⨆ x ∈ s i, (Order.coheight x : WithBot ℕ∞) := iSup_iUnion s _
+    _ = ⨆ i, Order.krullDim (s i) := by
+      apply iSup_congr
+      intro i
+      rw [hdim _ (hs i)]
+      exact (iSup_subtype'' _ (fun x ↦ (Order.coheight x : WithBot ℕ∞))).symm
+
+/-- The order-dual union formula: the order dimension of an indexed union of lower
+sets is the supremum of their order dimensions. No piece, index, or ambient point
+is required to exist. -/
+theorem Order.krullDim_iUnion_of_isLowerSet
+    {α : Type u} [Preorder α] {ι : Sort v}
+    (s : ι → Set α) (hs : ∀ i, IsLowerSet (s i)) :
+    Order.krullDim (⋃ i, s i) = ⨆ i, Order.krullDim (s i) := by
+  have h := Order.krullDim_iUnion_of_isUpperSet (α := αᵒᵈ) s
+    (fun i ↦ (hs i).toDual)
+  change Order.krullDim ({x : α // x ∈ ⋃ i, s i})ᵒᵈ =
+    ⨆ i, Order.krullDim ({x : α // x ∈ s i})ᵒᵈ at h
+  simpa only [Order.krullDim_orderDual] using h
