@@ -19,6 +19,7 @@ public import MinimalPrimes.Order.Filter.Germ.Regular
 public import MinimalPrimes.Order.Filter.Germ.Reduced
 public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
+public import MinimalPrimes.Order.Filter.Product.Basis
 public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
 public import MinimalPrimes.Order.Filter.Product.Faithful
@@ -145,8 +146,11 @@ constant-family bridge through the shared dependent section theorem.
 The dependent-semimodule leaf equips additive reduced products with the binary quotient
 action of the given varying fibre modules, over the existing scalar reduced product.
 Its named data have representative and opaque-vector map laws and constant-germ
-compatibility. Equality of two represented scalar actions is equivalent to eventual
-equality on every fibre vector, using only the given actions and vector zeros.
+compatibility. Given fibre bases with one common finite index, the basis leaf
+constructs the corresponding basis of this same semimodule. Its vector and coefficient
+equations retain the given bases, and standard function bases recover the existing
+finite-coordinate comparison. Equality of two represented scalar actions is equivalent
+to eventual equality on every fibre vector, using only the given actions and vector zeros.
 Whole-module annihilator membership and faithfulness of the given semimodule are
 equivalent to their eventual fibre criteria. Faithfulness distinguishes two scalars
 on all vectors and is not characterized by a zero annihilator at the semiring floor.

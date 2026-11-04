@@ -221,6 +221,14 @@ Mathlib ideal and module-annihilator formalization and the faithful scalar-actio
 interfaces of Chris Hughes and Yury Kudryashov, together with the existing Formal
 Frontier semimodule and dependent-section interfaces.
 
+The common finite-basis construction composes the existing Formal Frontier
+dependent Product module, varying-map and finite-coordinate interfaces. It uses
+Mathlib's basis interfaces of Johannes Hölzl, Mario Carneiro and Alexander Bentkamp,
+Johannes Hölzl's finite Finsupp/function and standard-basis interfaces, and the
+Pi-module interfaces of Simon Hudon and Patrick Massot. It retains the given fibre
+bases and the existing whole coordinate equivalence, without a new quotient,
+coordinate or basis-choice construction.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

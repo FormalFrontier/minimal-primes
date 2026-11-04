@@ -44,6 +44,20 @@ represented actions using only vector zeros. These zeros provide total sections,
 not zero-preservation laws. Bottom filters, empty indices and zero fibres remain
 included, with independent scalar and vector universes.
 
+### Common finite bases of dependent reduced products
+
+For the same given semiring and semimodule records, a family of given bases
+`b i : Module.Basis J (R i) (M i)` with **one common finite index** `J` induces
+[`Filter.Product.basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) of
+`F.Product M` over the existing scalar semiring `F.Product R`. Its vector at `j`
+is represented by `fun i => b i j`, and coefficients are the existing varying
+maps of the fibre coefficients, on represented and opaque vectors alike.
+For standard function bases on `J → R i`, the whole coordinate equivalence agrees
+with `Filter.Product.piComparison`. All four carrier universes are independent;
+empty `J`, bottom filters and zero semirings are included. No commutativity,
+faithfulness, properness or nontriviality hypothesis is imposed. A family of
+unbounded varying ranks is not an instance of this common finite-index construction.
+
 ### Coordinate maps and zero-reflection of dependent filter products
 
 For any filter `D` and independently universed dependent type families `R` and `S`,
@@ -734,6 +748,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
+| [`MinimalPrimes.Order.Filter.Product.Basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) | Given common finite bases, characteristic vector/coefficient equations and standard finite-coordinate alignment. |
 | [`MinimalPrimes.Order.Filter.Product.Faithful`](MinimalPrimes/Order/Filter/Product/Faithful.lean) | Whole-module annihilator membership and faithfulness iff their eventual fibre criteria, retaining the given actions. |
 | [`MinimalPrimes.Order.Filter.Product.Torsion`](MinimalPrimes/Order/Filter/Product/Torsion.lean) | Torsion-freeness iff eventual fibre torsion-freeness for the given semimodules; represented-scalar action injectivity. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
