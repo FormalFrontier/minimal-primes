@@ -236,6 +236,12 @@ record and its representative-zero equation. Constant-family agreement uses the
 existing germ-map and zero-point comparisons, based on Mathlib's germ interfaces
 credited above. No new quotient or bundled-map construction is introduced.
 
+The finite-generation criteria use Mathlib's span
+and Finsupp interfaces, including Johannes Hölzl's finite linear combinations,
+and Johan Commelin's module-finiteness interfaces, together with the existing
+Formal Frontier dependent Product semimodule, varying-map and Pi comparison.
+They introduce no new quotient, basis or representative-choice construction.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

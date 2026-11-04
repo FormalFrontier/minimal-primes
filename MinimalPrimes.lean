@@ -24,6 +24,7 @@ public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
 public import MinimalPrimes.Order.Filter.Product.Exact
 public import MinimalPrimes.Order.Filter.Product.Faithful
+public import MinimalPrimes.Order.Filter.Product.Finite
 public import MinimalPrimes.Order.Filter.Product.Map
 public import MinimalPrimes.Order.Filter.Product.Module
 public import MinimalPrimes.Order.Filter.Product.Torsion

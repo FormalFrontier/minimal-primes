@@ -58,6 +58,35 @@ empty `J`, bottom filters and zero semirings are included. No commutativity,
 faithfulness, properness or nontriviality hypothesis is imposed. A family of
 unbounded varying ranks is not an instance of this common finite-index construction.
 
+### Uniform finite generators of dependent reduced products
+
+The [finite-generation module](MinimalPrimes/Order/Filter/Product/Finite.lean)
+proves two finite-generation criteria.
+For the same given semiring, additive and module records, an arbitrary filter `F`,
+a naturally finite index type `J` and raw vectors `g : J → (∀ i, M i)`,
+`Filter.Product.span_range_coe_eq_top_iff` gives
+
+```text
+Submodule.span (F.Product R) (Set.range (fun j => (g j : F.Product M))) = ⊤
+  ↔ ∀ᶠ i in F, Submodule.span (R i) (Set.range (fun j => g j i)) = ⊤.
+```
+
+The target records are exactly `Product.instSemiring`, `Product.addCommMonoid`
+and `Product.module` of the given fibres, even when `R = M`.
+`Filter.Product.moduleFinite_iff` gives
+
+```text
+Module.Finite (F.Product R) (F.Product M)
+  ↔ ∃ n : ℕ, ∀ᶠ i in F, ∃ v : Fin n → M i,
+      Submodule.span (R i) (Set.range v) = ⊤.
+```
+
+One uniform `n` is essential; eventual pointwise finite generation alone does
+not give this condition. No basis or freeness is assumed. All four carrier
+universes are independent. Empty `J`, `n = 0`, empty index types, bottom filters
+and zero semirings are included, with no properness or nontriviality hypothesis.
+These criteria add no new functional data or global instances.
+
 ### Exactness of dependent reduced-product maps
 
 For arbitrary functions `f i : X i → Y i` and `g i : Y i → Z i` in independent
@@ -781,6 +810,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
 | [`MinimalPrimes.Order.Filter.Product.Basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) | Given common finite bases, characteristic vector/coefficient equations and standard finite-coordinate alignment. |
+| [`MinimalPrimes.Order.Filter.Product.Finite`](MinimalPrimes/Order/Filter/Product/Finite.lean) | Finite spanning by given vector germs and uniform finite generation. |
 | [`MinimalPrimes.Order.Filter.Product.Faithful`](MinimalPrimes/Order/Filter/Product/Faithful.lean) | Whole-module annihilator membership and faithfulness iff their eventual fibre criteria, retaining the given actions. |
 | [`MinimalPrimes.Order.Filter.Product.Torsion`](MinimalPrimes/Order/Filter/Product/Torsion.lean) | Torsion-freeness iff eventual fibre torsion-freeness for the given semimodules; represented-scalar action injectivity. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
