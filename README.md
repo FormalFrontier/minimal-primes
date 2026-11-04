@@ -356,12 +356,17 @@ section is a unit on a filter-large set. Only monoid fibres are required, with n
 commutativity, properness or nontriviality assumptions. Bottom filters, empty indices
 and trivial fibres are included. `Filter.Product.units_map_coeMulHom_surjective`
 states that every quotient unit has an everywhere-unit section representative.
+`Filter.Product.associated_coe_iff` characterizes right-unit association of represented
+elements by eventual right-unit association of their values: the witness multiplies
+on the right, `f i * u = g i`. This criterion has the same monoid-only hypotheses.
 The corresponding `Filter.Germ.isUnit_coe_iff` and
 `Filter.Germ.units_map_coeMulHom_surjective` remain constant-family specializations;
 the germ units equivalence and its projection laws are unchanged.
 The [dependent-product examples](MinimalPrimesTest/Order/Filter/Product.lean) use
 varying noncommutative endomorphism monoids to contrast identity and nonunit sections,
-and the same section at the top and bottom filters.
+and the same section at the top and bottom filters. They also check that distinct
+constant endomorphisms are not right-unit associated at the top filter, while the
+bottom filter forgets that distinction.
 
 The quotient is trivial exactly when `{i | (0 : K i) = 1}` belongs to the filter.
 Thus nontrivial fibres and a proper filter give a nontrivial quotient, whereas the

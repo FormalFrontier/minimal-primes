@@ -7,14 +7,16 @@ module
 public import MinimalPrimes.Order.Filter.Product
 public import Mathlib.Algebra.Group.Pi.Units
 public import Mathlib.Algebra.Group.Units.Hom
+public import Mathlib.Algebra.GroupWithZero.Associated
 
 /-!
-# Units in dependent reduced products
+# Units and right-unit association in dependent reduced products
 
 A represented element of a dependent filter product is a unit exactly when its
-section is a unit on a filter-large set. The coefficient monoids need not be
-commutative, and the filter need not be proper. Every unit of the reduced product
-has an everywhere-unit section representative.
+section is a unit on a filter-large set. Two represented elements are right-unit
+associated exactly when their sections are right-unit associated on a filter-large
+set. The coefficient monoids need not be commutative, and the filter need not be
+proper. Every unit of the reduced product has an everywhere-unit section representative.
 
 ## Implementation notes
 
@@ -23,7 +25,9 @@ For the converse, replacing nonunit values by `1` gives a unit in the total sect
 monoid, whose image under `Filter.Product.coeMulHom` is the original class.
 The representative-surjectivity theorem uses `Filter.skolem` and
 `MulEquiv.piUnits`, without constructing another equivalence of units.
-The constant-family specializations are retained in
+The association criterion lifts the quotient's right-unit witness by this surjectivity
+and chooses eventual coordinate witnesses with the same total-product unit equivalence.
+The constant-family unit specializations are retained in
 `MinimalPrimes.Order.Filter.Germ.Units`.
 
 ## References
@@ -34,7 +38,8 @@ Kudryashov and Abhimanyu Pallavi Sudhir. The total-section unit criterion and un
 equivalence are Andrew Yang's `Pi.isUnit_iff` and `MulEquiv.piUnits`.
 The units homomorphism API was formalized by Johan Commelin, Chris Hughes and Kevin
 Buzzard. Representative choice uses the filter API developed by Johannes Hölzl and
-Jeremy Avigad.
+Jeremy Avigad. Right-unit association uses the Mathlib formalization by Johannes Hölzl
+and Jens Wagemaker.
 -/
 
 @[expose] public section
@@ -82,5 +87,23 @@ theorem units_map_coeMulHom_surjective (F : Filter ι) :
     Filter.skolem.mp hf'
   refine ⟨MulEquiv.piUnits.symm v, Units.ext ?_⟩
   exact ((coe_eq (fun i => (v i : K i)) f).mpr hv).trans hf
+
+/-- Two represented elements of a dependent reduced product are right-unit associated
+    if and only if their sections are eventually right-unit associated. -/
+@[simp]
+theorem associated_coe_iff (F : Filter ι) (f g : ∀ i, K i) :
+    @Associated (F.Product K) inferInstance (f : F.Product K) (g : F.Product K) ↔
+      ∀ᶠ i in F, Associated (f i) (g i) := by
+  constructor
+  · rintro ⟨u, hu⟩
+    obtain ⟨v, rfl⟩ := units_map_coeMulHom_surjective (K := K) F u
+    have hfg : ∀ᶠ i in F, f i * (v : ∀ i, K i) i = g i :=
+      (coe_eq _ _).mp ((coe_mul (F := F) f (v : ∀ i, K i)).trans hu)
+    exact hfg.mono fun i hi => ⟨MulEquiv.piUnits v i, hi⟩
+  · intro hfg
+    obtain ⟨u, hu⟩ : ∃ u : ∀ i, (K i)ˣ, ∀ᶠ i in F, f i * (u i : K i) = g i :=
+      Filter.skolem.mp hfg
+    refine ⟨Units.map (coeMulHom F) (MulEquiv.piUnits.symm u), ?_⟩
+    exact (coe_mul (F := F) f (fun i => (u i : K i))).symm.trans ((coe_eq _ _).mpr hu)
 
 end Filter.Product

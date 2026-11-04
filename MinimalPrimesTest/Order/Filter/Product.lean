@@ -17,8 +17,10 @@ data, including natural powers, along the semiring and ultrafilter constructions
 Varying endomorphism monoids then exercise composition without addition, commutativity
 or inverses. The unit-locus criterion
 distinguishes identity sections from constant endomorphisms and the top filter from
-the bottom filter in this same family. Adjoining zero gives nonzero elements without
-right inverses even after taking the top-filter product.
+the bottom filter in this same family. Right-unit association cannot change a constant
+endomorphism's value at the top filter, whereas the bottom filter forgets it.
+Adjoining zero gives nonzero elements without right inverses even after taking the
+top-filter product.
 -/
 
 @[expose] public section
@@ -280,6 +282,17 @@ example :
     obtain ⟨q, hq, _⟩ := isUnit_iff_exists.mp h
     exact leftConstant_no_right_inverse ⟨q, hq⟩
   · exact (Product.isUnit_coe_iff _ _).2 (Eventually.of_forall fun _ => isUnit_one)
+
+-- Right composition preserves a constant map's value; bottom forgets the distinction.
+example :
+    @Associated ((⊥ : Filter ℕ).Product EndFamily) inferInstance leftConstant rightConstant ∧
+      ¬ @Associated ((⊤ : Filter ℕ).Product EndFamily) inferInstance
+        leftConstant rightConstant := by
+  constructor
+  · exact (Product.associated_coe_iff _ _ _).2 (by simp)
+  · intro h
+    obtain ⟨u, hu⟩ := Filter.mem_top_iff_forall.1 ((Product.associated_coe_iff _ _ _).1 h) 0
+    exact (by decide : (0 : Fin 2) ≠ 1) (congrFun hu 0)
 
 private def withZeroLeft : ∀ n, WithZero (EndFamily n) :=
   fun n => (leftConstant n : WithZero (EndFamily n))
