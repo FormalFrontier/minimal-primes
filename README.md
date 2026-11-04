@@ -8,6 +8,29 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Torsion-free semimodules over dependent reduced products
+
+For independent families `R i`, `M i` of semirings and additive commutative monoids,
+with given `Module (R i) (M i)` records and an arbitrary filter `F`,
+[`Filter.Product.module`](MinimalPrimes/Order/Filter/Product/Module.lean) supplies
+pointwise semimodule data on the existing `F.Product M` over the existing scalar
+semiring `F.Product R`. The data are named rather than globally registered:
+the given fibre actions stay fixed even when scalar and vector carriers coincide.
+Representative equations characterize zero, addition, natural scaling and scalar
+action. A represented scalar acts on every opaque vector by `Filter.Product.map`.
+The additive record agrees with the existing semiring parent; constant records
+recover Mathlib's two-germ module after identifying both base records.
+The [torsion-free criterion](MinimalPrimes/Order/Filter/Product/Torsion.lean)
+`Filter.Product.isTorsionFree_iff` identifies torsion-freeness of this semimodule
+over `F.Product R` with eventual torsion-freeness of the given fibre semimodules.
+Torsion-freeness uses full injectivity of the action of every two-sided regular
+scalar. The represented-scalar readout reduces action injectivity to eventual
+fibre injectivity, and regular-scalar sections give reflection. No additive
+inverses, cancellation, domain, properness or nontriviality assumption is required.
+The [varying-family client](MinimalPrimesTest/Order/Filter/Product/Module.lean)
+applies the criterion to free semimodules of ranks `n + 1` over `ℕ × ZMod (n + 2)`
+along the cofinite filter.
+
 ### Coordinate maps and zero-reflection of dependent filter products
 
 For any filter `D` and independently universed dependent type families `R` and `S`,
@@ -537,6 +560,15 @@ apply directly. Fibrewise homomorphisms descend through `Filter.Product.mapRingH
 preserving identity and composition. For constant families the section homomorphisms
 are the existing `Filter.Germ.coeMulHom` and `Filter.Germ.coeRingHom`.
 
+[`Product/Module.lean`](MinimalPrimes/Order/Filter/Product/Module.lean) adds the
+additive congruence quotient at `AddCommMonoid` fibres, the binary quotient action
+already at the `SMul` floor, and the semimodule over the existing scalar semiring.
+Use `Product.addCommMonoid`, `Product.smul` and `Product.module` as explicit data;
+there are no additional global instances. `module_toSMul` identifies the inherited
+action, and `smul_coe_eq_map` reads it on opaque vectors. `module_const_eq_germ`
+compares constant structure records with `Germ.instModule'` after explicit transport
+of both bases; `module_self_eq` applies only to standard given self-actions.
+
 [`Product/Units.lean`](MinimalPrimes/Order/Filter/Product/Units.lean) proves
 `Filter.Product.isUnit_coe_iff`: a represented element is a unit exactly when its
 section is a unit on a filter-large set. Only monoid fibres are required, with no
@@ -644,6 +676,8 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
+| [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
+| [`MinimalPrimes.Order.Filter.Product.Torsion`](MinimalPrimes/Order/Filter/Product/Torsion.lean) | Torsion-freeness iff eventual fibre torsion-freeness for the given semimodules; represented-scalar action injectivity. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.NoZeroDivisors`](MinimalPrimes/Order/Filter/Product/NoZeroDivisors.lean) | Weak zero-and-multiplication ultrafilter criterion; with absorbing zero, arbitrary-filter classification by eventual fibrewise no zero divisors and a bottom-or-atomic nontrivial-fibre trace. |
 | [`MinimalPrimes.Order.Filter.Product.Nilpotent`](MinimalPrimes/Order/Filter/Product/Nilpotent.lean) | A uniform vanishing exponent for eventually nilpotent dependent sections when the filter contains a finite set. |

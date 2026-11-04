@@ -188,6 +188,18 @@ height/coheight and minimal/maximal-point predicates, and its canonical prime sp
 The semiring formulation uses Andrew Yang's minimal-prime avoidance of non-zero-divisors
 in Mathlib.
 
+The dependent semimodule data use Amelia Livingston's additive congruence quotient
+machinery, Eric Wieser's ring-congruence factories, Johannes Hölzl's quotient maps,
+and the germ interfaces of Yury Kudryashov and Abhimanyu Pallavi Sudhir. Module and
+Pi-module interfaces are credited to Nathaniel Thomas, Jeremy Avigad, Johannes Hölzl,
+Mario Carneiro, Simon Hudon and Patrick Massot. The record comparisons use the
+algebraic extensionality interfaces of Bryan Gin-ge Chen, Yury Kudryashov and
+Raghuram Sundararajan.
+Regular scalar actions use Damiano Testa's regularity definitions, and the modern
+torsion-free class is Yaël Dillies's formalization. Their represented-scalar readout
+composes the existing Formal Frontier dependent coordinate-map injectivity theorem;
+no new quotient, representative-choice or collision engine is introduced.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

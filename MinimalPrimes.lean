@@ -22,6 +22,8 @@ public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
 public import MinimalPrimes.Order.Filter.Product.Map
+public import MinimalPrimes.Order.Filter.Product.Module
+public import MinimalPrimes.Order.Filter.Product.Torsion
 public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import MinimalPrimes.Order.Filter.Product.Nontrivial
 public import MinimalPrimes.Order.Filter.Product.NoZeroDivisors
@@ -124,6 +126,11 @@ identity/composition/uniqueness and exact onto API, and selected-section reflect
 Its zero-only specialization uses the image of the same chosen zero section, without
 installing another product zero instance. The germ pointed criterion is its
 constant-family bridge through the shared dependent section theorem.
+The dependent-semimodule leaf equips additive reduced products with the binary quotient
+action of the given varying fibre modules, over the existing scalar reduced product.
+Its named data have representative and opaque-vector map laws and constant-germ
+compatibility. Torsion-freeness of this semimodule is equivalent to eventual fibre
+torsion-freeness, by the coordinate-map injectivity and regular-scalar section criteria.
 The germ-scalar leaf specializes zero-reflection to a selected zero-preserving action,
 without scalar-zero or additive assumptions.
 The non-zero-divisor leaf characterizes intrinsic left, right and two-sided
