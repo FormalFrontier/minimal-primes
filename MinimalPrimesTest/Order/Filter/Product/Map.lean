@@ -65,6 +65,21 @@ example :
     · exact hS.false (fun _ => PUnit.unit)
     · exact nomatch f true
 
+/-- An ignored empty fibre makes the map injective although the selected coordinate
+map collapses two Boolean values. -/
+example :
+    let R : Bool → Type := fun b => if b then Empty else Bool
+    let φ : ∀ b, R b → PUnit := fun _ _ => PUnit.unit
+    Function.Injective (Product.map (pure false) φ) ∧
+      ¬∀ᶠ b in (pure false : Filter Bool), Function.Injective (φ b) := by
+  dsimp only
+  constructor
+  · apply (Product.map_injective_iff (pure false) _).2
+    exact Or.inl ⟨fun f => nomatch f true⟩
+  · change ¬Function.Injective (fun _ : Bool => PUnit.unit)
+    intro h
+    exact Bool.false_ne_true (h rfl)
+
 /-- Empty total target sections make onto vacuous, without a source-default hypothesis. -/
 example (D : Filter PUnit) :
     Function.Surjective (Product.map D (fun _ : PUnit => (id : Empty → Empty))) := by

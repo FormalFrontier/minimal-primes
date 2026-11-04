@@ -24,6 +24,7 @@ public import MinimalPrimes.Order.Filter.Product.Map
 public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import MinimalPrimes.Order.Filter.Product.Nontrivial
 public import MinimalPrimes.Order.Filter.Product.NoZeroDivisors
+public import MinimalPrimes.Order.Filter.Product.Pi
 public import MinimalPrimes.Order.Filter.Product.Reduced
 public import MinimalPrimes.Order.Filter.Product.Regular
 public import MinimalPrimes.Order.Filter.Product.Units
@@ -117,5 +118,7 @@ non-zero-divisors by their eventual coordinate loci, over arbitrary monoids with
 and gives the scalar submonoid criterion under an explicit eventual zero-preservation law.
 The germ-center leaf characterizes the full intrinsic magma center by eventual
 coordinate centrality, with a submonoid-center bridge requiring only a two-sided identity.
+The finite-product comparison is surjective for arbitrary coordinate types and is an
+equivalence for finite coordinates, with representative, inverse and naturality laws.
 Import a leaf directly for a smaller API.
 -/

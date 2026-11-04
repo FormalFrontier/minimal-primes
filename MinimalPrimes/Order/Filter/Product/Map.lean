@@ -104,6 +104,29 @@ theorem map_comp (D : Filter ι) (ψ : ∀ i, S i → T i) (φ : ∀ i, R i → 
     map D ψ ∘ map D φ = map D (fun i r => ψ i (φ i r)) :=
   funext (map_map D ψ φ)
 
+/-- The map on dependent filter products is injective exactly when there are no
+whole source sections or the coordinate maps are eventually injective. -/
+theorem map_injective_iff (D : Filter ι) (φ : ∀ i, R i → S i) :
+    Function.Injective (map D φ) ↔
+      IsEmpty (∀ i, R i) ∨ ∀ᶠ i in D, Function.Injective (φ i) := by
+  have hsection : Function.Injective (map D φ) ↔
+      ∀ f g : ∀ i, R i,
+        (∀ᶠ i in D, φ i (f i) = φ i (g i)) → ∀ᶠ i in D, f i = g i := by
+    constructor
+    · intro h f g hfg
+      apply (coe_eq f g).mp
+      apply h
+      rw [map_coe, map_coe]
+      exact (coe_eq _ _).mpr hfg
+    · intro h x y hxy
+      obtain ⟨f, rfl⟩ := coe_surjective D R x
+      obtain ⟨g, rfl⟩ := coe_surjective D R y
+      apply (coe_eq f g).mpr
+      apply h f g
+      apply (coe_eq (fun i => φ i (f i)) (fun i => φ i (g i))).mp
+      exact (map_coe D φ f).symm.trans (hxy.trans (map_coe D φ g))
+  exact hsection.trans (Filter.forall_eventually_eq_of_map_eq_iff D φ)
+
 /-- The exact onto criterion retains the empty-target and total-source alternatives. -/
 theorem map_surjective_iff (D : Filter ι) (φ : ∀ i, R i → S i) :
     Function.Surjective (map D φ) ↔

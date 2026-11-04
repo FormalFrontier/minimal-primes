@@ -66,6 +66,21 @@ this using the existing section setoids and stock `Nontrivial` support. An empty
 fibre ignored by a filter still prevents total sections; eventual inhabitation
 cannot replace the empty-total-section alternative.
 
+### Finite products of dependent filter products
+
+For an arbitrary filter `D` and `R : ι → κ → Type w`, with independent index and
+fibre universes, [`Filter.Product.piComparison`](MinimalPrimes/Order/Filter/Product/Pi.lean)
+maps the class of a matrix to its family of column classes. It is surjective for
+arbitrary `κ`; for `[Finite κ]`, `Filter.Product.piEquiv` is the corresponding
+equivalence. Its inverse transposes supplied global column representatives.
+Representative and naturality laws apply without unfolding a quotient; the forward
+naturality square needs no finiteness and permits an independent target universe.
+No algebra, inhabited fibres, properness or chosen finite enumeration is required.
+The [boundary examples](MinimalPrimesTest/Order/Filter/Product/Pi.lean) include
+varying fibres, empty coordinates and row indices, and bottom with empty global
+sections. A cofinite-Nat Boolean diagonal gives a specific infinite-coordinate
+failure of injectivity, not a claim that every infinite-coordinate comparison fails.
+
 ### Centers of dependent filter products
 
 For any filter and an independently universed family with multiplication, a section
@@ -581,6 +596,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Regular`](MinimalPrimes/Order/Filter/Product/Regular.lean) | Left, right and two-sided regularity at fibrewise multiplication, characterized by eventual regularity. |
 | [`MinimalPrimes.Order.Filter.Product.Center`](MinimalPrimes/Order/Filter/Product/Center.lean) | Full intrinsic centers at fibrewise multiplication; the equivalence of fibre-center products and product centers needs only two-sided identities. |
+| [`MinimalPrimes.Order.Filter.Product.Pi`](MinimalPrimes/Order/Filter/Product/Pi.lean) | Surjective comparison with coordinate reduced products, a finite-coordinate equivalence, and representative/inverse/naturality laws. |
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |

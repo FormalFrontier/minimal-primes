@@ -80,6 +80,14 @@ natural-number cancellation interfaces. Related multiplication-regularity criter
 were developed by Formal Frontier Agents/Almanac; the general function criterion
 introduces no dependency on that specialization.
 
+The comparison with finite products uses the existing dependent reduced-product
+carrier and canonical fibrewise map. Representative choice and finite eventual
+quantification reuse Mathlib's quotient and finite-filter modules, credited to
+Johannes Hölzl and Jeremy Avigad; equivalence packaging uses the interfaces credited
+to Leonardo de Moura and Mario Carneiro. The germ/product antecedents are credited
+to Yury Kudryashov and Abhimanyu Pallavi Sudhir. The comparison, representative and
+naturality proofs define no additional quotient or representative-choice engine.
+
 The dependent-product unit-locus criterion generalizes the germ unit-locus proof by
 Formal Frontier Agents, retaining its constant-family API and the germ units
 equivalence. It uses Andrew Yang's Mathlib `Pi.isUnit_iff` and `MulEquiv.piUnits`,
