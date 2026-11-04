@@ -21,7 +21,9 @@ The filters and universes are arbitrary. No properness assumption is needed.
 The carrier, quotient induction, evaluation and eventual-equality interfaces are
 Mathlib's filter-germ API, formalized by Yury Kudryashov and Abhimanyu Pallavi Sudhir.
 The pointed-fibre argument generalizes the annihilator witnesses in
-`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors` and uses `Filter.skolem`.
+`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`. Its criterion is now the
+constant-family bridge to the dependent selected-section criterion in
+`MinimalPrimes.Order.Filter.Basic`.
 -/
 
 @[expose] public section
@@ -105,23 +107,13 @@ theorem forall_map₂_apply_eq_const_imp_iff (D : Filter ι) (F : ι → A → B
     (∀ x : Germ D A,
       map₂ (fun (φ : A → B) (a : A) => φ a) (F : Germ D (A → B)) x = const b₀ →
         x = const a₀) ↔ ∀ᶠ i in D, ∀ a, F i a = b₀ → a = a₀ := by
-  classical
   constructor
   · intro h
-    -- At a bad coordinate choose a non-basepoint in the fibre; otherwise use a₀.
-    have hw : ∀ᶠ i in D, ∃ a : A,
-        F i a = b₀ ∧ (a = a₀ → ∀ a', F i a' = b₀ → a' = a₀) := by
-      filter_upwards [h₀] with i hi
-      by_cases href : ∀ a, F i a = b₀ → a = a₀
-      · exact ⟨a₀, hi, fun _ => href⟩
-      · obtain ⟨a, ha, hne⟩ : ∃ a, F i a = b₀ ∧ a ≠ a₀ := by
-          simpa only [not_forall, not_imp, exists_prop] using href
-        exact ⟨a, ha, fun heq => (hne heq).elim⟩
-    let : Nonempty A := ⟨a₀⟩
-    obtain ⟨g, hg⟩ := Filter.skolem.mp hw
-    have heq : (g : Germ D A) = const a₀ := h _ (by
-      simpa only [map₂_coe, coe_eq_const] using hg.mono fun _ hi => hi.1)
-    exact (hg.and ((coe_eq_const D g a₀).mp heq)).mono fun _ hi => hi.1.2 hi.2
+    apply (Filter.forall_eventually_map_eq_imp_iff D F
+      (fun _ => a₀) (fun _ => b₀) h₀).1
+    intro f hf
+    exact (coe_eq_const D f a₀).mp (h (f : Germ D A) (by
+      simpa only [map₂_coe, coe_eq_const] using hf))
   · exact forall_map₂_apply_eq_const_imp_of_eventually D F a₀ b₀
 
 end Filter.Germ

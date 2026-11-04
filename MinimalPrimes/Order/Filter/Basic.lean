@@ -12,6 +12,9 @@ public import Mathlib.Order.Filter.Basic
 A total section supplies fallback values when choosing a witness in each fibre.
 Consequently, testing a predicate along every section detects whether it holds
 for all elements of the fibres eventually. The fibres may belong to any sort.
+Selected-section reflection generalizes the pointed criterion for constant
+filter germs: eventual preservation makes a masked section map to the selected
+target section, and the section criterion detects the coordinate reflection locus.
 
 A family of coordinate maps lifts every total target section up to eventual equality
 exactly when the target has no total section, or the source has a total section and
@@ -25,6 +28,9 @@ section-reflection theorem.
 The witness argument generalizes the diagonal argument for centers of filter germs.
 
 ## References
+
+These witness arguments extend the prior Formal Frontier filter-germ formalizations
+in `MinimalPrimes.Order.Filter.Germ.Center` and `MinimalPrimes.Order.Filter.Germ.Map`.
 
 The filter extensionality and principal-restriction APIs reuse Mathlib's
 `Order.Filter.Basic`, by Johannes Hölzl and Jeremy Avigad. The section-reflection
@@ -57,6 +63,32 @@ theorem eventually_forall_iff_forall_section (s : ∀ i, R i) :
         exact ⟨x, fun h => (hx h).elim⟩
     choose f hf using hex
     exact (h f).mono fun i hi => hf i hi
+
+/-- Under eventual preservation of selected sections, reflection of those sections
+is detected coordinatewise eventually. The selected source section supplies the
+fallback values; no properness or separate inhabitance assumption is needed. -/
+theorem forall_eventually_map_eq_imp_iff
+    {R : ι → Sort v} {S : ι → Sort w}
+    (D : Filter ι) (φ : ∀ i, R i → S i) (a : ∀ i, R i) (b : ∀ i, S i)
+    (h₀ : ∀ᶠ i in D, φ i (a i) = b i) :
+    (∀ x : ∀ i, R i,
+      (∀ᶠ i in D, φ i (x i) = b i) → ∀ᶠ i in D, x i = a i) ↔
+      ∀ᶠ i in D, ∀ r : R i, φ i r = b i → r = a i := by
+  classical
+  constructor
+  · intro h
+    apply (eventually_forall_iff_forall_section (D := D)
+      (P := fun i r => φ i r = b i → r = a i) a).2
+    intro x
+    let y : ∀ i, R i := fun i => if φ i (x i) = b i then x i else a i
+    have hy : ∀ᶠ i in D, φ i (y i) = b i := h₀.mono fun i hi => by
+      by_cases he : φ i (x i) = b i
+      · simpa only [y, ite_eq_left he] using he
+      · simpa only [y, ite_eq_right he] using hi
+    exact (h y hy).mono fun i hi he => by
+      simpa only [y, ite_eq_left he] using hi
+  · intro h x hx
+    exact (h.and hx).mono fun i hi => hi.1 _ hi.2
 
 /-- Two filters give the same eventual-equality relation on total sections exactly
 when there is no total section or the filters agree after restriction to the

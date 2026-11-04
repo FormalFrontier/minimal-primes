@@ -20,6 +20,7 @@ public import MinimalPrimes.Order.Filter.Germ.SMul
 public import MinimalPrimes.Order.Filter.Germ.Units
 public import MinimalPrimes.Order.Filter.Product.Center
 public import MinimalPrimes.Order.Filter.Product.CompTendsto
+public import MinimalPrimes.Order.Filter.Product.Map
 public import MinimalPrimes.Order.Filter.Product.Nilpotent
 public import MinimalPrimes.Order.Filter.Product.Nontrivial
 public import MinimalPrimes.Order.Filter.Product.NoZeroDivisors
@@ -101,6 +102,11 @@ unit locus, for arbitrary filters and potentially noncommutative monoids.
 The germ-map leaf characterizes injectivity of varying pointwise application by eventual
 injectivity of the fibre maps, without properness or inhabitedness assumptions. Its pointed
 fibre criterion needs only eventual preservation of the specified points for the converse.
+The dependent product-map leaf gives the class-free canonical coordinate map, its
+identity/composition/uniqueness and exact onto API, and selected-section reflection.
+Its zero-only specialization uses the image of the same chosen zero section, without
+installing another product zero instance. The germ pointed criterion is its
+constant-family bridge through the shared dependent section theorem.
 The germ-scalar leaf specializes zero-reflection to a selected zero-preserving action,
 without scalar-zero or additive assumptions.
 The non-zero-divisor leaf characterizes intrinsic left, right and two-sided

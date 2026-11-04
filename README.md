@@ -8,6 +8,31 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Coordinate maps and zero-reflection of dependent filter products
+
+For any filter `D` and independently universed dependent type families `R` and `S`,
+coordinate functions `φ i : R i → S i` induce the canonical
+[`Filter.Product.map`](MinimalPrimes/Order/Filter/Product/Map.lean)
+from `D.Product R` to `D.Product S`. Its representative law uniquely characterizes
+it, with identity and composition laws and agreement with the existing semiring
+and constant-family germ maps. No algebra, points or proper-filter hypothesis is
+needed for the coordinate map.
+
+If the coordinate functions preserve selected total sections `a` and `b`
+eventually, the induced map reflects the represented point `b` to `a` exactly
+when the coordinate functions reflect these points eventually. For fibrewise
+`ZeroHom`s this gives zero-reflection using only the **same selected fibre zeros**:
+`Filter.Product.zeroPoint` is the class of that zero section, not a new Product
+zero instance. No multiplication, addition or scalar zero is required.
+
+`Filter.Product.map_surjective_iff` retains the exact global-section alternatives:
+the total target section type is empty, or the total source section type is
+nonempty and the coordinate maps are surjective eventually. An empty source fibre
+ignored by the filter cannot be silently filled. The
+[dependent controls](MinimalPrimesTest/Order/Filter/Product/Map.lean) include varying
+`Fin (n + 3) → Fin (n + 4)` maps that reflect zero but are neither injective nor
+additive, and a frequent bad locus giving a genuine nonzero kernel class.
+
 ### Reindexing dependent filter products
 
 For independently universed indices and fibres, a map `u : ι → κ` with
@@ -534,6 +559,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
+| [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.NoZeroDivisors`](MinimalPrimes/Order/Filter/Product/NoZeroDivisors.lean) | No zero divisors in ultrafilter products exactly for eventually no-zero-divisor fibres, with only zero and multiplication. |
 | [`MinimalPrimes.Order.Filter.Product.Nilpotent`](MinimalPrimes/Order/Filter/Product/Nilpotent.lean) | A uniform vanishing exponent for eventually nilpotent dependent sections when the filter contains a finite set. |
