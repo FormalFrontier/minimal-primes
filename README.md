@@ -104,6 +104,40 @@ universes are independent. Empty `J`, `n = 0`, empty index types, bottom filters
 and zero semirings are included, with no properness or nontriviality hypothesis.
 These criteria add no new functional data or global instances.
 
+### Uniform finite presentations of dependent reduced products
+
+The [finite-presentation module](MinimalPrimes/Order/Filter/Product/FinitePresentation.lean)
+proves the uniform generators-and-relations criterion. For arbitrary `F`,
+independently universed ring families `R i`, and given additive
+commutative monoids `M i` with their given `R i`-module actions,
+`Filter.Product.moduleFinitePresentation_iff` gives
+
+```text
+Module.FinitePresentation (F.Product R) (F.Product M)
+  ↔ ∃ n m : ℕ, ∀ᶠ i in F,
+      ∃ f : (Fin n → R i) →ₗ[R i] M i,
+      ∃ g : (Fin m → R i) →ₗ[R i] (Fin n → R i),
+        Function.Surjective f ∧ Function.Exact g f.
+```
+
+The left side uses exactly `Product.instSemiring` of the ring semiring parents,
+`Product.addCommMonoid` of the given vector records, and `Product.module` of the
+given actions. Each `f` retains the given target addition and action, even when
+`R = M`; only coefficient function spaces use standard self-actions. Exactness
+uses the given vector zero. The pair `(n,m)` precedes the eventual quantifier;
+eventual individual finite presentation or a generator bound alone is weaker.
+Padding generators may require additional relations, so exact fixed sizes must
+not be confused with independently padding both sizes at unchanged bounds.
+
+The rings may be noncommutative, and coefficients act on the left. No properness,
+nontriviality, freeness, coherence or Noetherian assumption is imposed. Bottom
+filters, empty index types, zero rings/modules and zero free sizes are included.
+Represented coordinate negation gives additive inverses for the named scalar
+semiring; the given module actions give vector inverses without a new group
+hypothesis. This is the genuine ring-module presentation scope. Over general
+semirings Mathlib's stock class concerns a finitely generated zero kernel, not a
+presentation by a finitely generated congruence; no such semiring claim is made.
+
 ### Exactness of dependent reduced-product maps
 
 For arbitrary functions `f i : X i → Y i` and `g i : Y i → Z i` in independent
@@ -838,6 +872,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Product.Module`](MinimalPrimes/Order/Filter/Product/Module.lean) | Named additive and varying-scalar semimodule data, characteristic maps, and scalar/self/constant-germ record comparisons. |
 | [`MinimalPrimes.Order.Filter.Product.Basis`](MinimalPrimes/Order/Filter/Product/Basis.lean) | Given common finite bases, characteristic vector/coefficient equations and standard finite-coordinate alignment. |
 | [`MinimalPrimes.Order.Filter.Product.Finite`](MinimalPrimes/Order/Filter/Product/Finite.lean) | Finite spanning by given vector germs and uniform finite generation. |
+| [`MinimalPrimes.Order.Filter.Product.FinitePresentation`](MinimalPrimes/Order/Filter/Product/FinitePresentation.lean) | Uniform finite generators and relations for given ring-module families over arbitrary filters. |
 | [`MinimalPrimes.Order.Filter.Product.Faithful`](MinimalPrimes/Order/Filter/Product/Faithful.lean) | Whole-module annihilator membership and faithfulness iff their eventual fibre criteria, retaining the given actions. |
 | [`MinimalPrimes.Order.Filter.Product.Torsion`](MinimalPrimes/Order/Filter/Product/Torsion.lean) | Torsion-freeness iff eventual fibre torsion-freeness for the given semimodules; represented-scalar action injectivity. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |

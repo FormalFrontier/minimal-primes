@@ -242,6 +242,16 @@ and Johan Commelin's module-finiteness interfaces, together with the existing
 Formal Frontier dependent Product semimodule, varying-map and Pi comparison.
 They introduce no new quotient, basis or representative-choice construction.
 
+The uniform finite-presentation criterion uses Andrew Yang's Mathlib
+`Module.FinitePresentation` and finite-free exact-sequence formulation,
+and Formal Frontier's [coherent-module library](https://github.com/FormalFrontier/coherent-modules)
+for the semiring-level finite-free presentation theorems. The proof combines
+Antoine Chambert-Loir's `Function.Exact`, Mathlib's finite linear combinations,
+basis extensionality and filter witness selection with the existing Formal
+Frontier Product module, common finite-basis, finite-combination and exactness
+interfaces. Its ring-family interpretation uses coordinate additive inverses;
+it introduces no presentation or group construction.
+
 AI agents developed the Lean code and examples.
 
 Ravi Vakil's *Foundations of Algebraic Geometry*, October 21, 2025 draft,

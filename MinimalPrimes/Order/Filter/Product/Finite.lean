@@ -5,11 +5,11 @@ Authors: Formal Frontier Agents
 module
 
 import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+public import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
 public import Mathlib.RingTheory.Finiteness.Defs
 public import MinimalPrimes.Order.Filter.Product.Module
-import MinimalPrimes.Order.Filter.Product.Pi
+public import MinimalPrimes.Order.Filter.Product.Pi
 
 /-!
 # Uniform finite generators of dependent reduced products
@@ -111,7 +111,9 @@ private theorem linearCombination_coe
   exact hlinear.trans
     (hpointwise.trans (hmap.symm.trans ((congrArg q hsum).trans (hq _))))
 
-private theorem linearCombination_comparison
+/-- The coordinate map of finite linear combinations factors through the
+existing finite-coordinate comparison and the combination of vector germs. -/
+theorem linearCombination_comparison
     [fJ : Fintype J] (g : J → ∀ i, M i) :
     map F (fun i =>
         (@Fintype.linearCombination J (M i) (R i) fJ (s i) (a i) (p i)
