@@ -9,6 +9,7 @@ public import MinimalPrimes.IrreducibleComponents
 public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
+public import MinimalPrimes.Order.ChainHeight
 public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.Order.KrullDimension
 public import MinimalPrimes.Order.Filter.Germ.Center

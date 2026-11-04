@@ -8,6 +8,23 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Chain cardinalities of lexicographic products
+
+For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
+sets `s`, `t`, [`Set.chainHeight_prod_lex`](MinimalPrimes/Order/ChainHeight.lean)
+proves that the chain height of `s ×ˢ t` for `Prod.Lex rα rβ` is the product of
+the factor chain heights, provided `rα` is irreflexive **on `s`**. Neither relation
+needs to be transitive; the second may have loops. `Set.chainHeight_toLex_prod`
+transports this formula to the canonical less-than relation on the image under `toLex`,
+with only `LT` on both types and first-relation `Std.Irrefl`.
+
+These are `ENat` **vertex cardinalities**, not edge counts, Krull dimensions or
+ordinal ranks. Empty factors give zero even beside infinite height. The proof
+uses products of comparable subsets for the lower bound and finite first-coordinate
+fibre counting for the upper bound, so it neither sorts a nontransitive comparable
+set nor assumes a longest chain exists. It does not assert the analogous formula
+for canonical weak `≤` in arbitrary preorders.
+
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,
@@ -807,6 +824,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality multiplication for lexicographic set products under local first irreflexivity, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Full `WithBot ℕ∞` bounds with shifts one or two and finite-bound equivalences after deleting original minimal, maximal or both boundary points; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
@@ -873,6 +891,11 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The lexicographic chain-cardinality proof builds on Mathlib's chain-height API
+  (Andrew Yang and Vlad Tsyrklevich), relation embeddings (Mario Carneiro and
+  contributors), set-cardinality and finite-union cardinality lemmas, and ENat
+  multiplication of suprema; see the
+  [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
   propagation of zero powers and finite-set order bounds; see the
