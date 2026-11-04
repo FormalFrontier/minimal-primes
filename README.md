@@ -491,6 +491,15 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   element, `Ring.krullDimLE_two_of_forall_exists_irreducible_span_eq` gives
   `Ring.KrullDimLE 2 R`. No domain, unique factorization, ring or Noetherian
   assumption is required, and irreducible elements need not be prime.
+- **Height and dimension of pointwise products**
+  ([module](MinimalPrimes/Order/KrullDimension.lean)). In arbitrary preorders,
+  pair heights and coheights are the sums of their coordinate values in `ℕ∞`.
+  `Order.krullDim_prod` and `Order.krullDim_pi` give the dimension of binary
+  and finite dependent products as the sum of the factor dimensions in `WithBot ℕ∞`.
+  Empty factors give bottom even alongside infinite dimension; an empty-index
+  product has dimension zero. No nonemptiness, finite-dimension or antisymmetry
+  hypothesis is required. These concern canonical pointwise orders, not lexicographic
+  or topological products.
 - **All-dimension bounds after deleting boundary points**
   ([module](MinimalPrimes/Order/KrullDimension.lean)). For any preorder `α : Type u`,
   `Order.krullDim_not_isMin_add_one_le` states

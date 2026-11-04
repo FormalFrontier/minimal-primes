@@ -4,14 +4,25 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 public import Mathlib.Order.KrullDimension
 
+import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Data.Set.Lattice.Order
+import Mathlib.Order.Fin.Tuple
 import Mathlib.Order.Minimal
 import Mathlib.Order.UpperLower.Basic
 
 /-!
-# Krull dimension, order covers, and boundary deletion
+# Krull dimension of products and covers, and boundary deletion
+
+In pointwise product preorders, the height and coheight of a pair are the sums of
+the coordinate heights and coheights. The order dimension of a binary product is
+the sum of the factor dimensions, and a finite dependent product has dimension the
+sum of its fibre dimensions. These formulas include empty factors and infinite
+dimensions. In `WithBot ℕ∞`, bottom absorbs addition, so an empty factor gives bottom
+even when another factor has top dimension. An empty-index product has dimension
+zero. These are pointwise order products, not lexicographic or topological products.
 
 The order dimension of an indexed union of upper sets is the supremum of the
 dimensions of its pieces. The order-dual statement holds for lower sets. The
@@ -53,11 +64,15 @@ provides finite strict chains; `Order.Max` supplies the ambient boundary predica
 The full dimension inequalities use the finite-bound characterizations together
 with Mathlib's bottom, zero- and one-dimensional criteria and extended-natural arithmetic.
 The cover equalities use its height and coheight restriction and indexed-supremum formulas.
+The product formulas use its finite-chain induction, fixed-coordinate maps and gluing,
+height suprema, order equivalences and extended-natural sum formulas.
 -/
 
 @[expose] public section
 
-universe u v
+universe u v w
+
+open scoped BigOperators
 
 /-- In dimension at most two, a comparison from a nonminimal element to a nonmaximal
 element also holds in the reverse direction. -/
@@ -262,3 +277,127 @@ theorem Order.krullDim_iUnion_of_isLowerSet
   change Order.krullDim ({x : α // x ∈ ⋃ i, s i})ᵒᵈ =
     ⨆ i, Order.krullDim ({x : α // x ∈ s i})ᵒᵈ at h
   simpa only [Order.krullDim_orderDual] using h
+
+/-- The height of a pair in the pointwise product preorder is the sum of its
+coordinate heights, including infinite heights. -/
+theorem Order.height_prod
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (a : α) (b : β) :
+    Order.height (a, b) = Order.height a + Order.height b := by
+  apply le_antisymm
+  · have hseries (p : LTSeries (α × β)) :
+        (p.length : ℕ∞) ≤ Order.height p.last.1 + Order.height p.last.2 := by
+      refine RelSeries.inductionOn'
+        (motive := fun q : LTSeries (α × β) ↦
+          (q.length : ℕ∞) ≤ Order.height q.last.1 + Order.height q.last.2)
+        ?_ ?_ p
+      · intro x
+        simp only [RelSeries.singleton_length, ENat.natCast_zero]
+        exact bot_le
+      · intro q x hx hq
+        simp only [RelSeries.snoc_length, RelSeries.last_snoc,
+          ENat.natCast_add, ENat.natCast_one]
+        rcases Prod.lt_iff.mp hx with ⟨hfst, hsnd⟩ | ⟨hfst, hsnd⟩
+        · calc
+            (q.length : ℕ∞) + 1 ≤
+                (Order.height q.last.1 + Order.height q.last.2) + 1 :=
+              add_le_add hq le_rfl
+            _ = (Order.height q.last.1 + 1) + Order.height q.last.2 :=
+              add_right_comm _ _ _
+            _ ≤ Order.height x.1 + Order.height x.2 :=
+              add_le_add (Order.height_add_one_le hfst) (Order.height_mono hsnd)
+        · calc
+            (q.length : ℕ∞) + 1 ≤
+                (Order.height q.last.1 + Order.height q.last.2) + 1 :=
+              add_le_add hq le_rfl
+            _ = Order.height q.last.1 + (Order.height q.last.2 + 1) :=
+              add_assoc _ _ _
+            _ ≤ Order.height x.1 + Order.height x.2 :=
+              add_le_add (Order.height_mono hfst) (Order.height_add_one_le hsnd)
+    apply Order.height_le
+    intro p hp
+    simpa only [hp] using hseries p
+  · -- Singleton endpoint chains justify adding the two endpoint suprema, even at top.
+    rw [Order.height_eq_iSup_last_eq a, Order.height_eq_iSup_last_eq b]
+    refine ENat.biSup_add_biSup_le'
+      (p := fun p : LTSeries α ↦ p.last = a)
+      (q := fun q : LTSeries β ↦ q.last = b)
+      ⟨RelSeries.singleton _ a, rfl⟩ ⟨RelSeries.singleton _ b, rfl⟩ ?_
+    intro p hp q hq
+    let p' : LTSeries (α × β) :=
+      LTSeries.map p (fun x ↦ (x, q.head))
+        (fun _ _ h ↦ Prod.mk_lt_mk_iff_left.mpr h)
+    let q' : LTSeries (α × β) :=
+      LTSeries.map q (fun y ↦ (p.last, y))
+        (fun _ _ h ↦ Prod.mk_lt_mk_iff_right.mpr h)
+    have hjoin : p'.last = q'.head := rfl
+    have h := Order.length_le_height_last (p := p'.smash q' hjoin)
+    rw [RelSeries.smash_length, RelSeries.last_smash] at h
+    change ((p.length + q.length : ℕ) : ℕ∞) ≤ Order.height (p.last, q.last) at h
+    simpa only [Nat.cast_add, hp, hq] using h
+
+/-- The coheight of a pair in the pointwise product preorder is the sum of its
+coordinate coheights, including infinite coheights. -/
+theorem Order.coheight_prod
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (a : α) (b : β) :
+    Order.coheight (a, b) = Order.coheight a + Order.coheight b := by
+  change Order.height (α := (α × β)ᵒᵈ) (a, b) =
+    Order.height (α := αᵒᵈ) a + Order.height (α := βᵒᵈ) b
+  exact (Order.height_orderIso
+    (OrderIso.refl _ : (α × β)ᵒᵈ ≃o αᵒᵈ × βᵒᵈ) (a, b)).symm.trans
+      (Order.height_prod (α := αᵒᵈ) (β := βᵒᵈ) a b)
+
+/-- The dimension of a pointwise product of preorders is the sum of the factor
+dimensions in `WithBot ℕ∞`. An empty factor gives bottom even when the other
+factor has infinite dimension. -/
+theorem Order.krullDim_prod
+    (α : Type u) (β : Type v) [Preorder α] [Preorder β] :
+    Order.krullDim (α × β) = Order.krullDim α + Order.krullDim β := by
+  cases isEmpty_or_nonempty α with
+  | inl h => simp [Order.krullDim_eq_bot]
+  | inr h =>
+    cases isEmpty_or_nonempty β with
+    | inl h => simp [Order.krullDim_eq_bot]
+    | inr h =>
+      rw [Order.krullDim_eq_iSup_height_of_nonempty (α := α × β),
+        Order.krullDim_eq_iSup_height_of_nonempty (α := α),
+        Order.krullDim_eq_iSup_height_of_nonempty (α := β),
+        ← WithBot.coe_add, WithBot.coe_inj, iSup_prod]
+      simp_rw [Order.height_prod, ← ENat.add_iSup, ← ENat.iSup_add]
+
+/-- The dimension of a finite dependent pointwise product is the sum of its fibre
+dimensions in `WithBot ℕ∞`. Empty factors give bottom, and an empty index gives
+zero. No fibre is required to be nonempty or finite-dimensional. -/
+theorem Order.krullDim_pi
+    {ι : Type w} [Fintype ι]
+    (α : ι → Type v) [∀ i, Preorder (α i)] :
+    Order.krullDim (∀ i, α i) = ∑ i, Order.krullDim (α i) := by
+  have hfin :
+      ∀ (n : ℕ) (β : Fin n → Type v) [∀ i, Preorder (β i)],
+        Order.krullDim (∀ i, β i) = ∑ i, Order.krullDim (β i) := by
+    intro n
+    induction n with
+    | zero =>
+      intro β hβ
+      simpa only [Fin.sum_univ_zero] using
+        (Order.krullDim_eq_zero_of_unique (α := ∀ i : Fin 0, β i))
+    | succ n ih =>
+      intro β hβ
+      rw [Order.krullDim_eq_of_orderIso (Fin.consOrderIso β).symm,
+        Order.krullDim_prod, ih (fun i : Fin n ↦ β i.succ),
+        Fin.sum_univ_succ]
+  let e : Fin (Fintype.card ι) ≃ ι := (Fintype.equivFin ι).symm
+  calc
+    Order.krullDim (∀ i, α i) =
+        Order.krullDim (∀ j : Fin (Fintype.card ι), α (e j)) :=
+      Order.krullDim_eq_of_orderIso
+        { toEquiv := (Equiv.piCongrLeft α e).symm
+          map_rel_iff' := by
+            intro f g
+            change (∀ j, f (e j) ≤ g (e j)) ↔ ∀ i, f i ≤ g i
+            exact e.forall_congr_right (q := fun i ↦ f i ≤ g i) }
+    _ = ∑ j : Fin (Fintype.card ι), Order.krullDim (α (e j)) :=
+      hfin _ _
+    _ = ∑ i, Order.krullDim (α i) :=
+      e.sum_comp (fun i ↦ Order.krullDim (α i))
