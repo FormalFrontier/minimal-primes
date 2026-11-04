@@ -6,6 +6,7 @@ module
 
 public import MinimalPrimes.Order.Filter.Germ.NoZeroDivisors
 public import Mathlib.Algebra.Ring.Nat
+public import Mathlib.Algebra.Ring.PUnit
 
 /-!
 # No zero divisors without absorption
@@ -79,5 +80,37 @@ example : NeBot (⊤ : Filter Bool) ∧ NoZeroDivisors ℕ ∧
     exact Nat.one_ne_zero (Filter.mem_top_iff_forall.1 he false)
   · have he := (Product.coe_eq rightSupport 0).1 hr
     exact Nat.one_ne_zero (Filter.mem_top_iff_forall.1 he true)
+
+private def mixedFiber : Bool → Type
+  | false => ℕ
+  | true => PUnit
+
+private instance (b : Bool) : MonoidWithZero (mixedFiber b) := by
+  cases b <;> dsimp only [mixedFiber] <;> infer_instance
+
+/-- At the proper, non-atomic top filter on `Bool`, only the `false` fibre is
+nontrivial. Its trace is the atom `pure false`, so the canonical criterion still
+gives no zero divisors for this mixed family. -/
+example : NoZeroDivisors ((⊤ : Filter Bool).Product mixedFiber) := by
+  have hsupport : {b | Nontrivial (mixedFiber b)} = ({false} : Set Bool) := by
+    ext b
+    cases b
+    · exact iff_of_true (inferInstance : Nontrivial ℕ) rfl
+    · exact iff_of_false (not_nontrivial PUnit) (by simp)
+  have htrace : (⊤ : Filter Bool) ⊓ principal {b | Nontrivial (mixedFiber b)} =
+      pure false := by
+    rw [top_inf_eq, hsupport, principal_singleton]
+  have hfibres : ∀ᶠ b in (⊤ : Filter Bool), NoZeroDivisors (mixedFiber b) :=
+    Eventually.of_forall fun b => by
+      cases b
+      · exact inferInstanceAs (NoZeroDivisors ℕ)
+      · exact @Subsingleton.to_noZeroDivisors (mixedFiber true)
+          (inferInstance : Mul (mixedFiber true)) (inferInstance : Zero (mixedFiber true))
+          (inferInstance : Subsingleton PUnit)
+  apply (Product.noZeroDivisors_iff_eventually_and_trace_of_monoidWithZero
+    (R := mixedFiber) ⊤).2
+  refine ⟨hfibres, Or.inr ?_⟩
+  rw [htrace]
+  exact Filter.isAtom_pure
 
 end FilterProductNoZeroDivisorsExamples

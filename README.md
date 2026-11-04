@@ -148,8 +148,22 @@ therefore characterizes no zero divisors in the germ by no zero divisors in the
 value type, still with only `Zero` and `Mul`. The same nonabsorbing client exercises
 this specialization. These generic criteria are Mathlib-upstream candidates.
 
-The ultrafilter hypothesis is essential: at the proper top filter on a two-point
-index type, complementary nonzero sections over a domain multiply to zero.
+Eventual fibrewise no zero divisors alone does not suffice for arbitrary filters:
+at the proper top filter on a two-point index type, complementary nonzero sections
+over a domain multiply to zero.
+
+For arbitrary `F`, if each fibre has a **two-sided absorbing zero** (`MulZeroClass`),
+`Filter.Product.noZeroDivisors_iff_eventually_and_trace` characterizes no zero divisors
+for the same congruence operations by the conjunction of eventual fibrewise no zero
+divisors and `D = ⊥ ∨ IsAtom D`, where
+`D = F ⊓ principal {i | Nontrivial (R i)}`. Both absorption laws are material; no unit,
+associativity, properness or all-fibre nontriviality is required. The trace, not `F`
+itself, must be bottom or an atom, and even an atomic trace does not remove the
+fibrewise condition. The canonical monoid-with-zero specialization is
+`Filter.Product.noZeroDivisors_iff_eventually_and_trace_of_monoidWithZero`.
+The [mixed-fibre client](MinimalPrimesTest/Order/Filter/Product/NoZeroDivisors.lean)
+uses top on Bool with a natural-number fibre and a singleton fibre: its trace is
+`pure false`, so the product has no zero divisors although top is not an ultrafilter.
 
 ### Reduced dependent filter products
 
@@ -590,7 +604,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
 | [`MinimalPrimes.Order.Filter.Product.Map`](MinimalPrimes/Order/Filter/Product/Map.lean) | Canonical coordinate maps with representative/identity/composition/uniqueness and exact onto laws; selected-section and Zero-only reflection. |
 | [`MinimalPrimes.Order.Filter.Germ.NoZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NoZeroDivisors.lean) | Weak-data comparison with constant products and no zero divisors in ultrafilter germs exactly for no-zero-divisor coefficients. |
-| [`MinimalPrimes.Order.Filter.Product.NoZeroDivisors`](MinimalPrimes/Order/Filter/Product/NoZeroDivisors.lean) | No zero divisors in ultrafilter products exactly for eventually no-zero-divisor fibres, with only zero and multiplication. |
+| [`MinimalPrimes.Order.Filter.Product.NoZeroDivisors`](MinimalPrimes/Order/Filter/Product/NoZeroDivisors.lean) | Weak zero-and-multiplication ultrafilter criterion; with absorbing zero, arbitrary-filter classification by eventual fibrewise no zero divisors and a bottom-or-atomic nontrivial-fibre trace. |
 | [`MinimalPrimes.Order.Filter.Product.Nilpotent`](MinimalPrimes/Order/Filter/Product/Nilpotent.lean) | A uniform vanishing exponent for eventually nilpotent dependent sections when the filter contains a finite set. |
 | [`MinimalPrimes.Order.Filter.Product.Reduced`](MinimalPrimes/Order/Filter/Product/Reduced.lean) | Reducedness by the reduced-fibre locus; uniform-exponent nilpotence and finite-member, finite-index and finite-principal nilpotence criteria. |
 | [`MinimalPrimes.Order.Filter.Germ.Regular`](MinimalPrimes/Order/Filter/Germ/Regular.lean) | Constant-family specializations of eventual regularity. |
