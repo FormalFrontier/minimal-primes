@@ -183,6 +183,10 @@ these earlier formalizations supply the factorization and dimension interfaces.
 The irreducible-generator dimension criterion is formulated using Mathlib's
 `Irreducible.dvd_symm` for monoids, singleton-span inclusion and divisibility for
 commutative semirings, and the order-theoretic finite-chain dimension criterion.
+The dimension-two comparison interfaces use Mathlib's order Krull dimension,
+height/coheight and minimal/maximal-point predicates, and its canonical prime spectrum.
+The semiring formulation uses Andrew Yang's minimal-prime avoidance of non-zero-divisors
+in Mathlib.
 
 AI agents developed the Lean code and examples.
 

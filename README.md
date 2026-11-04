@@ -367,6 +367,14 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   element, `Ring.krullDimLE_two_of_forall_exists_irreducible_span_eq` gives
   `Ring.KrullDimLE 2 R`. No domain, unique factorization, ring or Noetherian
   assumption is required, and irreducible elements need not be prime.
+- **Comparison in dimension at most two**
+  ([order](MinimalPrimes/Order/KrullDimension.lean),
+  [prime ideals](MinimalPrimes/RingTheory/KrullDimension/Basic.lean)). In a preorder
+  with `[Order.KrullDimLE 2 α]`, if `x ≤ y`, `¬ IsMin x` and `¬ IsMax y`, then
+  `y ≤ x`; equality needs antisymmetry. In a commutative semiring with
+  `[Ring.KrullDimLE 2 R]`, a nonmaximal prime ideal `I` containing a prime element
+  `a ∈ nonZeroDivisors R` equals `Ideal.span {a}`. No unique factorization, global
+  no-zero-divisors, ring or Noetherian hypothesis is required.
 - **Prime ideals in dimension-two unique factorization semirings**
   ([module](MinimalPrimes/RingTheory/KrullDimension/UniqueFactorizationDomain.lean)).
   In a commutative semiring with `[UniqueFactorizationMonoid R]` and
@@ -628,6 +636,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | Reverse comparison between nonminimal and nonmaximal points in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |
@@ -650,7 +659,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Maximal ultrafilter ideals for division semirings; prime ideals of dependent products of semifields classified by ultrafilters. |
 | [`MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter`](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean) | Canonical residue-field/dependent-Product comparison over the section ring, with characteristic equations, uniqueness and fibrewise naturality. |
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |
-| [`MinimalPrimes.RingTheory.KrullDimension.Basic`](MinimalPrimes/RingTheory/KrullDimension/Basic.lean) | Dimension at most two from irreducible generators of nonzero nonmaximal prime ideals. |
+| [`MinimalPrimes.RingTheory.KrullDimension.Basic`](MinimalPrimes/RingTheory/KrullDimension/Basic.lean) | Prime non-zero-divisor generators of nonmaximal primes in dimension at most two; dimension bound from irreducible generators. |
 | [`MinimalPrimes.RingTheory.KrullDimension.Integral`](MinimalPrimes/RingTheory/KrullDimension/Integral.lean) | Integral-map dimension bound, injective equality, kernel quotient and faithful algebra. |
 | [`MinimalPrimes.RingTheory.KrullDimension.FieldExtension`](MinimalPrimes/RingTheory/KrullDimension/FieldExtension.lean) | Dimension preserved under base-field extension for finite-type commutative algebras. |
 | [`MinimalPrimes.RingTheory.KrullDimension.UniqueFactorizationDomain`](MinimalPrimes/RingTheory/KrullDimension/UniqueFactorizationDomain.lean) | Prime ideals in dimension-at-most-two unique factorization semirings are zero, irreducible-principal, or maximal. |
