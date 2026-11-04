@@ -229,9 +229,16 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   infinite index types; it does not classify all primes of an infinite product.
   No nonempty-index, nontrivial-factor, proper-base-ideal or ring assumptions
   are needed. Equal factors retain distinct coordinate labels.
-- **Minimality detected by localization** ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean)).
+- **Minimal primes and radical membership detected by localization**
+  ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean)).
+  In a commutative semiring `R`, an element belongs to `I.radical` exactly when its
+  canonical image belongs to the radical of the extension of `I` in
+  `Localization.AtPrime q` for every minimal prime `q` over `I`
+  (`Ideal.mem_radical_iff_forall_minimalPrimes_localization`). The unit ideal is included.
+  The [natural-number client](MinimalPrimesTest/RingTheory/Ideal/MinimalPrimeLocalization.lean)
+  shows that `2` passes these tests for `(4)` despite not belonging to `(4)`, while `1` fails.
   For commutative semirings `R`, `A` with `[Algebra R A]`, a prime ideal `q`
-  and `[IsLocalization.AtPrime A q]`, any ideal `I` satisfies
+  and `[IsLocalization.AtPrime A q]`, any ideal `I` also satisfies
   `(I.map (algebraMap R A)).radical = q.map (algebraMap R A)` iff `q ∈ I.minimalPrimes`.
   No separate `I ≤ q` is needed. Mathlib supplies the implication from minimality.
 - **Multipliers outside a minimal prime** ([module](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean)).
@@ -537,7 +544,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Ideal.FiniteHeightChain`](MinimalPrimes/RingTheory/Ideal/FiniteHeightChain.lean) | Stabilizing prime chains and their all-index infima. |
 | [`MinimalPrimes.RingTheory.Ideal.PrincipalPrimeHeight`](MinimalPrimes/RingTheory/Ideal/PrincipalPrimeHeight.lean) | Height bound and regular/domain equalities for prime generators. |
 | [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeMultipliers`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeMultipliers.lean) | Multipliers outside a minimal prime into a radical. |
-| [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality detected by a localized radical. |
+| [`MinimalPrimes.RingTheory.Ideal.MinimalPrimeLocalization`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean) | Minimality and radical membership detected by localization. |
 | [`MinimalPrimes.RingTheory.Ideal.PrimePiUltrafilter`](MinimalPrimes/RingTheory/Ideal/PrimePiUltrafilter.lean) | Maximal ultrafilter ideals for division semirings; prime ideals of dependent products of semifields classified by ultrafilters. |
 | [`MinimalPrimes.RingTheory.Ideal.ResidueFieldPiUltrafilter`](MinimalPrimes/RingTheory/Ideal/ResidueFieldPiUltrafilter.lean) | Canonical residue-field/dependent-Product comparison over the section ring, with characteristic equations, uniqueness and fibrewise naturality. |
 | [`MinimalPrimes.RingTheory.Ideal.PositivePowerRange`](MinimalPrimes/RingTheory/Ideal/PositivePowerRange.lean) | Contraction reflects containment in radical ideals, and extension–contraction preserves radicals, when positive powers lie in the image. |

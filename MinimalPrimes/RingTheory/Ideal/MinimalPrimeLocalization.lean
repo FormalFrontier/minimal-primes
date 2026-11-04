@@ -14,12 +14,18 @@ identifies the radical of the extended ideal with the extension of `q` exactly w
 is minimal over `I`. No containment hypothesis is required: the equality itself forces
 `I ≤ q` through the prime-ideal correspondence for localization.
 
+An element belongs to `I.radical` if and only if its image belongs to the radical of
+the extension of `I` in the canonical localization at every minimal prime over `I`.
+This membership criterion includes the unit ideal, whose family of minimal primes is empty.
+
 ## References
 
 This module uses Mathlib's `IsLocalization.minimalPrimes_map`,
 `Ideal.radical_minimalPrimes`, and the prime-ideal correspondence for localization at a
-prime. The reverse implication of the equivalence is Mathlib's
+prime. The implication from minimality is Mathlib's
 `IsLocalization.AtPrime.radical_map_of_mem_minimalPrimes`, formalized by Andrew Yang.
+The global membership criterion combines this with Mathlib's `Ideal.sInf_minimalPrimes`
+and `Ideal.under_map_of_isLocalizationAtPrime`.
 -/
 
 @[expose] public section
@@ -55,3 +61,30 @@ theorem radical_map_eq_iff_mem_minimalPrimes
   ⟨mem_minimalPrimes_of_radical_map_eq q I, radical_map_of_mem_minimalPrimes A q I⟩
 
 end IsLocalization.AtPrime
+
+namespace Ideal
+
+/-- An element belongs to the radical of an ideal exactly when its image belongs to the
+radical of the extended ideal at every minimal prime over that ideal. This includes the
+unit ideal and uses Mathlib's intersection of minimal primes and prime contraction under
+localization. -/
+theorem mem_radical_iff_forall_minimalPrimes_localization
+    {R : Type u} [CommSemiring R] (I : Ideal R) (x : R) :
+    x ∈ I.radical ↔
+      ∀ (q : Ideal R) [q.IsPrime], q ∈ I.minimalPrimes →
+        algebraMap R (Localization.AtPrime q) x ∈
+          (Ideal.map (algebraMap R (Localization.AtPrime q)) I).radical := by
+  constructor
+  · intro hx q _ _
+    exact Ideal.map_radical_le _ (Ideal.mem_map_of_mem _ hx)
+  · intro h
+    rw [← Ideal.sInf_minimalPrimes, Ideal.mem_sInf]
+    intro q hq
+    let : q.IsPrime := hq.isPrime
+    have hx := h q hq
+    rw [IsLocalization.AtPrime.radical_map_of_mem_minimalPrimes
+      (Localization.AtPrime q) q I hq] at hx
+    have hx' : x ∈ (q.map (algebraMap R (Localization.AtPrime q))).under R := hx
+    simpa only [Ideal.under_map_of_isLocalizationAtPrime q le_rfl] using hx'
+
+end Ideal
