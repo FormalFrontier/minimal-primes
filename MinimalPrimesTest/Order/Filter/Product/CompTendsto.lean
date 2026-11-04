@@ -72,6 +72,30 @@ example : Function.Surjective
         rfl))
     exact Bool.false_ne_true (eventually_top.mp ((Product.coe_eq _ _).mp h) true).symm
 
+-- The Unit fibre contributes no distinction: both quotients retain two classes,
+-- so the full criterion gives injectivity despite unequal image and target filters.
+example : Function.Injective
+    (fun x : (⊤ : Filter Bool).Product fibre =>
+      x.compTendsto id (show Tendsto id (principal {false}) ⊤ from tendsto_top)) ∧
+    Filter.map id (principal ({false} : Set Bool)) ≠ ⊤ := by
+  constructor
+  · apply (Product.compTendsto_injective_iff (R := fibre) id tendsto_top).2
+    right
+    have hs : {b | Nontrivial (fibre b)} = ({false} : Set Bool) := by
+      ext b
+      cases b
+      · change Nontrivial Bool ↔ false = false
+        exact iff_of_true inferInstance rfl
+      · change Nontrivial Unit ↔ true = false
+        exact iff_of_false (not_nontrivial_iff_subsingleton.mpr inferInstance)
+          (fun h => Bool.false_ne_true h.symm)
+    simp [hs]
+  · rw [Filter.map_id]
+    intro h
+    have h' : ∀ b : Bool, b ∈ ({false} : Set Bool) :=
+      eventually_top.mp (h ▸ mem_principal_self {false})
+    exact Bool.false_ne_true (Set.mem_singleton_iff.mp (h' true)).symm
+
 private def emptyFibre : Bool → Type
   | false => Unit
   | true => Empty

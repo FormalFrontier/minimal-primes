@@ -122,13 +122,23 @@ injectivity API and Mathlib's equivalence interfaces, formalized by Johannes Hö
 Callum Sutton, Yury Kudryashov, Leonardo de Moura and Mario Carneiro. Its total
 central lift extends the same nonassociative client.
 
+The comparison of two filters by eventual equality of dependent sections uses
+Mathlib's filter extensionality and principal-restriction APIs, by Johannes Hölzl
+and Jeremy Avigad. Its locally masked sections reuse the original project
+section-reflection theorem, rather than a second witness-selection construction.
+The Sort-general comparison and its nontrivial-fibre interpretation are original
+project arguments. The Type-valued setoid bridge uses Mathlib's setoid extensionality
+and Sébastien Gouëzel's nontriviality API.
+
 The dependent index-pullback properties reuse Mathlib's complete quotient-kernel
 injectivity criterion in `Data.Setoid.Basic`, by Amelia Livingston and Bryan Gin-ge
 Chen, and `eventually_map` in `Order.Filter.Map`, by Johannes Hölzl and Jeremy Avigad.
-Surjective representative lifting uses the dependent Pi equivalence in
-`Logic.Equiv.Basic`, by Leonardo de Moura and Mario Carneiro, and the canonical
-quotient representative API. The existing filter-product carrier and pullback
-remain those described in the module references; no second quotient is introduced.
+The full injectivity criterion composes that kernel comparison with the section
+setoid criterion. Surjectivity uses the complete `Quotient.map_surjective` API
+in `Data.Quot`, whose quotient interface was developed by Johannes Hölzl, and the
+dependent Pi equivalence in `Logic.Equiv.Basic`, by Leonardo de Moura and Mario
+Carneiro. The existing filter-product carrier and pullback remain those described
+in the module references; no second quotient is introduced.
 
 AI agents developed the Lean code and examples.
 

@@ -15,7 +15,10 @@ public import MinimalPrimes.Order.Filter.Product.Nontrivial
 # Algebra on dependent reduced products
 
 The carrier is Mathlib's `Filter.Product`: dependent total sections modulo eventual
-equality. `Filter.productCon` refines its exact setoid and descends multiplication,
+equality. Without algebraic assumptions, `Filter.productSetoid_eq_iff` compares
+the section relations of two filters by their restrictions to nontrivial fibres,
+with a separate alternative for an empty total-section type. `Filter.productCon`
+refines its exact setoid and descends multiplication,
 unital multiplication, monoid and monoid-with-zero structures without additive
 assumptions. The class of the pointwise one section needs only `One` on each fibre.
 `Filter.Product.coeMulHom` is the canonical section homomorphism for `MulOneClass`
@@ -60,6 +63,24 @@ without algebraic assumptions. -/
 @[simp]
 theorem productSetoid_apply (F : Filter ι) (K : ι → Type v) (f g : ∀ i, K i) :
     productSetoid F K f g ↔ ∀ᶠ i in F, f i = g i := Iff.rfl
+
+/-- The section setoids of two filters agree exactly when there is no total
+section or the filters agree on the nontrivial fibres. No algebraic structure or
+inhabitation hypothesis is required. -/
+theorem productSetoid_eq_iff {R : ι → Type v} (F G : Filter ι) :
+    productSetoid F R = productSetoid G R ↔
+      IsEmpty (∀ i, R i) ∨
+        F ⊓ principal {i | Nontrivial (R i)} = G ⊓ principal {i | Nontrivial (R i)} := by
+  have hrel : productSetoid F R = productSetoid G R ↔
+      ∀ f g : (∀ i, R i), (∀ᶠ i in F, f i = g i) ↔ (∀ᶠ i in G, f i = g i) := by
+    constructor
+    · intro h f g
+      have hfg : productSetoid F R f g ↔ productSetoid G R f g := by rw [h]
+      simpa only [productSetoid_apply] using hfg
+    · intro h
+      exact Setoid.ext fun f g => by simpa only [productSetoid_apply] using h f g
+  exact hrel.trans (by
+    simpa only [nontrivial_iff] using (forall_eventually_eq_iff (R := R) F G))
 
 /-- Eventual equality of dependent sections is a multiplicative congruence. -/
 abbrev productCon (F : Filter ι) (K : ι → Type v) [∀ i, Mul (K i)] :

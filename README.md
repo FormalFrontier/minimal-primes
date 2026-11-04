@@ -16,14 +16,30 @@ For independently universed indices and fibres, a map `u : ι → κ` with
 from `G.Product R` to `F.Product (fun i => R (u i))`. It sends a section to its
 precomposition, respects identity and composition, and agrees with the existing
 `Filter.Germ.compTendsto` on constant families. No algebra, total-section existence
-or proper-filter assumption is needed. Exact filter-image equality `Filter.map u F = G`
-makes this pullback injective (`compTendsto_injective_of_map_eq`), without injectivity
-of `u`. An index equivalence makes it surjective with only forward convergence
-(`compTendsto_surjective_of_equiv`), but not necessarily injective. Convergence in
-both directions gives `Filter.Product.compTendstoEquiv`, whose inverse uses canonical
-dependent Pi reindexing. The [dependent Bool client](MinimalPrimesTest/Order/Filter/Product/CompTendsto.lean)
-exhibits an injective, non-surjective diagonal and a surjective, non-injective
-one-way equivalence-index pullback with proper filters.
+or proper-filter assumption is needed. The full criterion
+`compTendsto_injective_iff` says that pullback is injective exactly when the original
+total-section type is empty or
+`Filter.map u F ⊓ principal {j | Nontrivial (R j)} =
+G ⊓ principal {j | Nontrivial (R j)}`. Exact filter-image equality therefore suffices
+(`compTendsto_injective_of_map_eq`), without injectivity of `u`, but is not necessary
+for a fixed family. An index equivalence makes pullback surjective with only forward
+convergence (`compTendsto_surjective_of_equiv`), but not necessarily injective.
+Convergence in both directions gives `Filter.Product.compTendstoEquiv`, whose inverse
+uses canonical dependent Pi reindexing. The
+[dependent Bool client](MinimalPrimesTest/Order/Filter/Product/CompTendsto.lean)
+contrasts a four-to-two noninjective pullback with a two-to-two injective pullback
+for the same unequal filters, by making the ignored fibre a singleton. It also
+exhibits an injective, non-surjective diagonal.
+
+The underlying
+[`Filter.forall_eventually_eq_iff`](MinimalPrimes/Order/Filter/Basic.lean) works for
+fibres in any independently universed `Sort`: two filters give the same eventual
+equality on all pairs of total sections exactly when there is no total section or
+their restrictions to `{i | ∃ x y : R i, x ≠ y}` agree. For Type-valued families,
+[`Filter.productSetoid_eq_iff`](MinimalPrimes/Order/Filter/Product.lean) expresses
+this using the existing section setoids and stock `Nontrivial` support. An empty
+fibre ignored by a filter still prevents total sections; eventual inhabitation
+cannot replace the empty-total-section alternative.
 
 ### Centers of dependent filter products
 
@@ -481,6 +497,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
+| [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
+| [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
+| [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |
 | [`MinimalPrimes.Order.Filter.Germ.Map`](MinimalPrimes/Order/Filter/Germ/Map.lean) | Varying germ application is injective exactly for eventually injective fibre maps. |
 | [`MinimalPrimes.Order.Filter.Germ.NonZeroDivisors`](MinimalPrimes/Order/Filter/Germ/NonZeroDivisors.lean) | Left, right and two-sided non-zero-divisor membership is equivalent to eventual coordinate membership. |
 | [`MinimalPrimes.Order.Filter.Germ.Reduced`](MinimalPrimes/Order/Filter/Germ/Reduced.lean) | Nilpotence and reducedness with only zero and natural-number powers; finite-member eventual nilpotence for monoid-with-zero coefficients. |
