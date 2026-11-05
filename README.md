@@ -8,6 +8,16 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Finite localization near a minimal prime
+
+For a finite-type algebra over any commutative ring, module finiteness of the
+residue-field fibre at a minimal prime gives finiteness after inverting an element
+outside that prime. The map is the canonical localization of the given algebra map.
+[`Algebra.FiniteType.exists_finite_awayMap_of_mem_minimalPrimes`](MinimalPrimes/RingTheory/Ideal/MinimalPrimeLocalization.lean)
+requires no reducedness or Noetherian hypothesis and includes the zero algebra.
+The supporting [nil-integrality lemmas](MinimalPrimes/RingTheory/IntegralNilpotent.lean)
+lift monic relations using individual nilpotence rather than a uniformly nilpotent ideal.
+
 ### Directed suprema of relations on a fixed set
 
 For any type `α` and fixed subset `s`,
