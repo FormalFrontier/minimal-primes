@@ -1133,6 +1133,35 @@ The index and coefficient universes are independent; improper filters, empty ind
 and trivial monoids are included. These are zero-annihilator criteria, not full
 multiplicative cancellation criteria. The generic API is a Mathlib-upstream candidate.
 
+### Irreducible closed rectangles and topological product dimensions
+
+For spaces `X : Type u` and `Y : Type v` with their given topologies,
+[`topologicalKrullDim_prod`](MinimalPrimes/Topology/KrullDimension/Product.lean) states
+
+```lean
+topologicalKrullDim (X × Y) = topologicalKrullDim X + topologicalKrullDim Y
+```
+
+For `ι : Type w`, `[Fintype ι]` and given topological fibres `Y : ι → Type u`,
+`topologicalKrullDim_pi` gives
+`topologicalKrullDim (∀ i, Y i) = ∑ i, topologicalKrullDim (Y i)`.
+These use the canonical topological product and ordinary dependent product, with values
+in `WithBot ℕ∞`. Empty factors give bottom, and empty index gives zero. No separation,
+sobriety, Noetherianity, nonemptiness, finite dimension or attainment is assumed.
+There is no arbitrary-infinite-index dimension sum, and these are not assertions about
+scheme fibre-product Zariski topologies or lexicographic orders.
+
+The [irreducible-closed product module](MinimalPrimes/Topology/IrreducibleCloseds.lean)
+provides set-level product irreducibility and the arbitrary-index classification
+`closure S = Set.pi Set.univ (fun i => closure (Function.eval i '' S))` for irreducible
+`S`. The binary version needs only preirreducibility and includes empty `S`.
+Its canonical irreducible closed products have the set-product and set-rectangle carriers.
+`TopologicalSpace.IrreducibleCloseds.prodOrderIso` and `piOrderIso` send a closed
+irreducible set to the closures of its projection images, with the canonical rectangles
+as inverses. The dependent-product classification and order isomorphism allow arbitrary
+index types, and nonemptiness for factor recovery comes from the factor sets themselves.
+The dimension formulas reuse this library's pointwise product-order dimension formulas.
+
 ### Topological dimension under inducing maps and covers
 
 The [inducing-map and open-cover module](MinimalPrimes/Topology/KrullDimension/OpenCover.lean)
@@ -1453,6 +1482,8 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; connected-component fibre formula; irreducible containment and the existing map's range and height. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension under inducing maps, finite inducing covers and open covers. |
+| [`MinimalPrimes.Topology.IrreducibleCloseds`](MinimalPrimes/Topology/IrreducibleCloseds.lean) | Set-level product irreducibility and closure classification; canonical irreducible closed products and arbitrary-index projection-closure order isomorphisms. |
+| [`MinimalPrimes.Topology.KrullDimension.Product`](MinimalPrimes/Topology/KrullDimension/Product.lean) | Topological dimension of binary and ordinary finite dependent products, without separation or nonemptiness assumptions. |
 
 ## Conventions and limitations
 
@@ -1476,6 +1507,12 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The topological product formulas use Mathlib's irreducibility formalization by
+  Johannes Hölzl, Mario Carneiro and Yury Kudryashov, closed-set and irreducible-closed
+  APIs by Floris van Doorn and Yaël Dillies, and topological Krull dimension by
+  Jujian Zhang, Fangming Li and Alessandro D'Angelo. They combine the canonical
+  product topology and coordinate-image APIs with this library's whole pointwise
+  product-order dimension formulas; see the two topology modules' references.
 - The exclusive-piece union formula generalizes the earlier Formal Frontier binary
   no-cross result, reusing its directed-union theorem and Mathlib's chain-height,
   chain-cardinality, intersection and indexed-supremum APIs. The binary theorem is

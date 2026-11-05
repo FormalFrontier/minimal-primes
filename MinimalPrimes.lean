@@ -61,6 +61,8 @@ public import MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional
 public import MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange
 public import MinimalPrimes.Topology.KrullDimension.ClosedCover
 public import MinimalPrimes.Topology.KrullDimension.OpenCover
+public import MinimalPrimes.Topology.IrreducibleCloseds
+public import MinimalPrimes.Topology.KrullDimension.Product
 public import MinimalPrimes.RingTheory.RingHom.ULift
 
 /-!
