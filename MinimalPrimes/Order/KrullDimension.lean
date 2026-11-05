@@ -833,3 +833,52 @@ theorem Order.krullDim_toLex_prod
           simpa only [Nat.cast_add, Nat.cast_mul] using hdim
 
 end LexicographicProduct
+
+section DimensionComparison
+
+/-!
+## Dimension comparison and arbitrary unions
+
+Dimension counts strict steps in `WithBot ℕ∞`; chain height counts vertices in `ℕ∞`.
+The comparison includes empty subtypes and unbounded finite chains without attainment.
+-/
+
+/-- Comparing the dimensions of inherited membership subtypes is
+equivalent to comparing their strict-chain vertex heights. The ambient preorders and
+universes are independent; every strict relation comes from its given preorder. -/
+theorem Order.krullDim_le_krullDim_iff_chainHeight_le_chainHeight
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (s : Set α) (t : Set β) :
+    Order.krullDim s ≤ Order.krullDim t ↔
+      s.chainHeight (fun a b : α ↦ a < b) ≤ t.chainHeight (fun a b : β ↦ a < b) := by
+  cases ht : Order.krullDim t with
+  | bot =>
+    have ht0 : t.chainHeight (fun a b : β ↦ a < b) = 0 :=
+      (Set.chainHeight_eq_zero_iff t _).mpr
+        (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp ht))
+    rw [ht0, le_bot_iff, Order.krullDim_eq_bot_iff, Set.isEmpty_coe_sort,
+      nonpos_iff_eq_zero, Set.chainHeight_eq_zero_iff]
+  | coe d =>
+    cases d with
+    | top =>
+      rw [chainHeight_eq_top_of_krullDim_eq_top t ht]
+      simp only [WithBot.coe_top, le_top]
+    | coe n =>
+      have htH : t.chainHeight (fun a b : β ↦ a < b) = (n + 1 : ℕ∞) :=
+        le_antisymm ((Order.krullDim_le_iff_chainHeight_le t n).mp ht.le)
+          ((Order.le_krullDim_iff_le_chainHeight t n).mp ht.ge)
+      rw [htH]
+      exact Order.krullDim_le_iff_chainHeight_le s n
+
+/-- The dimension of an arbitrary union is bounded by the maximum
+of the piece dimensions and their sum plus one in `WithBot ℕ∞`. The pieces may overlap;
+the separate terms retain the other dimension when one piece is empty, even at top. -/
+theorem Order.krullDim_union_le
+    {α : Type u} [Preorder α] (s t : Set α) :
+    Order.krullDim (s ∪ t : Set α) ≤ Order.krullDim s ⊔ Order.krullDim t ⊔
+      (Order.krullDim s + Order.krullDim t + 1) := by
+  rw [← Order.krullDim_toLex_sum s t,
+    Order.krullDim_le_krullDim_iff_chainHeight_le_chainHeight, Set.chainHeight_toLex_sum]
+  exact Set.chainHeight_union_le (fun a b : α ↦ a < b) s t
+
+end DimensionComparison
