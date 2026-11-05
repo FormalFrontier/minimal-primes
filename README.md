@@ -18,7 +18,24 @@ the subset products and their sum are in `WithBot ℕ∞`. Empty `J` and arbitra
 bottom and top values are included, with no decidable-equality premise on `ι`.
 The proof reuses Mathlib's whole finite-product expansion `Finset.prod_add_one`.
 
-### Ranks of finite dependent pointwise products
+### Ranks of dependent pointwise products
+
+For arbitrary `ι : Type u`, independently universed given preorders
+`β : ι → Type v`, and a section `f : ∀ i, β i`,
+[`Order.height_pi_eq_iSup_finset` and `Order.coheight_pi_eq_iSup_finset`](MinimalPrimes/Order/KrullDimension.lean)
+state
+
+```lean
+Order.height f = ⨆ s : Finset ι, ∑ i ∈ s, Order.height (f i)
+Order.coheight f = ⨆ s : Finset ι, ∑ i ∈ s, Order.coheight (f i)
+```
+
+The supremum includes every finite coordinate set, including the empty set.
+No finite-support condition on `f` or finiteness assumption on the index is needed.
+Infinitely many positive finite coordinate ranks, or one infinite coordinate rank,
+can give infinite rank. The proof detects each finite strict series on finitely
+many coordinates and reuses the finite product formula on that restriction;
+the reverse bound fills the remaining coordinates with the supplied `f`.
 
 For a finite index `ι : Type u`, independently universed given preorders
 `β : ι → Type v`, and a section `f : ∀ i, β i`,
@@ -943,7 +960,10 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   ([module](MinimalPrimes/Order/KrullDimension.lean)). In arbitrary preorders,
   `Order.height_pi` and `Order.coheight_pi` express the ranks of a section of a
   finite dependent product as sums of its coordinate ranks in `ℕ∞`, including
-  infinite ranks and rank zero for an empty index. The binary formulas are
+  infinite ranks and rank zero for an empty index. For arbitrary dependent products,
+  `Order.height_pi_eq_iSup_finset` and `Order.coheight_pi_eq_iSup_finset` give the
+  supremum of finite coordinate-rank sums, with no finite-support hypothesis.
+  The binary formulas are
   `Order.height_prod` and `Order.coheight_prod`.
   `Order.krullDim_prod` and `Order.krullDim_pi` give the dimension of binary
   and finite dependent products as the sum of the factor dimensions in `WithBot ℕ∞`.

@@ -13,7 +13,8 @@ import Mathlib.Order.Fin.Tuple
 Empty products have rank zero without inhabited fibres. In the pointwise square
 of a two-element chain, the top has height two and the bottom has coheight two.
 These calculations use the binary rank identities and the canonical two-coordinate
-order isomorphism.
+order isomorphism. On the infinite product `ℕ → ℕ`, the identity section has infinite
+height, detected by its finite-coordinate restrictions using the arbitrary product formula.
 -/
 
 universe u v
@@ -63,3 +64,10 @@ private theorem square_ranks :
         change Order.coheight ((0 : Fin 2), (0 : Fin 2)) = _
         exact Order.coheight_prod _ _
       _ = 2 := by rw [hcoheight]; rfl
+
+private theorem infinite_nat_height :
+    Order.height (fun n : ℕ => n) = ⊤ := by
+  rw [Order.height_pi_eq_iSup_finset]
+  apply ENat.eq_top_iff_forall_ge.mpr
+  intro n
+  exact le_iSup_of_le ({n} : Finset ℕ) (by simp)

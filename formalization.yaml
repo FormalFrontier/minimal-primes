@@ -44,9 +44,10 @@ project:
     For arbitrary finite sets and WithBot ℕ∞ values, the bottom-aware successor of
     the nonempty-subset product sum equals the product of successors in ℕ∞,
     including empty indices and arbitrary bottom and top values.
-    For finite dependent families of preorders in independent universes, the height
-    and coheight of a supplied section are the sums of its coordinate ranks in ENat,
-    for the original pointwise order, including empty indices and infinite ranks.
+    For arbitrary dependent families of given preorders in independent universes,
+    the height and coheight of a supplied section in the original pointwise order
+    are the suprema of finite coordinate-rank sums in ENat. For finite indices these
+    are the coordinate sums, including empty indices and infinite ranks.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
@@ -223,10 +224,11 @@ status:
     attain infinite height. The middle point of Fin 3 ×ₗ Fin 3 has both height and
     coheight four, rather than the pointwise values two; its second-factor weight is
     three, not dimension two.
-    For a supplied section of a finite dependent family of given preorders, height
-    and coheight in the original pointwise product equal the sums of coordinate
-    ranks in ENat. Empty indices and infinite or unattained ranks are included,
-    without antisymmetry, fibre inhabitation or finite-height hypotheses.
+    For a supplied section of an arbitrary dependent family of given preorders,
+    height and coheight in the original pointwise product equal the suprema of
+    finite coordinate-rank sums in ENat. The finite-index formulas remain coordinate
+    sums. Empty indices and infinite or unattained ranks are included, without
+    antisymmetry, fibre inhabitation, finite-height or finite-support hypotheses.
   sorry_count: 0
   main_results:
     - declaration: Order.height_eq_chainHeight_Iio
@@ -236,6 +238,10 @@ status:
     - declaration: Order.height_toLex_prod
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.coheight_toLex_prod
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.height_pi_eq_iSup_finset
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.coheight_pi_eq_iSup_finset
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.height_pi
       file: MinimalPrimes/Order/KrullDimension.lean
@@ -305,5 +311,7 @@ acknowledgements: >-
   earlier Formal Frontier lexicographic product and disjoint cross-comparable union formulas.
   The finite pointwise rank formulas compose the binary rank identities with
   Mathlib's order-isomorphism rank invariance, canonical finite-Pi splitting and
-  reindexing, and finite-sum APIs.
+  reindexing, and finite-sum APIs. The arbitrary pointwise rank formulas reuse those
+  finite identities with Mathlib's finite-subcover, restriction, finite-update,
+  strict-series and strict-map rank APIs.
   AI agents developed the Lean code and examples.

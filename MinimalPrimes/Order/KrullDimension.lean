@@ -17,6 +17,7 @@ import Mathlib.Algebra.BigOperators.WithTop
 import Mathlib.Data.ENat.BigOperators
 import Mathlib.Algebra.Order.Monoid.WithTop
 import Mathlib.Data.ENat.Basic
+import Mathlib.Data.Finset.Update
 import Mathlib.Data.List.Sort
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Lattice.Order
@@ -28,7 +29,13 @@ import Mathlib.Order.UpperLower.Basic
 # Krull dimension of products, lexicographic orders, covers and boundary deletion
 
 In pointwise product preorders, the height and coheight of a pair are the sums of
-the coordinate heights and coheights. The order dimension of a binary product is
+the coordinate heights and coheights. For an arbitrary dependent product, the rank
+of a supplied section is the supremum of its finite coordinate-rank sums in `ℕ∞`.
+The given fibre preorders and original pointwise order are retained, with no
+finiteness, antisymmetry, inhabitance or attainment hypotheses. The finite-index
+identities remain finite sums, including the empty-index case.
+
+The order dimension of a binary product is
 the sum of the factor dimensions, and a finite dependent product has dimension the
 sum of its fibre dimensions. These formulas include empty factors and infinite
 dimensions. In `WithBot ℕ∞`, bottom absorbs addition, so an empty factor gives bottom
@@ -130,6 +137,11 @@ with Mathlib's bottom, zero- and one-dimensional criteria and extended-natural a
 The cover equalities use its height and coheight restriction and indexed-supremum formulas.
 The product formulas use its finite-chain induction, fixed-coordinate maps and gluing,
 height suprema, order equivalences and extended-natural sum formulas.
+The arbitrary point-rank formula reuses the finite point-rank identity on restrictions.
+Mathlib's finite-subcover theorem captures the finitely many strict-coordinate tests
+of a given finite series. Its `Function.updateFinset` fills outside a finite set with
+the supplied section, and strict-map rank monotonicity gives the opposite inequality.
+Only strict-edge tests are captured, not all differences between series vertices.
 For directed unions, the finite ambient-value range of each strict series fits in one piece;
 restricting those same values preserves its length and the inherited order. This uses the
 defining `WithBot ℕ∞` supremum, without a nonemptiness premise or a longest chain.
@@ -670,6 +682,76 @@ theorem Order.coheight_pi
     (f : ∀ i, β i) :
     Order.coheight f = ∑ i, Order.coheight (f i) := by
   exact (Order.pi_ranks f).2
+
+-- A restriction need only preserve the strict edges of this particular series.
+-- A finite subcover captures those tests, even if the vertices differ at infinitely many indices.
+private theorem LTSeries.exists_finset_strictMono_restrict
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)]
+    (p : LTSeries (∀ i, β i)) :
+    ∃ s : Finset ι, StrictMono (fun j : Fin (p.length + 1) => s.restrict (p j)) := by
+  classical
+  have hcover : (Set.univ : Set (Fin p.length)) ⊆
+      ⋃ i : ι, {j | p j.castSucc i < p j.succ i} := by
+    intro j _
+    obtain ⟨i, hi⟩ := (Pi.lt_def.mp (p.step j)).2
+    exact Set.mem_iUnion.mpr ⟨i, hi⟩
+  obtain ⟨s, hs, hsub⟩ := Set.finite_subset_iUnion Set.finite_univ hcover
+  refine ⟨hs.toFinset, Fin.strictMono_iff_lt_succ.mpr ?_⟩
+  intro j
+  refine Pi.lt_def.mpr ⟨?_, ?_⟩
+  · intro i
+    exact p.monotone (Fin.castSucc_le_succ j) i
+  · obtain ⟨i, hi, hij⟩ := Set.mem_iUnion₂.mp (hsub (Set.mem_univ j))
+    exact ⟨⟨i, hs.mem_toFinset.mpr hi⟩, hij⟩
+
+private theorem Order.strictMono_updateFinset
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) (s : Finset ι) [DecidableEq ι] :
+    StrictMono (Function.updateFinset f s) := by
+  intro g h hgh
+  obtain ⟨hle, i, hi⟩ := Pi.lt_def.mp hgh
+  refine Pi.lt_def.mpr ⟨?_, ?_⟩
+  · intro j
+    dsimp only [Function.updateFinset]
+    split_ifs with hj
+    · exact hle ⟨j, hj⟩
+    · exact le_rfl
+  · exact ⟨i, by simpa only [Function.updateFinset, dite_eq_left i.property] using hi⟩
+
+/-- The height of a point in a dependent pointwise product is the supremum of the
+finite sums of its coordinate heights. -/
+theorem Order.height_pi_eq_iSup_finset
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) :
+    Order.height f = ⨆ s : Finset ι, ∑ i ∈ s, Order.height (f i) := by
+  classical
+  refine le_antisymm (Order.height_le_iff.mpr ?_) (iSup_le ?_)
+  · intro p hp
+    obtain ⟨s, hs⟩ := p.exists_finset_strictMono_restrict
+    let q := LTSeries.mk p.length (fun j => s.restrict (p j)) hs
+    calc
+      (p.length : ENat) = q.length := rfl
+      _ ≤ Order.height (s.restrict f) := Order.length_le_height (fun i => hp i)
+      _ = ∑ i ∈ s, Order.height (f i) := by
+        rw [Order.height_pi]
+        exact Finset.sum_coe_sort s (fun i => Order.height (f i))
+      _ ≤ _ := le_iSup (fun s : Finset ι => ∑ i ∈ s, Order.height (f i)) s
+  · intro s
+    calc
+      (∑ i ∈ s, Order.height (f i)) = Order.height (s.restrict f) := by
+        rw [Order.height_pi]
+        exact (Finset.sum_coe_sort s (fun i => Order.height (f i))).symm
+      _ ≤ Order.height (Function.updateFinset f s (s.restrict f)) :=
+        Order.height_le_height_apply_of_strictMono _ (Order.strictMono_updateFinset f s) _
+      _ = Order.height f := by rw [Function.updateFinset_restrict]
+
+/-- The coheight of a point in a dependent pointwise product is the supremum of the
+finite sums of its coordinate coheights. -/
+theorem Order.coheight_pi_eq_iSup_finset
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) :
+    Order.coheight f = ⨆ s : Finset ι, ∑ i ∈ s, Order.coheight (f i) := by
+  exact Order.height_pi_eq_iSup_finset (β := fun i => (β i)ᵒᵈ) f
 
 /-- The dimension of a pointwise product of preorders is the sum of the factor
 dimensions in `WithBot ℕ∞`. An empty factor gives bottom even when the other
