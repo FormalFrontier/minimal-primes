@@ -148,6 +148,23 @@ transport. The lower bound glues factor chains by the cross comparison; neither
 argument sorts chains or assumes their heights are attained. Unbounded finite
 chain cardinalities are included.
 
+### Krull dimension of lexicographic sums
+
+For arbitrary subsets `s`, `t` of independently universed preorders,
+[`Order.krullDim_toLex_sum`](MinimalPrimes/Order/KrullDimension.lean) gives
+`κ(L) = κ(s) ⊔ κ(t) ⊔ (κ(s) + κ(t) + 1)` in `WithBot ℕ∞`, where
+`L = toLex '' (Sum.inl '' s ∪ Sum.inr '' t)` and each dimension uses the
+membership subtype with its inherited preorder. No antisymmetry, nonemptiness,
+finite height or attainment is assumed. This generic order formula is a
+Mathlib-upstream candidate.
+
+The separate terms retain the other dimension when a factor is empty: bottom
+absorbs addition even beside top. Heights two and three give dimension four;
+two nonempty antichains give lexicographic dimension one, unlike ordinary Sum's
+zero. Infinite dimension includes unbounded finite chain lengths without a
+longest or infinite chain. The proof uses the whole lexicographic height formula
+and the finite-cut comparisons above, rather than another chain construction.
+
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,

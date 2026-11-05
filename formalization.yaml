@@ -67,6 +67,14 @@ highlights:
     declarations:
       - declaration: Filter.Product.nontrivial_iff
         file: MinimalPrimes/Order/Filter/Product/Nontrivial.lean
+  - title: Krull dimension of lexicographic sums
+    statement: >-
+      For arbitrary subsets of independently universed preorders, the dimension
+      of their tagged lexicographic union is the maximum of the two factor
+      dimensions and their sum plus one, including empty and infinite cases.
+    declarations:
+      - declaration: Order.krullDim_toLex_sum
+        file: MinimalPrimes/Order/KrullDimension.lean
 
 sources:
   - title: Foundations of Algebraic Geometry

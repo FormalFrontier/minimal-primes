@@ -5,11 +5,14 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.KrullDimension
 public import MinimalPrimes.Order.ChainHeight
 
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Algebra.Order.Monoid.WithTop
+import Mathlib.Data.ENat.Basic
 import Mathlib.Data.List.Sort
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Lattice.Order
@@ -18,7 +21,7 @@ import Mathlib.Order.Minimal
 import Mathlib.Order.UpperLower.Basic
 
 /-!
-# Krull dimension of products and covers, and boundary deletion
+# Krull dimension of products, lexicographic sums, covers and boundary deletion
 
 In pointwise product preorders, the height and coheight of a pair are the sums of
 the coordinate heights and coheights. The order dimension of a binary product is
@@ -70,7 +73,17 @@ In dimension at most two, comparable elements are equivalent in the preorder if 
 lower element is not minimal and the upper element is not maximal. The conclusion
 is a reverse inequality; equality requires antisymmetry.
 
+The dimension of the stock lexicographic image of a tagged union is the maximum
+of the two factor dimensions and their sum plus one. The two separate terms preserve
+the other factor when one set is empty, including when its dimension is infinite.
+All three membership subtypes retain the given preorders.
+
 ## References
+
+The lexicographic sum uses Mathlib's `Sum.Lex` order and `toLex` type synonym.
+Its vertex-height counterpart is `Set.chainHeight_toLex_sum` in
+`MinimalPrimes.Order.ChainHeight`; `Set.chainHeight_coe_univ_lt` is Mathlib's
+ambient-set to inherited-subtype height comparison.
 
 Mathlib's `Order.KrullDimension` supplies the dimension bound, order-dual invariance,
 height and coheight, and their relations to `IsMin` and `IsMax`. Its `Order.RelSeries`
@@ -580,3 +593,164 @@ theorem Order.krullDim_pi
       hfin _ _
     _ = ∑ i, Order.krullDim (α i) :=
       e.sum_comp (fun i ↦ Order.krullDim (α i))
+
+section LexicographicSum
+
+universe u₁ v₁
+
+private theorem chainHeight_eq_top_of_krullDim_eq_top
+    {α : Type u₁} [Preorder α] (s : Set α) (h : Order.krullDim s = ⊤) :
+    Set.chainHeight s (fun a b : α ↦ a < b) = ⊤ := by
+  refine ENat.eq_top_iff_forall_ge.mpr fun n ↦ ?_
+  have hn := (Order.le_krullDim_iff_le_chainHeight s n).mp (by simp [h])
+  have hsucc : (n : ℕ∞) ≤ (n + 1 : ℕ∞) := by
+    simpa only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one] using
+      (ENat.natCast_le_natCast.mpr (Nat.le_succ n))
+  exact hsucc.trans hn
+
+private theorem krullDim_toLex_sum_eq_top
+    {α : Type u₁} {β : Type v₁} [Preorder α] [Preorder β]
+    (s : Set α) (t : Set β)
+    (h : Order.krullDim s = ⊤ ∨ Order.krullDim t = ⊤) :
+    Order.krullDim ((toLex : α ⊕ β → α ⊕ₗ β) ''
+      ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)) = ⊤ := by
+  have hheight :
+      ((toLex : α ⊕ β → α ⊕ₗ β) ''
+        ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)).chainHeight
+          (fun a b : α ⊕ₗ β ↦ a < b) = ⊤ := by
+    rw [Set.chainHeight_toLex_sum]
+    rcases h with hs | ht
+    · simp [chainHeight_eq_top_of_krullDim_eq_top s hs]
+    · simp [chainHeight_eq_top_of_krullDim_eq_top t ht]
+  refine ENat.WithBot.eq_top_iff_forall_ge.mpr fun n ↦ ?_
+  exact (Order.le_krullDim_iff_le_chainHeight _ n).mpr (by simp [hheight])
+
+private theorem Order.krullDim_toLex_sum_of_eq_nat
+    {α : Type u₁} {β : Type v₁} [Preorder α] [Preorder β]
+    (s : Set α) (t : Set β) (n m : ℕ)
+    (hs : Order.krullDim s = (n : WithBot ℕ∞))
+    (ht : Order.krullDim t = (m : WithBot ℕ∞)) :
+    Order.krullDim ((toLex : α ⊕ β → α ⊕ₗ β) ''
+      ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)) =
+      Order.krullDim s ⊔ Order.krullDim t ⊔
+        (Order.krullDim s + Order.krullDim t + 1) := by
+  have hs' : Order.krullDim s = ((n : ℕ∞) : WithBot ℕ∞) := by
+    simpa only [ENat.WithBot.coe_eq_natCast] using hs
+  have ht' : Order.krullDim t = ((m : ℕ∞) : WithBot ℕ∞) := by
+    simpa only [ENat.WithBot.coe_eq_natCast] using ht
+  have hs_height : Set.chainHeight s (fun a b : α ↦ a < b) = (n + 1 : ℕ∞) :=
+    le_antisymm
+      ((Order.krullDim_le_iff_chainHeight_le s n).mp hs'.le)
+      ((Order.le_krullDim_iff_le_chainHeight s n).mp hs'.ge)
+  have ht_height : Set.chainHeight t (fun a b : β ↦ a < b) = (m + 1 : ℕ∞) :=
+    le_antisymm
+      ((Order.krullDim_le_iff_chainHeight_le t m).mp ht'.le)
+      ((Order.le_krullDim_iff_le_chainHeight t m).mp ht'.ge)
+  have h_height :
+      Set.chainHeight ((toLex : α ⊕ β → α ⊕ₗ β) ''
+        ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t))
+        (fun x y : α ⊕ₗ β ↦ x < y) =
+          ((n + m + 1 : ℕ) : ℕ∞) + 1 := by
+    rw [Set.chainHeight_toLex_sum, hs_height, ht_height]
+    simp only [ENat.natCast_add, ENat.natCast_one, add_assoc, add_left_comm, add_comm]
+  have hdim :
+      Order.krullDim ((toLex : α ⊕ β → α ⊕ₗ β) ''
+        ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)) =
+          (((n + m + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) :=
+    le_antisymm
+      ((Order.krullDim_le_iff_chainHeight_le _ (n + m + 1)).mpr h_height.le)
+      ((Order.le_krullDim_iff_le_chainHeight _ (n + m + 1)).mpr h_height.ge)
+  have hsum : (((n + m + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) =
+      (n : WithBot ℕ∞) + (m : WithBot ℕ∞) + 1 := by
+    simp only [ENat.natCast_add, ENat.natCast_one, WithBot.coe_add,
+      WithBot.coe_one, ENat.WithBot.coe_eq_natCast]
+  have hstep : (n : WithBot ℕ∞) + (m : WithBot ℕ∞) ≤
+      (n : WithBot ℕ∞) + (m : WithBot ℕ∞) + 1 :=
+    WithBot.le_self_add (WithBot.natCast_ne_bot 1) _
+  have hn : (n : WithBot ℕ∞) ≤
+      (n : WithBot ℕ∞) + (m : WithBot ℕ∞) + 1 :=
+    (WithBot.le_self_add (WithBot.natCast_ne_bot m) (n : WithBot ℕ∞)).trans hstep
+  have hm : (m : WithBot ℕ∞) ≤
+      (n : WithBot ℕ∞) + (m : WithBot ℕ∞) + 1 :=
+    (WithBot.le_add_self (WithBot.natCast_ne_bot n) (m : WithBot ℕ∞)).trans hstep
+  rw [hdim, hs, ht, hsum]
+  exact (sup_eq_right.mpr (sup_le hn hm)).symm
+
+/-- The order dimension of the stock lexicographic image of a tagged union is the
+maximum of the factor dimensions and their sum plus one in `WithBot ℕ∞`.
+The separate factor terms retain the other dimension when either set is empty,
+even at infinite dimension. All subtypes inherit the given preorders. -/
+theorem Order.krullDim_toLex_sum
+    {α : Type u₁} {β : Type v₁} [Preorder α] [Preorder β]
+    (s : Set α) (t : Set β) :
+    Order.krullDim ((toLex : α ⊕ β → α ⊕ₗ β) ''
+      ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)) =
+      Order.krullDim s ⊔ Order.krullDim t ⊔
+        (Order.krullDim s + Order.krullDim t + 1) := by
+  let L : Set (α ⊕ₗ β) := (toLex : α ⊕ β → α ⊕ₗ β) ''
+    ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t)
+  have hheight := Set.chainHeight_toLex_sum s t
+  change L.chainHeight (fun a b ↦ a < b) =
+    s.chainHeight (fun a b ↦ a < b) + t.chainHeight (fun a b ↦ a < b) at hheight
+  have hfinite (n : ℕ) (h : L.chainHeight (fun a b ↦ a < b) = (n + 1 : ℕ∞)) :
+      Order.krullDim L = ((n : ℕ∞) : WithBot ℕ∞) :=
+    le_antisymm ((Order.krullDim_le_iff_chainHeight_le L n).mpr h.le)
+      ((Order.le_krullDim_iff_le_chainHeight L n).mpr h.ge)
+  have htop (h : Order.krullDim s = ⊤ ∨ Order.krullDim t = ⊤) :
+      Order.krullDim L = Order.krullDim s ⊔ Order.krullDim t ⊔
+        (Order.krullDim s + Order.krullDim t + 1) := by
+    have hL : Order.krullDim L = ⊤ := krullDim_toLex_sum_eq_top s t h
+    rcases h with hs | ht
+    · simp [hL, hs]
+    · simp [hL, ht]
+  change Order.krullDim L = _
+  cases hs : Order.krullDim s with
+  | bot =>
+    have hs0 : s.chainHeight (fun a b ↦ a < b) = 0 :=
+      (Set.chainHeight_eq_zero_iff s _).mpr
+        (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp hs))
+    cases ht : Order.krullDim t with
+    | bot =>
+      have ht0 : t.chainHeight (fun a b ↦ a < b) = 0 :=
+        (Set.chainHeight_eq_zero_iff t _).mpr
+          (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp ht))
+      have hL0 : L.chainHeight (fun a b ↦ a < b) = 0 := by
+        simpa [hs0, ht0] using hheight
+      have hL : Order.krullDim L = ⊥ := Order.krullDim_eq_bot_iff.mpr
+        (Set.isEmpty_coe_sort.mpr ((Set.chainHeight_eq_zero_iff L _).mp hL0))
+      simpa [hs, ht] using hL
+    | coe d =>
+      cases d with
+      | top => simpa only [hs, ht] using htop (Or.inr ht)
+      | coe m =>
+        have htH : t.chainHeight (fun a b ↦ a < b) = (m + 1 : ℕ∞) :=
+          le_antisymm ((Order.krullDim_le_iff_chainHeight_le t m).mp ht.le)
+            ((Order.le_krullDim_iff_le_chainHeight t m).mp ht.ge)
+        have hL := hfinite m (by simpa [hs0, htH] using hheight)
+        simpa [hs, ht] using hL
+  | coe d =>
+    cases d with
+    | top => simpa only [hs] using htop (Or.inl hs)
+    | coe n =>
+      cases ht : Order.krullDim t with
+      | bot =>
+        have ht0 : t.chainHeight (fun a b ↦ a < b) = 0 :=
+          (Set.chainHeight_eq_zero_iff t _).mpr
+            (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp ht))
+        have hsH : s.chainHeight (fun a b ↦ a < b) = (n + 1 : ℕ∞) :=
+          le_antisymm ((Order.krullDim_le_iff_chainHeight_le s n).mp hs.le)
+            ((Order.le_krullDim_iff_le_chainHeight s n).mp hs.ge)
+        have hL := hfinite n (by simpa [hsH, ht0] using hheight)
+        simpa [hs, ht] using hL
+      | coe e =>
+        cases e with
+        | top => simpa only [hs, ht] using htop (Or.inr ht)
+        | coe m =>
+          have hs' : Order.krullDim s = (n : WithBot ℕ∞) := by
+            simpa only [ENat.WithBot.coe_eq_natCast] using hs
+          have ht' : Order.krullDim t = (m : WithBot ℕ∞) := by
+            simpa only [ENat.WithBot.coe_eq_natCast] using ht
+          simpa only [hs, ht] using
+            Order.krullDim_toLex_sum_of_eq_nat s t n m hs' ht'
+
+end LexicographicSum
