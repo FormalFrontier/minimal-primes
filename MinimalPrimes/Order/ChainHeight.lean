@@ -67,6 +67,17 @@ left, whereas the empty supremum of heights is zero. Nondirected joins can incre
 on three points, the relations with edges `0 → 1, 0 → 2` and `1 → 2` each have height two,
 but their join has height three. Loops and directed cycles are allowed.
 
+## Disjoint sums
+
+For `Sum.LiftRel rα rβ`, no left-tagged point compares with a right-tagged point in either
+direction. The chain height of the tagged union is therefore the maximum of the factor
+heights. `Set.chainHeight_sum` specializes this to the ordinary sum less-than relation induced
+by exactly the two given less-than structures. No relation laws are required.
+
+More generally, `Set.chainHeight_union_of_not_rel` gives the maximum formula for two sets
+on one carrier when points in their exclusive pieces `s \ t` and `t \ s` cannot compare in
+either direction. Comparisons involving the intersection and all loops are unrestricted.
+
 ## Proof strategy
 
 Products of comparable subsets give the lower bound by cardinal multiplication and ENat suprema.
@@ -90,6 +101,13 @@ containment in one directed relation preserves the same comparable subset. Natur
 bounds handle unbounded finite heights without choosing an infinite or longest chain. The
 false-relation baseline accounts for empty indexed families and chains of size at most one.
 
+For disjoint sums and the no-cross union formula, any comparable subset of the union lies
+in one piece: a point outside the first piece forces every other point into the second.
+The empty subset needs no chosen point. Taking the defining supremum of cardinalities gives
+the upper maximum bound, and subset monotonicity gives both lower bounds. The stock factor
+relation embeddings and whole image-height transport identify the tagged-piece heights.
+This does not require a longest or infinite chain.
+
 ## References
 
 The proof uses Mathlib's chain-height and finite-witness API in `Mathlib.Order.Height`
@@ -107,6 +125,9 @@ The Scott-continuity predicate and complete-lattice characterization are from
 (Christopher Hoskin). Relation monotonicity of comparable subsets uses `IsChain.mono_rel`
 from `Mathlib.Order.Preorder.Chain` (Johannes Hölzl).
 Finiteness of comparison pairs uses `Mathlib.Basic.Finite.Prod` (Kyle Miller).
+The disjoint-sum formula reuses `RelEmbedding.sumLiftRelInl/Inr` and the whole
+`Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs, with the cross-tag
+negation lemmas from Lean's Sum relation API and `Sum.lt_def` for the ordinary-sum specialization.
 -/
 
 @[expose] public section
@@ -394,5 +415,65 @@ theorem chainHeight_iSup_of_directed
     exact heq.trans (sup_eq_right.mpr hbot).symm
   · have : IsEmpty ι := ⟨fun i ↦ hi ⟨i⟩⟩
     simp only [iSup_of_empty, sup_bot_eq]
+
+/-- Chain height takes the maximum on a union when points in its two exclusive pieces
+cannot compare across those pieces. Comparisons involving the intersection and all loops
+are unrestricted. -/
+theorem chainHeight_union_of_not_rel
+    {α : Type u} (r : α → α → Prop) (s t : Set α)
+    (h : ∀ a ∈ s \ t, ∀ b ∈ t \ s, ¬ r a b ∧ ¬ r b a) :
+    (s ∪ t).chainHeight r = max (s.chainHeight r) (t.chainHeight r) := by
+  classical
+  apply le_antisymm
+  · rw [Set.chainHeight_eq_iSup]
+    refine iSup_le fun c ↦ ?_
+    by_cases hcs : c.1 ⊆ s
+    · exact (Set.encard_le_chainHeight_of_isChain s c.1 hcs c.2.2).trans
+        (le_max_left _ _)
+    · obtain ⟨a, hac, has⟩ := Set.not_subset.mp hcs
+      have hat : a ∈ t := (c.2.1 hac).resolve_left has
+      have hct : c.1 ⊆ t := by
+        intro b hbc
+        by_cases hbt : b ∈ t
+        · exact hbt
+        · have hbs : b ∈ s := (c.2.1 hbc).resolve_right hbt
+          have hba : b ≠ a := fun hba ↦ has (hba ▸ hbs)
+          obtain ⟨hab, hba'⟩ := h b ⟨hbs, hbt⟩ a ⟨hat, has⟩
+          exact ((c.2.2 hbc hac hba).elim hab hba').elim
+      exact (Set.encard_le_chainHeight_of_isChain t c.1 hct c.2.2).trans
+        (le_max_right _ _)
+  · exact max_le
+      (Set.chainHeight_mono r s (s ∪ t) Set.subset_union_left)
+      (Set.chainHeight_mono r t (s ∪ t) Set.subset_union_right)
+
+/-- The chain height of the union of the two tagged images under the disjoint sum relation
+is the maximum of the factor chain heights. The relations are arbitrary, and either set or
+ambient type may be empty. -/
+theorem chainHeight_sum_liftRel
+    {α : Type u} {β : Type v} (rα : α → α → Prop) (rβ : β → β → Prop)
+    (s : Set α) (t : Set β) :
+    ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t).chainHeight
+        (Sum.LiftRel rα rβ) = max (s.chainHeight rα) (t.chainHeight rβ) := by
+  calc
+    _ = max (((Sum.inl : α → α ⊕ β) '' s).chainHeight (Sum.LiftRel rα rβ))
+        (((Sum.inr : β → α ⊕ β) '' t).chainHeight (Sum.LiftRel rα rβ)) := by
+      apply chainHeight_union_of_not_rel
+      rintro _ ⟨⟨a, _, rfl⟩, _⟩ _ ⟨⟨b, _, rfl⟩, _⟩
+      exact ⟨Sum.not_liftRel_inl_inr, Sum.not_liftRel_inr_inl⟩
+    _ = _ := congrArg₂ max
+      (Set.chainHeight_eq_of_relEmbedding s (RelEmbedding.sumLiftRelInl rα rβ))
+      (Set.chainHeight_eq_of_relEmbedding t (RelEmbedding.sumLiftRelInr rα rβ))
+
+/-- The chain height of the union of the two tagged images in the ordinary sum is the maximum
+of the factor chain heights. The less-than relation is induced by `Sum.instLTSum` from the given
+less-than structures on the factors; no relation laws or nonemptiness are required. -/
+theorem chainHeight_sum
+    {α : Type u} {β : Type v} [LT α] [LT β] (s : Set α) (t : Set β) :
+    ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t).chainHeight
+        (fun x y : α ⊕ β => x < y) =
+      max (s.chainHeight (fun x y : α => x < y))
+        (t.chainHeight (fun x y : β => x < y)) := by
+  simpa only [Sum.lt_def] using
+    chainHeight_sum_liftRel (fun x y : α => x < y) (fun x y : β => x < y) s t
 
 end Set

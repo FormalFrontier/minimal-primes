@@ -8,6 +8,24 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Chain cardinalities of disjoint sums
+
+For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
+sets `s`, `t`, [`Set.chainHeight_sum_liftRel`](MinimalPrimes/Order/ChainHeight.lean)
+gives chain height `max (s.chainHeight rα) (t.chainHeight rβ)` for the union of the
+two tagged images under `Sum.LiftRel rα rβ`. No cross-tag points compare.
+[`Set.chainHeight_sum`](MinimalPrimes/Order/ChainHeight.lean) gives the same formula
+for ordinary `α ⊕ β` less-than, induced by precisely the two given `LT` records.
+Neither result requires relation laws, nonemptiness, finiteness or attainment.
+
+The heights are `ENat` vertex cardinalities: two nonempty antichains have disjoint-sum
+height one, unlike lexicographic-sum height two. Empty factors contribute zero;
+unbounded finite heights are included without assuming an infinite or longest chain.
+The supporting `Set.chainHeight_union_of_not_rel` gives the maximum formula on one
+carrier whenever no point in `s \ t` compares in either direction with a point in `t \ s`.
+Comparisons involving the intersection and all diagonal loops are unrestricted. The proof
+bounds each chain inside one piece, reusing Mathlib's embeddings and image-height transport.
+
 ### Finite localization near a minimal prime
 
 For a finite-type algebra over any commutative ring, module finiteness of the
