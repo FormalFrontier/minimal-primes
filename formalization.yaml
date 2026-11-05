@@ -41,6 +41,9 @@ project:
     transports minimality over arbitrary ideals without finiteness of the index.
     The finite classification includes empty indices, subsingleton factors and whole
     base ideals, and retains the labels of repeated isomorphic factors.
+    For arbitrary finite sets and WithBot ℕ∞ values, the bottom-aware successor of
+    the nonempty-subset product sum equals the product of successors in ℕ∞,
+    including empty indices and arbitrary bottom and top values.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
@@ -172,8 +175,13 @@ status:
     A given Algebra R S that is integral and faithful gives
     ringKrullDim R = ringKrullDim S. These statements use the full WithBot ℕ∞
     codomain, including bottom for the zero ring and top for infinite dimension.
+    The finite-product successor identity uses WithBot ℕ∞ products and sums over
+    nonempty subsets, with equality in ℕ∞ and no index equality, nonempty-index,
+    nonbottom or finite-value hypothesis.
   sorry_count: 0
   main_results:
+    - declaration: ENat.WithBot.succ_sum_powerset_nonempty
+      file: MinimalPrimes/Data/ENat/BigOperators.lean
     - declaration: Order.krullDim_toLex_sigma
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: PrimeSpectrum.piHomeomorphUltrafilter
@@ -223,4 +231,6 @@ acknowledgements: >-
   The finite-support Sigma dimension formula consumes that whole height formula and the
   earlier Formal Frontier dimension/height finite cuts, with Mathlib's bottom-aware
   successor and finite-sum arithmetic.
+  The scalar successor identity reuses Mathlib's whole finite-product expansion
+  Finset.prod_add_one, finite-sum single-point separation and WithBot coercion APIs.
   AI agents developed the Lean code and examples.

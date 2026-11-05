@@ -9,6 +9,7 @@ public import MinimalPrimes.IrreducibleComponents
 public import MinimalPrimes.Principal
 public import MinimalPrimes.AssociatedRestrictScalars
 public import MinimalPrimes.AssociatedPrincipal
+public import MinimalPrimes.Data.ENat.BigOperators
 public import MinimalPrimes.Order.ChainHeight
 public import MinimalPrimes.Order.FiniteHeightChain
 public import MinimalPrimes.Order.KrullDimension

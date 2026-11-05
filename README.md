@@ -8,6 +8,16 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Successors of finite product expansions
+
+For arbitrary `ι : Type u`, `J : Finset ι` and `d : ι → WithBot ℕ∞`,
+[`ENat.WithBot.succ_sum_powerset_nonempty`](MinimalPrimes/Data/ENat/BigOperators.lean)
+states that the bottom-aware successor of the sum of `∏ i ∈ U, d i` over nonempty
+subsets `U` of `J` equals `∏ i ∈ J, WithBot.succ (d i)`. The equality is in `ℕ∞`;
+the subset products and their sum are in `WithBot ℕ∞`. Empty `J` and arbitrary
+bottom and top values are included, with no decidable-equality premise on `ι`.
+The proof reuses Mathlib's whole finite-product expansion `Finset.prod_add_one`.
+
 ### Chain cardinalities of unions
 
 For an arbitrary relation `r` and subsets `s`, `t` of any type,
@@ -1168,6 +1178,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
+| [`MinimalPrimes.Data.ENat.BigOperators`](MinimalPrimes/Data/ENat/BigOperators.lean) | Bottom-aware successors of nonempty-subset product expansions, including empty indices and arbitrary bottom/top values. |
 | [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for disjoint cross-comparable unions and lexicographic tagged sums, finite-sum suprema for dependent lexicographic sums over active index chains, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
