@@ -968,6 +968,22 @@ Both equalities use `WithBot ℕ∞`, including bottom for an empty-index cover 
 empty space and infinite or unbounded dimensions. No separation, sobriety,
 Noetherianity, quasi-compactness, finiteness or nonemptiness assumption is needed.
 
+### Topological dimension on locally finite closed covers
+
+The [closed-cover leaf](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) states
+`topologicalKrullDim_eq_iSup_of_isClosedEmbedding_cover`: the dimension is the
+supremum of the dimensions of the given domains of a jointly surjective family of
+closed embeddings, provided the original indexed family of images is locally finite.
+The ambient, index and domain universes are independent. Its closed-subspace form,
+`topologicalKrullDim_eq_iSup_of_locallyFinite_isClosed_cover`, uses the ordinary
+membership subtypes with their induced topologies. Both equalities are in
+`WithBot ℕ∞`, including empty covers and unbounded dimensions, without separation,
+sobriety, Noetherianity, quasi-compactness, nonemptiness or attainment assumptions.
+
+The supporting containment theorem applies to any irreducible set, not necessarily
+closed. The characteristic range theorem for the existing `IrreducibleCloseds.map`
+and closed-embedding height invariance use the canonical inclusion orders.
+
 ## Using the library
 
 Add the public library to your `lakefile.toml`:
@@ -1197,6 +1213,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter`](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean) | Stone homeomorphism for arbitrary dependent products of semifields, basis transport and dense coordinate primes. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
+| [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers; irreducible containment and the existing map's range and height. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations
