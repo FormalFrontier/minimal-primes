@@ -41,6 +41,10 @@ sum of its fibre dimensions. These formulas include empty factors and infinite
 dimensions. In `WithBot ℕ∞`, bottom absorbs addition, so an empty factor gives bottom
 even when another factor has top dimension. An empty-index product has dimension
 zero. These are pointwise order products, not lexicographic or topological products.
+For an arbitrary dependent product, its dimension is the supremum of the dimensions
+of its finite coordinate-restriction images, each with the inherited pointwise order.
+The restriction maps have the original full product as domain, so an empty full
+product makes every image empty, including at the empty coordinate set.
 
 The order dimension of an indexed union of upper sets is the supremum of the
 dimensions of its pieces. The order-dual statement holds for lower sets. The
@@ -142,6 +146,11 @@ Mathlib's finite-subcover theorem captures the finitely many strict-coordinate t
 of a given finite series. Its `Function.updateFinset` fills outside a finite set with
 the supplied section, and strict-map rank monotonicity gives the opposite inequality.
 Only strict-edge tests are captured, not all differences between series vertices.
+The arbitrary product dimension formula composes this point-height supremum with
+Mathlib's dimension-as-supremum-of-heights formula. A range witness supplies a full
+section for finite updates, giving the lower lifting needed for height transport
+from a restriction image to its ambient finite product. Surjective range factorization
+reindexes the point supremum, including when the original product is empty.
 For directed unions, the finite ambient-value range of each strict series fits in one piece;
 restricting those same values preserves its length and the inherited order. This uses the
 defining `WithBot ℕ∞` supremum, without a nonemptiness premise or a longest chain.
@@ -806,6 +815,50 @@ theorem Order.krullDim_pi
       hfin _ _
     _ = ∑ i, Order.krullDim (α i) :=
       e.sum_comp (fun i ↦ Order.krullDim (α i))
+
+/-- The dimension of a dependent pointwise product of preorders is the supremum of
+its finite coordinate-restriction image dimensions in `WithBot ℕ∞`. Each image has
+its inherited pointwise subtype order. If the full product is empty, every image
+is empty, including the empty-coordinate image; an empty ambient index gives zero. -/
+theorem Order.krullDim_pi_eq_iSup_range_restrict
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)] :
+    Order.krullDim (∀ i, β i) =
+      ⨆ J : Finset ι,
+        Order.krullDim (Set.range
+          (fun f : (∀ i, β i) => fun j : J => f j.1)) := by
+  classical
+  calc
+    Order.krullDim (∀ i, β i) =
+        ⨆ f : (∀ i, β i), ⨆ J : Finset ι,
+          (Order.height (Set.rangeFactorization (J.restrict (π := β)) f) : WithBot ℕ∞) := by
+      rw [Order.krullDim_eq_iSup_height]
+      refine iSup_congr fun f => ?_
+      -- Only the finite-set index is known to be inhabited; the point index may be empty.
+      rw [Order.height_pi_eq_iSup_finset, WithBot.coe_iSup (OrderTop.bddAbove _)]
+      refine iSup_congr fun J => ?_
+      have hfinite : Order.height (J.restrict f) = ∑ i ∈ J, Order.height (f i) := by
+        rw [Order.height_pi]
+        exact Finset.sum_coe_sort J (fun i => Order.height (f i))
+      rw [← hfinite]
+      apply congrArg (fun d : ℕ∞ => (d : WithBot ℕ∞))
+      symm
+      refine Order.height_eq_of_strictMono
+        (fun g : Set.range (J.restrict (π := β)) => g.1) (fun _ _ h => h) ?_ _
+      intro a b hba
+      -- This point's range witness supplies the original section for filling outside J.
+      obtain ⟨g, _⟩ := a.property
+      exact ⟨⟨b, ⟨Function.updateFinset g J b, Function.restrict_updateFinset g b⟩⟩,
+        hba, rfl⟩
+    _ = ⨆ J : Finset ι, ⨆ f : (∀ i, β i),
+          (Order.height (Set.rangeFactorization (J.restrict (π := β)) f) : WithBot ℕ∞) :=
+      iSup_comm
+    _ = ⨆ J : Finset ι,
+        Order.krullDim (Set.range
+          (fun f : (∀ i, β i) => fun j : J => f j.1)) := by
+      refine iSup_congr fun J => ?_
+      rw [Order.krullDim_eq_iSup_height]
+      exact Set.rangeFactorization_surjective.iSup_comp
+        (fun g : Set.range (J.restrict (π := β)) => (Order.height g : WithBot ℕ∞))
 
 section LexicographicSum
 

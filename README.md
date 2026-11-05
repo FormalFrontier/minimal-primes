@@ -56,6 +56,30 @@ rank three. The proofs compose the binary rank identities with Mathlib's
 order-isomorphism rank invariance, canonical finite-Pi head/tail splitting and
 reindexing, and finite-sum formulas.
 
+### Dimension from finite coordinate-restriction images
+
+For arbitrary `ι : Type u` and independently universed given preorders
+`β : ι → Type v`,
+[`Order.krullDim_pi_eq_iSup_range_restrict`](MinimalPrimes/Order/KrullDimension.lean)
+states
+
+```lean
+Order.krullDim (∀ i, β i) =
+  ⨆ J : Finset ι,
+    Order.krullDim (Set.range
+      (fun f : (∀ i, β i) => fun j : J => f j.1))
+```
+
+The equality is in `WithBot ℕ∞`. Every range has the inherited ordinary pointwise
+subtype order, and every restriction starts from the original full product.
+Thus an empty full product makes every image empty, even for `J = ∅`, giving
+bottom on both sides. An empty ambient index instead gives dimension zero.
+No nonemptiness, finite-index, finite-fibre, antisymmetry, finite-rank,
+attainment or finite-support hypothesis is required; an infinite supremum need
+not be attained by a finite image. These are not lexicographic or topological
+products. The proof combines the point-height formulas above with Mathlib's
+height transport, finite updates and surjective range reindexing.
+
 ### Chain cardinalities of unions
 
 For an arbitrary relation `r` and subsets `s`, `t` of any type,
@@ -1014,6 +1038,9 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   infinite ranks and rank zero for an empty index. For arbitrary dependent products,
   `Order.height_pi_eq_iSup_finset` and `Order.coheight_pi_eq_iSup_finset` give the
   supremum of finite coordinate-rank sums, with no finite-support hypothesis.
+  `Order.krullDim_pi_eq_iSup_range_restrict` expresses the dimension of an arbitrary
+  dependent product as the supremum of its finite restriction-image dimensions,
+  retaining empty images when the full product is empty.
   The binary formulas are
   `Order.height_prod` and `Order.coheight_prod`.
   `Order.krullDim_prod` and `Order.krullDim_pi` give the dimension of binary

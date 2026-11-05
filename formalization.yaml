@@ -48,6 +48,9 @@ project:
     the height and coheight of a supplied section in the original pointwise order
     are the suprema of finite coordinate-rank sums in ENat. For finite indices these
     are the coordinate sums, including empty indices and infinite ranks.
+    The dimension of an arbitrary dependent pointwise product is the supremum of
+    its finite coordinate-restriction image dimensions, with inherited subtype orders.
+    An empty full product makes every image empty, including at the empty coordinate set.
     Over a finite linearly ordered index, their canonical lexicographic point ranks
     are sums of original coordinate ranks weighted by the whole later fibres'
     strict-chain vertex heights, with the same suffix priority for height and coheight.
@@ -243,6 +246,14 @@ status:
     finite coordinate-rank sums in ENat. The finite-index formulas remain coordinate
     sums. Empty indices and infinite or unattained ranks are included, without
     antisymmetry, fibre inhabitation, finite-height or finite-support hypotheses.
+    The dimension of an arbitrary dependent pointwise product is the supremum in
+    WithBot ENat of the dimensions of the ranges of its finite coordinate restrictions.
+    Each range retains the inherited pointwise subtype order and has the original
+    full product as the restriction domain. An empty full product makes all images
+    empty, including the empty-coordinate image, and gives bottom; an empty ambient
+    index gives zero. No nonemptiness, finiteness, antisymmetry, finite-rank,
+    attainment or finite-support hypothesis is required. An infinite supremum need
+    not be attained by a finite image. No topological product formula is asserted.
     For an original index ι : Type u with Fintype and LinearOrder, independently
     universed arbitrary given fibre preorders β : ι → Type v and a given section f,
     height (toLex f) is the sum of height (f i) times the product over original j > i
@@ -269,6 +280,8 @@ status:
     empty pieces and unbounded unattained heights are included.
   sorry_count: 0
   main_results:
+    - declaration: Order.krullDim_pi_eq_iSup_range_restrict
+      file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.height_toLex_pi
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.coheight_toLex_pi
@@ -357,7 +370,10 @@ acknowledgements: >-
   Mathlib's order-isomorphism rank invariance, canonical finite-Pi splitting and
   reindexing, and finite-sum APIs. The arbitrary pointwise rank formulas reuse those
   finite identities with Mathlib's finite-subcover, restriction, finite-update,
-  strict-series and strict-map rank APIs.
+  strict-series and strict-map rank APIs. The arbitrary pointwise dimension formula
+  further uses its dimension-as-supremum-of-heights, lower-lifting height transport,
+  finite updates and surjective range-factorization APIs. These restriction and finite-update
+  interfaces are Mathlib work by Johannes Hölzl and Floris van Doorn.
   The finite dependent lexicographic point-rank formulas reuse Mathlib's PiLex and
   strict-order constructions credited above, its point-rank and finite-chain APIs
   by Jujian Zhang, Fangming Li and Joachim Breitner, chain-height APIs by Andrew Yang

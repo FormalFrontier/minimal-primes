@@ -84,3 +84,19 @@ private theorem lex_middle_point_ranks :
       show Set.Ioi (1 : Fin 3) = {2} from Set.ext (by decide),
       ← Set.encard_eq_chainHeight_of_isChain _ IsChain.singleton, Set.encard_singleton]
   norm_num [Order.height_toLex_prod, Order.coheight_toLex_prod, hwhole, hheight, hcoheight]
+
+-- A finite restriction image is bounded using the product dimension formula.
+private theorem krullDim_range_restrict_le
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)] (J : Finset ι) :
+    Order.krullDim (Set.range (J.restrict (π := β))) ≤ Order.krullDim (∀ i, β i) := by
+  rw [Order.krullDim_pi_eq_iSup_range_restrict (β := β)]
+  exact le_iSup (fun K : Finset ι => Order.krullDim (Set.range
+    (fun f : (∀ i, β i) => fun j : K => f j.1))) J
+
+-- Original sections give range witnesses; comparison is the inherited weak relation.
+private theorem range_restrict_le_iff
+    {ι : Type u} {β : ι → Type v} [∀ i, Preorder (β i)]
+    (J : Finset ι) (f g : ∀ i, β i) :
+    (⟨J.restrict f, Set.mem_range_self f⟩ : Set.range (J.restrict (π := β))) ≤
+        (⟨J.restrict g, Set.mem_range_self g⟩ : Set.range (J.restrict (π := β))) ↔
+      ∀ j : J, f j.1 ≤ g j.1 := Iff.rfl
