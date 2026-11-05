@@ -1062,7 +1062,7 @@ The index and coefficient universes are independent; improper filters, empty ind
 and trivial monoids are included. These are zero-annihilator criteria, not full
 multiplicative cancellation criteria. The generic API is a Mathlib-upstream candidate.
 
-### Topological dimension under inducing maps and open covers
+### Topological dimension under inducing maps and covers
 
 The [inducing-map and open-cover module](MinimalPrimes/Topology/KrullDimension/OpenCover.lean)
 proves `Topology.IsInducing.topologicalKrullDim_eq`: an inducing surjection between
@@ -1079,6 +1079,33 @@ any family of open sets whose union is the whole space, with their induced topol
 Both equalities use `WithBot ℕ∞`, including bottom for an empty-index cover of the
 empty space and infinite or unbounded dimensions. No separation, sobriety,
 Noetherianity, quasi-compactness, finiteness or nonemptiness assumption is needed.
+
+For `ι : Type u`, `X : Type v`, `Y : ι → Type w`, and `I : Finset ι`,
+`topologicalKrullDim_le_iSup_of_isInducing_finset_cover` states
+
+```lean
+topologicalKrullDim X ≤
+  ⨆ J ∈ I.powerset, ⨆ (_ : J.Nonempty),
+    (∑ i ∈ J, topologicalKrullDim (Y i)) + ((J.card - 1 : ℕ) : WithBot ℕ∞)
+```
+
+The hypotheses are `∀ i ∈ I, Topology.IsInducing (f i)` and
+`∀ x : X, ∃ i ∈ I, ∃ y : Y i, f i y = x` for `f : ∀ i, Y i → X`.
+All original topologies are retained, with independent index, ambient and domain
+universes. No global finiteness of the index, injectivity, separation, sobriety,
+Noetherianity, nonemptiness, finite dimension or attaining chain is assumed.
+Empty families give bottom, and mixed empty pieces are handled by the supremum
+over subfamilies. Subtraction is in `ℕ` before casting. The two point subspaces of
+Sierpiński space show that a maximum bound is false and the additive penalty is sharp.
+The order-theoretic finite-cover bound supplies the powerset expression.
+
+The characteristic lemmas
+`TopologicalSpace.IrreducibleCloseds.map_le_map_iff_of_isInducing` and
+`TopologicalSpace.IrreducibleCloseds.mem_range_map_iff_of_isInducing` concern Mathlib's
+existing closure-image map, not a different map. For inducing `f`, it reflects
+inclusion, and an ambient irreducible closed `Z` belongs to its range exactly when
+`closure ((Z : Set X) ∩ Set.range f) = (Z : Set X)`. These properties apply to
+noninjective maps and identify the chart orders used in the finite-cover bound.
 
 ### Topological dimension on closed covers and components
 
@@ -1346,7 +1373,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; connected-component fibre formula; irreducible containment and the existing map's range and height. |
-| [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension under inducing maps and on open covers. |
+| [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension under inducing maps, finite inducing covers and open covers. |
 
 ## Conventions and limitations
 
