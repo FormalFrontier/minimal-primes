@@ -7,8 +7,10 @@ module
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 public import Mathlib.Order.Directed
 public import Mathlib.Order.KrullDimension
+public import MinimalPrimes.Order.ChainHeight
 
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.List.Sort
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Lattice.Order
 import Mathlib.Order.Fin.Tuple
@@ -36,6 +38,12 @@ not the topological dimension of an arbitrary subspace.
 The same supremum formula holds for inclusion-directed unions of arbitrary subsets.
 Here too all subtypes inherit the given ambient preorder, with no antisymmetry,
 nonemptiness or finite-dimensionality requirement.
+
+The union formula also holds when opposite exclusive pieces have no strict
+comparisons for every ordered pair of indices. The family need not be inclusion-directed.
+The finite-cut comparisons with `Set.chainHeight` account for its vertex-count convention:
+a dimension lower bound of `n` corresponds to a strict-chain height lower bound of `n + 1`.
+Empty sets have dimension bottom and chain height zero.
 
 For any preorder, the dimension of its nonminimal or nonmaximal locus, plus one,
 is at most the ambient dimension. The dimension of the original interior, plus
@@ -75,6 +83,12 @@ height suprema, order equivalences and extended-natural sum formulas.
 For directed unions, the finite ambient-value range of each strict series fits in one piece;
 restricting those same values preserves its length and the inherited order. This uses the
 defining `WithBot ℕ∞` supremum, without a nonemptiness premise or a longest chain.
+The exclusive-piece union formula uses the relation-family theorem in
+`MinimalPrimes.Order.ChainHeight`. The finite-cut comparisons relate Mathlib's strict-series
+witnesses to its chain-cardinality witnesses in `Mathlib.Order.Height` (Andrew Yang and
+Vlad Tsyrklevich). Finite strict chains are enumerated using the inherited weak relation and
+Mathlib's relational list-sorting API in `Mathlib.Data.List.Sort` (Jeremy Avigad and
+Wrenna Robson), then converted with `RelSeries.fromListIsChain`.
 The directed-family predicate is from `Mathlib.Order.Directed` (Johannes Hölzl and Yaël Dillies),
 and finite containment and finite ranges are from `Mathlib.Data.Set.Finite.Lattice` and
 `Mathlib.Data.Set.Finite.Range` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
@@ -320,6 +334,123 @@ theorem Order.krullDim_iUnion_of_directed
     have hq : (p.length : WithBot ℕ∞) ≤ Order.krullDim (s i) :=
       Order.LTSeries.length_le_krullDim q
     exact le_iSup_of_le i hq
+  · refine iSup_le fun i ↦ ?_
+    exact Order.krullDim_le_of_strictMono
+      (fun x : s i ↦
+        (⟨x.1, Set.mem_iUnion.mpr ⟨i, x.2⟩⟩ : ⋃ j, s j))
+      (fun _ _ h ↦ h)
+
+private theorem exists_ltSeries_of_isChain
+    {α : Type u} [Preorder α] {s : Set α} {n : ℕ}
+    (hcard : s.encard = (n + 1 : ℕ∞)) (hc : IsChain (fun a b : α ↦ a < b) s) :
+    ∃ p : LTSeries s, p.length = n := by
+  classical
+  let := (Set.finite_of_encard_eq_coe hcard).fintype
+  -- A strict chain makes the inherited weak relation total.
+  let : Std.Total (fun a b : s ↦ a ≤ b) := ⟨fun a b ↦ by
+    by_cases hab : a = b
+    · exact Or.inl (le_of_eq hab)
+    · exact (hc a.property b.property (fun h ↦ hab (Subtype.ext h))).imp
+        le_of_lt le_of_lt⟩
+  let l : List s := (Finset.univ : Finset s).toList.mergeSort (· ≤ ·)
+  have hle : l.Pairwise (· ≤ ·) := List.pairwise_mergeSort' _ _
+  have hne : l.Nodup := (List.mergeSort_perm _ _).nodup_iff.mpr
+    (Finset.nodup_toList _)
+  have hlt : l.IsChain (· < ·) := by
+    rw [List.isChain_iff_pairwise]
+    refine (hle.and hne).imp ?_
+    intro a b hab
+    exact (hc a.property b.property (fun h ↦ hab.2 (Subtype.ext h))).resolve_right
+      (not_lt_of_ge hab.1)
+  have hlen : l.length = n + 1 := by
+    apply ENat.natCast_inj.mp
+    calc
+      (l.length : ℕ∞) = (Fintype.card s : ℕ∞) := by simp [l]
+      _ = s.encard := Set.coe_fintypeCard s
+      _ = (n + 1 : ℕ∞) := hcard
+  have hlne : l ≠ [] := by
+    intro h
+    have := congrArg List.length h
+    simp [hlen] at this
+  exact ⟨RelSeries.fromListIsChain l hlne hlt, by simp [hlen]⟩
+
+/-- A natural dimension lower bound on an inherited subtype is equivalent to the
+corresponding strict-chain vertex bound. The empty subtype satisfies neither bound. -/
+theorem Order.le_krullDim_iff_le_chainHeight
+    {α : Type u} [Preorder α] (s : Set α) (n : ℕ) :
+    ((n : ℕ∞) : WithBot ℕ∞) ≤ Order.krullDim s ↔
+      (n + 1 : ℕ∞) ≤ Set.chainHeight s (fun a b : α ↦ a < b) := by
+  classical
+  rw [show ((n : ℕ∞) : WithBot ℕ∞) = (n : WithBot ℕ∞) from rfl,
+    Order.le_krullDim_iff]
+  constructor
+  · rintro ⟨p, hp⟩
+    let f : Fin (p.length + 1) → α := fun i ↦ (p i).val
+    have hf : StrictMono f := fun _ _ hij ↦ p.strictMono hij
+    have hsub : Set.range f ⊆ s := by
+      rintro _ ⟨i, rfl⟩
+      exact (p i).property
+    have hc : IsChain (fun a b : α ↦ a < b) (Set.range f) := by
+      rintro _ ⟨i, rfl⟩ _ ⟨j, rfl⟩ hij
+      rcases lt_trichotomy i j with h | h | h
+      · exact Or.inl (hf h)
+      · exact (hij (congrArg f h)).elim
+      · exact Or.inr (hf h)
+    simpa [hf.injective.encard_range, ENat.card_eq_coe_fintype_card, hp] using
+      Set.encard_le_chainHeight_of_isChain s (Set.range f) hsub hc
+  · intro h
+    obtain ⟨t, hts, hcard, hc⟩ := Set.exists_isChain_of_le_chainHeight (n + 1) h
+    obtain ⟨p, hp⟩ := exists_ltSeries_of_isChain hcard hc
+    exact ⟨p.map (fun x : t ↦ (⟨x.val, hts x.property⟩ : s))
+      (fun _ _ hij ↦ hij), hp⟩
+
+/-- A finite dimension upper bound on an inherited subtype is equivalent to the
+corresponding strict-chain vertex bound, including the empty subtype. -/
+theorem Order.krullDim_le_iff_chainHeight_le
+    {α : Type u} [Preorder α] (s : Set α) (n : ℕ) :
+    Order.krullDim s ≤ ((n : ℕ∞) : WithBot ℕ∞) ↔
+      Set.chainHeight s (fun a b : α ↦ a < b) ≤ (n + 1 : ℕ∞) := by
+  rw [← not_lt, ← not_lt]
+  apply not_congr
+  calc
+    ((n : ℕ∞) : WithBot ℕ∞) < Order.krullDim s ↔
+        (((n + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) ≤ Order.krullDim s := by
+      simpa only [Nat.cast_add, Nat.cast_one, WithBot.coe_add,
+        WithBot.coe_natCast, WithBot.coe_one] using
+        (ENat.WithBot.add_one_le_iff (n := n) (m := Order.krullDim s)).symm
+    _ ↔ ((n + 1 : ℕ) : ℕ∞) + 1 ≤ Set.chainHeight s (fun a b : α ↦ a < b) :=
+      Order.le_krullDim_iff_le_chainHeight s (n + 1)
+    _ ↔ (n + 1 : ℕ∞) < Set.chainHeight s (fun a b : α ↦ a < b) := by
+      rw [ENat.natCast_add_one_le_iff, Nat.cast_add, Nat.cast_one]
+
+/-- The dimension of an indexed union is the supremum of the piece dimensions when
+opposite exclusive pieces have no strict comparisons. All subtypes inherit the given
+preorder, and empty unions have dimension bottom. -/
+theorem Order.krullDim_iUnion_of_not_lt
+    {α : Type u} [Preorder α] {ι : Sort v}
+    (s : ι → Set α)
+    (h : ∀ i j, ∀ a ∈ s i \ s j, ∀ b ∈ s j \ s i, ¬ a < b) :
+    Order.krullDim (⋃ i, s i) = ⨆ i, Order.krullDim (s i) := by
+  apply le_antisymm
+  · cases hdim : (⨆ i, Order.krullDim (s i)) with
+    | bot =>
+      have hpiece (i : ι) : IsEmpty (s i) := by
+        apply Order.krullDim_eq_bot_iff.mp
+        apply le_bot_iff.mp
+        simpa only [hdim] using (le_iSup (fun j ↦ Order.krullDim (s j)) i)
+      have : IsEmpty (⋃ i, s i) := ⟨fun x ↦ by
+        obtain ⟨i, hi⟩ := Set.mem_iUnion.mp x.property
+        exact (hpiece i).false ⟨x.1, hi⟩⟩
+      exact Order.krullDim_eq_bot.le
+    | coe d =>
+      cases d with
+      | top => exact le_top
+      | coe n =>
+        apply (Order.krullDim_le_iff_chainHeight_le (⋃ i, s i) n).mpr
+        rw [Set.chainHeight_iUnion_of_not_rel s (fun a b : α ↦ a < b) h]
+        refine iSup_le fun i ↦ ?_
+        apply (Order.krullDim_le_iff_chainHeight_le (s i) n).mp
+        simpa only [hdim] using (le_iSup (fun j ↦ Order.krullDim (s j)) i)
   · refine iSup_le fun i ↦ ?_
     exact Order.krullDim_le_of_strictMono
       (fun x : s i ↦

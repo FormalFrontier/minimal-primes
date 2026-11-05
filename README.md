@@ -37,6 +37,24 @@ chain satisfy the hypothesis but no piece contains their union.
 The retained `Set.chainHeight_union_of_not_rel` is the Bool-family corollary, giving
 the two-piece maximum formula with the same exclusive-piece hypothesis.
 
+### Krull dimension of exclusive-piece unions
+
+For a given preorder on `α : Type u`, an arbitrary independent `ι : Sort v`, and
+`s : ι → Set α`,
+[`Order.krullDim_iUnion_of_not_lt`](MinimalPrimes/Order/KrullDimension.lean) states
+`Order.krullDim (⋃ i, s i) = ⨆ i, Order.krullDim (s i)` when points in
+`s i \ s j` and `s j \ s i` satisfy `¬ a < b` for every ordered pair `i,j`.
+All membership subtypes inherit the given preorder. No antisymmetry, inhabitation,
+finiteness, directedness or attainment is assumed.
+
+The finite-cut comparisons `Order.le_krullDim_iff_le_chainHeight` and
+`Order.krullDim_le_iff_chainHeight_le` relate dimension bounds `n : ℕ` to
+strict-chain height bounds `n + 1`, without assuming finite height. Dimension lies
+in `WithBot ℕ∞` and counts strict steps, whereas chain height lies in `ℕ∞` and
+counts vertices. Empty sets have values bottom and zero, singletons zero and one,
+and unbounded finite chains give top. These generic order interfaces are
+Mathlib-upstream candidates.
+
 ### Chain cardinalities of disjoint sums
 
 For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
