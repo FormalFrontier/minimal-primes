@@ -8,6 +8,21 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Directed suprema of relations on a fixed set
+
+For any type `α` and fixed subset `s`,
+[`Set.scottContinuous_chainHeight`](MinimalPrimes/Order/ChainHeight.lean) states that
+`r ↦ s.chainHeight r` is Scott continuous for the pointwise implication order on relations
+`α → α → Prop`. No order or relation laws on `α` are needed. Scott continuity preserves
+suprema of **nonempty directed** families, not arbitrary joins or bottom.
+
+For a directed family `r : ι → α → α → Prop`, with independent `ι : Sort v`,
+[`Set.chainHeight_iSup_of_directed`](MinimalPrimes/Order/ChainHeight.lean) gives
+`H(⨆ i, r i) = H(⊥) ⊔ ⨆ i, H(r i)`, where `H(r) = s.chainHeight r` takes values in
+`ENat` and `⊔` is maximum. The false-relation baseline is zero for empty `s` and one
+otherwise; it is essential when `ι` is empty. The proof captures all distinct-point
+comparisons of a finite chain in one relation, without sorting or assuming attainment.
+
 ### Directed unions: chain cardinality and order dimension
 
 For an inclusion-directed family `s : ι → Set α`, with independent carrier and
@@ -909,7 +924,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | Scott continuity for directed relation suprema on a fixed set, the empty-family false-relation baseline, ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
@@ -978,6 +993,11 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- Scott continuity of chain height in the relation uses Mathlib's Scott-continuity
+  predicate and complete-lattice characterization (Christopher Hoskin), chain relation
+  transport (Johannes Hölzl), finite chain witnesses, finite products (Kyle Miller),
+  and directed finite containment; see the
+  [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
 - The directed-union formulas combine Mathlib's finite chain witnesses and strict
   relation series with its directed-range and finite-set containment APIs; see the
   [chain-height](MinimalPrimes/Order/ChainHeight.lean) and

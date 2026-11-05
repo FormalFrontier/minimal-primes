@@ -8,6 +8,8 @@ public import Mathlib.Data.Prod.Lex
 public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.Height
+public import Mathlib.Order.ScottContinuity.Complete
+import Mathlib.Basic.Finite.Prod
 import Mathlib.Data.Set.Card.Arithmetic
 
 /-!
@@ -51,6 +53,20 @@ For an inclusion-directed family of sets, the chain height of the union is the s
 its pieces' chain heights. The relation is arbitrary, and the index may be any sort, including
 an empty one; in that case both sides are zero.
 
+## Directed suprema of relations
+
+For a fixed subset, chain height is Scott continuous as a function of the relation, ordered by
+pointwise implication. Scott continuity tests nonempty directed sets of relations, not arbitrary
+joins or the empty supremum. No order or relation laws on the carrier are required.
+
+For an indexed directed family of relations, including an empty family, the height of the
+pointwise supremum is the join of the height of the false relation and the supremum of the
+members' heights. The false-relation baseline is zero on the empty subset and one on any
+nonempty subset. In particular, a singleton subset and an empty index have height one on the
+left, whereas the empty supremum of heights is zero. Nondirected joins can increase height:
+on three points, the relations with edges `0 → 1, 0 → 2` and `1 → 2` each have height two,
+but their join has height three. Loops and directed cycles are allowed.
+
 ## Proof strategy
 
 Products of comparable subsets give the lower bound by cardinal multiplication and ENat suprema.
@@ -68,6 +84,12 @@ For directed unions, every finite positive chain-cardinality witness fits in one
 A point of the witness supplies the local nonempty range needed by the finite-containment
 theorem; the zero bound requires no index. Testing all natural lower bounds also handles top.
 
+For directed relation suprema, a finite chain witness requires simultaneous capture of all
+comparisons between distinct points, not just the points or successive edges. Finite
+containment in one directed relation preserves the same comparable subset. Natural-number
+bounds handle unbounded finite heights without choosing an infinite or longest chain. The
+false-relation baseline accounts for empty indexed families and chains of size at most one.
+
 ## References
 
 The proof uses Mathlib's chain-height and finite-witness API in `Mathlib.Order.Height`
@@ -80,6 +102,11 @@ in `Mathlib.Data.Sum.Order` (Yaël Dillies), and Mathlib's tagged-set partition 
 disjoint-cardinality addition APIs. The directed-family predicate is from `Mathlib.Order.Directed`
 (Johannes Hölzl and Yaël Dillies). Finite containment in directed unions uses
 `Mathlib.Data.Set.Finite.Lattice` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
+The Scott-continuity predicate and complete-lattice characterization are from
+`Mathlib.Order.ScottContinuity` and `Mathlib.Order.ScottContinuity.Complete`
+(Christopher Hoskin). Relation monotonicity of comparable subsets uses `IsChain.mono_rel`
+from `Mathlib.Order.Preorder.Chain` (Johannes Hölzl).
+Finiteness of comparison pairs uses `Mathlib.Basic.Finite.Prod` (Kyle Miller).
 -/
 
 @[expose] public section
@@ -294,5 +321,78 @@ theorem chainHeight_toLex_sum
         (Sum.Lex (fun x y : α => x < y) (fun x y : β => x < y)) :=
       chainHeight_eq_of_relIso _ (Sum.Lex.toLexRelIsoLT (α := α) (β := β))
     _ = _ := chainHeight_sum_lex _ _ s t
+
+/-- On a fixed subset, chain height is Scott continuous in the relation ordered by pointwise
+implication. Scott continuity preserves suprema of nonempty directed sets of relations; it
+requires neither bottom preservation nor preservation of nondirected joins. -/
+theorem scottContinuous_chainHeight
+    {α : Type u} (s : Set α) :
+    ScottContinuous (fun r : α → α → Prop => s.chainHeight r) := by
+  have hmono : Monotone (Set.chainHeight s) := by
+    intro r r' hrr'
+    rw [Set.chainHeight_eq_iSup s r]
+    refine iSup_le fun t ↦ ?_
+    exact Set.encard_le_chainHeight_of_isChain s t.1 t.2.1
+      (t.2.2.mono_rel fun a b hab ↦ hrr' a b hab)
+  apply ScottContinuous.of_map_sSup
+  intro d hdne hd
+  apply le_antisymm
+  · refine ENat.forall_natCast_le_iff_le.mp fun n hn ↦ ?_
+    obtain ⟨t, hts, hcard, htchain⟩ := Set.exists_isChain_of_le_chainHeight n hn
+    have htfin : t.Finite := Set.finite_of_encard_eq_coe hcard
+    -- Capture all off-diagonal comparisons in one relation, without sorting the chain.
+    let C (q : α → α → Prop) : Set (α × α) :=
+      {p | q p.1 p.2 ∨ q p.2 p.1}
+    let p : Set (α × α) := {p | p.1 ∈ t ∧ p.2 ∈ t ∧ p.1 ≠ p.2}
+    have hpfin : p.Finite :=
+      (htfin.prod htfin).subset fun _ hp ↦ ⟨hp.1, hp.2.1⟩
+    have hCmono : Monotone C := by
+      intro q q' hqq' a ha
+      exact ha.imp (hqq' _ _) (hqq' _ _)
+    have hCdir : DirectedOn (· ⊆ ·) (C '' d) := hd.mono_comp hCmono
+    have hpc : p ⊆ ⋃₀ (C '' d) := by
+      rintro ⟨a, b⟩ ⟨ha, hb, hne⟩
+      rcases htchain ha hb hne with hab | hba
+      · obtain ⟨q, hq, hab⟩ := (binary_relation_sSup_iff d).mp hab
+        exact Set.mem_sUnion.mpr ⟨C q, ⟨q, hq, rfl⟩, Or.inl hab⟩
+      · obtain ⟨q, hq, hba⟩ := (binary_relation_sSup_iff d).mp hba
+        exact Set.mem_sUnion.mpr ⟨C q, ⟨q, hq, rfl⟩, Or.inr hba⟩
+    obtain ⟨_, ⟨q, hq, rfl⟩, hpq⟩ :=
+      DirectedOn.exists_mem_subset_of_finite_of_subset_sUnion
+        (hdne.image C) hCdir hpfin hpc
+    have htq : IsChain q t := by
+      intro a ha b hb hne
+      exact hpq (show (a, b) ∈ p from ⟨ha, hb, hne⟩)
+    calc
+      (n : ENat) = t.encard := hcard.symm
+      _ ≤ s.chainHeight q := Set.encard_le_chainHeight_of_isChain s t hts htq
+      _ ≤ sSup ((fun r : α → α → Prop ↦ s.chainHeight r) '' d) :=
+        le_sSup ⟨q, hq, rfl⟩
+  · refine sSup_le ?_
+    rintro _ ⟨q, hq, rfl⟩
+    exact hmono (le_sSup hq)
+
+/-- The chain height of a directed pointwise supremum of relations is the join of the
+false-relation height and the supremum of the members' heights. The index may be any sort,
+including an empty one; no order or relation laws on the carrier are required. -/
+theorem chainHeight_iSup_of_directed
+    {α : Type u} {ι : Sort v}
+    (s : Set α) (r : ι → α → α → Prop) (hr : Directed (· ≤ ·) r) :
+    s.chainHeight (⨆ i, r i) =
+      s.chainHeight (⊥ : α → α → Prop) ⊔ ⨆ i, s.chainHeight (r i) := by
+  classical
+  by_cases hi : Nonempty ι
+  · obtain ⟨i⟩ := hi
+    have heq : s.chainHeight (⨆ i, r i) = ⨆ i, s.chainHeight (r i) := by
+      simpa only [← Set.range_comp, sSup_range, Function.comp_def] using
+        (scottContinuous_chainHeight s).map_sSup
+          (show (Set.range r).Nonempty from ⟨r i, ⟨i, rfl⟩⟩) hr.directedOn_range
+    have hbot : s.chainHeight (⊥ : α → α → Prop) ≤ ⨆ i, s.chainHeight (r i) :=
+      ((scottContinuous_chainHeight s).monotone
+        (show (⊥ : α → α → Prop) ≤ r i from bot_le)).trans
+          (le_iSup (fun i ↦ s.chainHeight (r i)) i)
+    exact heq.trans (sup_eq_right.mpr hbot).symm
+  · have : IsEmpty ι := ⟨fun i ↦ hi ⟨i⟩⟩
+    simp only [iSup_of_empty, sup_bot_eq]
 
 end Set
