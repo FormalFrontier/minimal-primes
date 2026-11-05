@@ -13,12 +13,15 @@ import Mathlib.Basic.Finite.Prod
 import Mathlib.Data.Set.Card.Arithmetic
 
 /-!
-# Chain heights of lexicographic products, sums and directed unions
+# Chain heights of unions, lexicographic products and sums
 
 `Set.chainHeight` is the supremum in `ENat` of the cardinalities of subsets whose distinct
 points are pairwise comparable for a given relation. It counts vertices, not steps, dimensions
 or ordinal ranks. Pairwise comparability does not imply transitivity or a linear ordering by the
 relation.
+
+The chain height of a union is at most the sum of the chain heights of its pieces, with no
+relation laws required. The pieces may overlap or be empty, and infinite heights are allowed.
 
 For the relation `Prod.Lex rα rβ`, comparison uses `rα` in the first coordinate or equality of
 first coordinates together with `rβ` in the second. The chain height of a product of sets is the
@@ -86,10 +89,14 @@ its fibres. The first projection is a comparable subset, and local first irrefle
 each fibre a comparable subset for the second relation. This argument never sorts a chain or
 assumes either relation is transitive.
 
-For sums, the two tagged slices of a comparable subset are comparable for the respective factor
-relations. Their tagged images partition the subset, so their cardinalities add. Conversely,
-the tagged union of two factor chains is a chain because every cross pair compares. Taking the
-two suprema gives the addition formula without choosing a longest or infinite chain.
+For unions, intersect a comparable subset with the two pieces. Each restriction remains
+comparable, and their union is the original subset. Cardinality subadditivity and the two
+piece-height bounds give the upper bound without any relation laws.
+
+For lexicographic sums, the union bound and relation-embedding transport give the sum of the
+factor heights as an upper bound. Conversely, the tagged union of two factor chains is a chain
+because every cross pair compares. Taking the two suprema gives the addition formula without
+choosing a longest or infinite chain.
 
 For directed unions, every finite positive chain-cardinality witness fits in one piece.
 A point of the witness supplies the local nonempty range needed by the finite-containment
@@ -114,20 +121,22 @@ The proof uses Mathlib's chain-height and finite-witness API in `Mathlib.Order.H
 (Andrew Yang and Vlad Tsyrklevich), relation embeddings in `Mathlib.Order.RelIso.Basic`
 (Mario Carneiro and contributors), finite-union cardinality bounds in
 `Mathlib.Data.Set.Card.Arithmetic` (Pim Otte), and its set-cardinality, lexicographic product
-and ENat supremum APIs. The sum formula uses the sum relation API in Lean's `Init.Data.Sum.Basic`
+and ENat supremum APIs. The union bound uses `Set.encard_union_le` from `Mathlib.Data.Set.Card`
+(Peter Nelson). The sum formula uses the sum relation API in Lean's `Init.Data.Sum.Basic`
 (Mario Carneiro and Yury G. Kudryashov), the canonical lexicographic sum and relation isomorphism
-in `Mathlib.Data.Sum.Order` (Yaël Dillies), and Mathlib's tagged-set partition and
-disjoint-cardinality addition APIs. The directed-family predicate is from `Mathlib.Order.Directed`
+in `Mathlib.Data.Sum.Order` (Yaël Dillies), and Mathlib's disjoint-cardinality addition API.
+The directed-family predicate is from `Mathlib.Order.Directed`
 (Johannes Hölzl and Yaël Dillies). Finite containment in directed unions uses
 `Mathlib.Data.Set.Finite.Lattice` (Johannes Hölzl, Mario Carneiro and Kyle Miller).
 The Scott-continuity predicate and complete-lattice characterization are from
 `Mathlib.Order.ScottContinuity` and `Mathlib.Order.ScottContinuity.Complete`
-(Christopher Hoskin). Relation monotonicity of comparable subsets uses `IsChain.mono_rel`
-from `Mathlib.Order.Preorder.Chain` (Johannes Hölzl).
+(Christopher Hoskin). Restriction and relation monotonicity of comparable subsets use
+`IsChain.mono` and `IsChain.mono_rel` from `Mathlib.Order.Preorder.Chain` (Johannes Hölzl).
 Finiteness of comparison pairs uses `Mathlib.Basic.Finite.Prod` (Kyle Miller).
-The disjoint-sum formula reuses `RelEmbedding.sumLiftRelInl/Inr` and the whole
-`Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs, with the cross-tag
-negation lemmas from Lean's Sum relation API and `Sum.lt_def` for the ordinary-sum specialization.
+The sum formulas reuse `RelEmbedding.sumLexInl/Inr`, `RelEmbedding.sumLiftRelInl/Inr` and the
+whole `Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs. The disjoint-sum
+formula also uses the cross-tag negation lemmas from Lean's Sum relation API and `Sum.lt_def`
+for the ordinary-sum specialization.
 -/
 
 @[expose] public section
@@ -275,6 +284,25 @@ theorem chainHeight_toLex_prod
         (RelIso.ofOnFun (fun x y : α ×ₗ β => x < y) toLex)
     _ = _ := chainHeight_prod_lex _ _ s t (fun a _ => irrefl a)
 
+/-- The chain height of a union is at most the sum of the chain heights of its pieces.
+The relation is arbitrary, the pieces may overlap, and either piece or the ambient type
+may be empty. -/
+theorem chainHeight_union_le
+    {α : Type u} (r : α → α → Prop) (s t : Set α) :
+    (s ∪ t).chainHeight r ≤ s.chainHeight r + t.chainHeight r := by
+  rw [Set.chainHeight_eq_iSup]
+  refine iSup_le fun c ↦ ?_
+  calc
+    c.1.encard = (c.1 ∩ s ∪ c.1 ∩ t).encard := by
+      rw [← Set.inter_union_distrib_left, Set.inter_eq_left.mpr c.2.1]
+    _ ≤ (c.1 ∩ s).encard + (c.1 ∩ t).encard := Set.encard_union_le _ _
+    _ ≤ s.chainHeight r + t.chainHeight r :=
+      add_le_add
+        (Set.encard_le_chainHeight_of_isChain s _ Set.inter_subset_right
+          (c.2.2.mono Set.inter_subset_left))
+        (Set.encard_le_chainHeight_of_isChain t _ Set.inter_subset_right
+          (c.2.2.mono Set.inter_subset_left))
+
 /-- Chain heights add for the union of the two tagged images under the lexicographic sum
 relation. The relations are arbitrary: neither irreflexivity nor transitivity is required, and
 either set or ambient type may be empty. -/
@@ -289,28 +317,13 @@ theorem chainHeight_sum_lex
     rw [Set.encard_union_eq Set.disjoint_image_inl_image_inr,
       Sum.inl_injective.encard_image, Sum.inr_injective.encard_image]
   apply le_antisymm
-  · rw [Set.chainHeight_eq_iSup]
-    refine iSup_le fun c ↦ ?_
-    have hleftsub : (Sum.inl : α → α ⊕ β) ⁻¹' c.1 ⊆ s := by
-      simpa only [Set.preimage_union, Set.preimage_image_eq s Sum.inl_injective,
-        Set.preimage_inl_image_inr, Set.union_empty] using
-        (Set.preimage_mono (f := (Sum.inl : α → α ⊕ β)) c.2.1)
-    have hrightsub : (Sum.inr : β → α ⊕ β) ⁻¹' c.1 ⊆ t := by
-      simpa only [Set.preimage_union, Set.preimage_image_eq t Sum.inr_injective,
-        Set.preimage_inr_image_inl, Set.empty_union] using
-        (Set.preimage_mono (f := (Sum.inr : β → α ⊕ β)) c.2.1)
-    calc
-      c.1.encard =
-          ((Sum.inl : α → α ⊕ β) '' (Sum.inl ⁻¹' c.1) ∪
-            (Sum.inr : β → α ⊕ β) '' (Sum.inr ⁻¹' c.1)).encard :=
-        congrArg Set.encard (Set.image_preimage_inl_union_image_preimage_inr c.1).symm
-      _ = (Sum.inl ⁻¹' c.1).encard + (Sum.inr ⁻¹' c.1).encard := hcard _ _
-      _ ≤ s.chainHeight rα + t.chainHeight rβ :=
-        add_le_add
-          (Set.encard_le_chainHeight_of_isChain s _ hleftsub
-            (c.2.2.preimage_relEmbedding (RelEmbedding.sumLexInl rα rβ)))
-          (Set.encard_le_chainHeight_of_isChain t _ hrightsub
-            (c.2.2.preimage_relEmbedding (RelEmbedding.sumLexInr rα rβ)))
+  · calc
+      _ ≤ ((Sum.inl : α → α ⊕ β) '' s).chainHeight (Sum.Lex rα rβ) +
+          ((Sum.inr : β → α ⊕ β) '' t).chainHeight (Sum.Lex rα rβ) :=
+        chainHeight_union_le (Sum.Lex rα rβ) _ _
+      _ = _ := congrArg₂ (· + ·)
+        (Set.chainHeight_eq_of_relEmbedding s (RelEmbedding.sumLexInl rα rβ))
+        (Set.chainHeight_eq_of_relEmbedding t (RelEmbedding.sumLexInr rα rβ))
   · -- The empty chains inhabit the supremum indices even when the factors are empty.
     have : Nonempty {a : Set α // a ⊆ s ∧ IsChain rα a} :=
       ⟨⟨∅, Set.empty_subset s, IsChain.empty⟩⟩

@@ -8,6 +8,15 @@ dimension and associated-prime comparisons.
 
 ## Headline results
 
+### Chain cardinalities of unions
+
+For an arbitrary relation `r` and subsets `s`, `t` of any type,
+[`Set.chainHeight_union_le`](MinimalPrimes/Order/ChainHeight.lean) gives
+`(s ∪ t).chainHeight r ≤ s.chainHeight r + t.chainHeight r`.
+The pieces may overlap or be empty; neither relation laws nor finite heights or
+attainment are required. The proof restricts each comparable subset to its two
+intersections and uses `ENat` cardinality subadditivity.
+
 ### Chain cardinalities of disjoint sums
 
 For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
@@ -98,9 +107,10 @@ less-than relation on `α ⊕ₗ β`, using only the given `LT` records on both 
 The heights count vertices in `ENat`: two singleton blocks, or two nonempty
 antichains, give height two. The disjoint relation `Sum.LiftRel`, used by ordinary
 Sum less-than, is different. Empty factors contribute zero, including beside top.
-The proof splits arbitrary chains into their tagged preimages and glues factor
-chains by the cross comparison; it neither sorts chains nor assumes their heights
-are attained. Unbounded finite chain cardinalities are included.
+The upper bound uses the general union inequality and Mathlib's relation-embedding
+transport. The lower bound glues factor chains by the cross comparison; neither
+argument sorts chains or assumes their heights are attained. Unbounded finite
+chain cardinalities are included.
 
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
