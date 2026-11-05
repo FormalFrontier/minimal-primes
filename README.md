@@ -71,6 +71,17 @@ gives equality: `(s ∪ t).chainHeight r = s.chainHeight r + t.chainHeight r`.
 Cross comparisons need not have a consistent direction. The binary lexicographic-sum
 formula below reuses this common-ambient union result.
 
+For an arbitrary relation `q : X → X → Prop`, family `P : κ → Set X` and
+`J : Finset κ`, the finite-family formula
+[`Set.chainHeight_biUnion_finset_of_disjoint_of_cross`](MinimalPrimes/Order/ChainHeight.lean)
+states
+`(⋃ i ∈ J, P i).chainHeight q = ∑ i ∈ J, (P i).chainHeight q`.
+Pairwise disjointness and cross comparability are required **only on `J`**:
+for distinct `i,j ∈ J`, the pieces are disjoint and every point of `P i` compares
+with every point of `P j` in either direction. There are no relation laws,
+ambient finiteness, decidable-equality, nonemptiness or attainment assumptions.
+Empty pieces and unbounded, unattained chain heights are included.
+
 ### Chain cardinalities of exclusive-piece unions
 
 For an arbitrary relation `r` on `α : Type u` and a family `s : ι → Set α` with
@@ -390,7 +401,7 @@ two. The proofs combine the strict-segment identities with the existing whole
 lexicographic product, disjoint-union, singleton-slice and direction-reversal
 chain-height APIs.
 
-### Krull dimension of finite dependent lexicographic products
+### Dimension and point ranks of finite dependent lexicographic products
 
 For a finite linearly ordered index `ι : Type u`, independently universed given
 preorders `β : ι → Type v`, and subsets `s i`,
@@ -421,6 +432,46 @@ record with Mathlib's construction under the original fibre PartialOrder hypothe
 Prefixes use equality, not preorder equivalence: distinct equivalent fibre elements
 need not retain their weak comparisons, even at a singleton index. Thus dimension
 agreement does not assert an order isomorphism with a nonantisymmetric fibre.
+
+For the original index with `[Fintype ι] [LinearOrder ι]`, arbitrary given fibre
+preorders `β : ι → Type v` independent of the index universe, and a given section
+`f : ∀ i, β i`, the point-rank formulas
+[`Order.height_toLex_pi` and `Order.coheight_toLex_pi`](MinimalPrimes/Order/KrullDimension.lean)
+are
+
+```text
+height (toLex f)   = ∑ i, height (f i)   * ∏ j > i, H j
+coheight (toLex f) = ∑ i, coheight (f i) * ∏ j > i, H j
+H j = (Set.univ : Set (β j)).chainHeight (· < ·)
+```
+
+All arithmetic is in `ℕ∞`. The target is exactly the existing canonical
+`Pi.Lex.partialOrderOfLT` described above: equality or strict lexicographic
+comparison, with equality prefixes, not the pointwise order or the binary
+`Prod.Lex` weak fallback at the last coordinate. Every coordinate rank, strict
+comparison and whole-fibre height uses the **original given fibre preorder**.
+Both formulas use the **same suffix `j > i`**, with the original index priority.
+The weights count strict-chain vertices in whole later fibres, not their
+Krull dimensions, carrier cardinalities or the ranks of `f j`.
+
+No fibre partial order, linearity or finiteness, global fibre inhabitation,
+nonempty index, finite height, attainment, decidable equality, bounds, coherence
+or separate irreflexivity premise is required. Empty strict cuts give zero,
+including beside infinite suffix weights since `0 * ∞ = 0`; an empty index gives
+both ranks zero. Infinite heights may be unbounded without an attaining chain.
+A singleton index preserves point ranks, not necessarily the fibre's weak order.
+
+The [middle-section client](MinimalPrimesTest/Order/PiLexRanks.lean) uses `Fin 3`
+for both index and every fibre, with `f i = 1`. Both lexicographic ranks are
+`1 * 9 + 1 * 3 + 1 * 1 = 13`, while the original pointwise ranks are
+`1 + 1 + 1 = 3`. To distinguish priority, with first fibre `Fin 2`, second fibre
+`Fin 3` and point `(1,1)`, coheight is `0 * 3 + 1 = 1`, not the value
+`1 * 2 + 0 = 2` obtained by reversing priority.
+
+The proofs decompose the original strict lower and upper cones into first-change
+rectangles and compose the existing whole `Set.chainHeight_toLex_pi`, finite
+disjoint cross-comparable union addition and original strict-cone/point-rank
+bridges. They require no additional chain or enumeration construction.
 
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
@@ -1355,9 +1406,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
 | [`MinimalPrimes.Data.ENat.BigOperators`](MinimalPrimes/Data/ENat/BigOperators.lean) | Bottom-aware successors of nonempty-subset product expansions, including empty indices and arbitrary bottom/top values. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for disjoint cross-comparable unions and lexicographic tagged sums, finite-sum suprema for dependent lexicographic sums over active index chains, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for disjoint cross-comparable unions, finite families with hypotheses only on the chosen support, and lexicographic tagged sums, finite-sum suprema for dependent lexicographic sums over active index chains, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
-| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, strict-segment point ranks and weighted binary lexicographic height/coheight formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, strict-segment point ranks and weighted binary and finite dependent lexicographic height/coheight formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |
@@ -1456,6 +1507,14 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
   together with this library's whole product and disjoint cross-comparable union
   formulas. Strict-segment ranks retain the original preorder and its inherited
   interval orders; see the [order module](MinimalPrimes/Order/KrullDimension.lean).
+- Finite dependent lexicographic point ranks build on Chris Hughes's Mathlib
+  `Pi.Lex`, the strict-order and `partialOrderOfSO` interfaces of Jeremy Avigad,
+  Mario Carneiro and Yury Kudryashov, and the point-rank and finite-chain APIs of
+  Jujian Zhang, Fangming Li and Joachim Breitner. They reuse Mathlib's chain-height
+  formalization by Andrew Yang and Vlad Tsyrklevich and its Finset big operators,
+  together with the earlier Formal Frontier whole finite-PiLex cardinality,
+  disjoint cross-comparable union and strict-cone/point-rank APIs. The finite-family
+  union formula uses the same binary union core, with hypotheses on its finite support.
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
   propagation of zero powers and finite-set order bounds; see the

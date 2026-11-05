@@ -653,16 +653,25 @@ theorem chainHeight_toLex_sum
       chainHeight_eq_of_relIso _ (Sum.Lex.toLexRelIsoLT (α := α) (β := β))
     _ = _ := chainHeight_sum_lex _ _ s t
 
-private theorem chainHeight_biUnion_finset_of_disjoint_of_cross
-    {X : Type w} {κ : Type u} (q : X → X → Prop) (P : κ → Set X)
-    (hd : Pairwise fun i j ↦ Disjoint (P i) (P j))
-    (hcross : ∀ i j, i ≠ j → ∀ a ∈ P i, ∀ b ∈ P j, q a b ∨ q b a)
-    (J : Finset κ) :
+/-- Chain heights add over a finite family of pairwise disjoint sets whose cross pairs are
+comparable in either direction. Disjointness and cross comparability are required only for
+indices in `J`. The relation is arbitrary; empty pieces and infinite heights are allowed. -/
+theorem chainHeight_biUnion_finset_of_disjoint_of_cross
+    {X : Type w} {κ : Type u} (q : X → X → Prop) (P : κ → Set X) (J : Finset κ)
+    (hd : (↑J : Set κ).Pairwise (fun i j => Disjoint (P i) (P j)))
+    (hcross : ∀ i ∈ J, ∀ j ∈ J, i ≠ j → ∀ a ∈ P i, ∀ b ∈ P j, q a b ∨ q b a) :
     (⋃ i ∈ J, P i).chainHeight q = ∑ i ∈ J, (P i).chainHeight q := by
   classical
+  revert hd hcross
   induction J using Finset.induction_on with
   | empty => simp
   | @insert i J hi ih =>
+    intro hd hcross
+    have hJ := ih
+      (fun j hj k hk hjk ↦
+        hd (Finset.mem_insert_of_mem hj) (Finset.mem_insert_of_mem hk) hjk)
+      (fun j hj k hk hjk ↦
+        hcross j (Finset.mem_insert_of_mem hj) k (Finset.mem_insert_of_mem hk) hjk)
     have hdisj : Disjoint (P i) (⋃ j ∈ J, P j) := by
       refine Set.disjoint_left.mpr ?_
       intro x hxi hxJ
@@ -672,7 +681,8 @@ private theorem chainHeight_biUnion_finset_of_disjoint_of_cross
         intro hij
         subst j
         exact hi hj
-      exact Set.disjoint_left.mp (hd hij) hxi hxj
+      exact Set.disjoint_left.mp
+        (hd (Finset.mem_insert_self i J) (Finset.mem_insert_of_mem hj) hij) hxi hxj
     have hcomp : ∀ a ∈ P i, ∀ b ∈ ⋃ j ∈ J, P j, q a b ∨ q b a := by
       intro a ha b hb
       obtain ⟨j, hbj⟩ := Set.mem_iUnion.mp hb
@@ -681,9 +691,9 @@ private theorem chainHeight_biUnion_finset_of_disjoint_of_cross
         intro hij
         subst j
         exact hi hj
-      exact hcross i j hij a ha b hbj
+      exact hcross i (Finset.mem_insert_self i J) j (Finset.mem_insert_of_mem hj) hij a ha b hbj
     rw [Finset.set_biUnion_insert, Finset.sum_insert hi,
-      chainHeight_union_of_disjoint_of_cross q _ _ hdisj hcomp, ih]
+      chainHeight_union_of_disjoint_of_cross q _ _ hdisj hcomp, hJ]
 
 private theorem chainHeight_image_sigma_mk
     {ι : Type u} {α : ι → Type v}
@@ -772,9 +782,9 @@ theorem chainHeight_sigma_lex
   have hfinite (J : Finset ι) :
       (⋃ i ∈ J, P i).chainHeight (Sigma.Lex r R) =
         ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (R i) := by
-    rw [chainHeight_biUnion_finset_of_disjoint_of_cross (Sigma.Lex r R) P
-      (fun i j hij ↦ disjoint_image_sigma_mk S i j hij)
-      (sigma_lex_cross_images r R S hchain) J]
+    rw [chainHeight_biUnion_finset_of_disjoint_of_cross (Sigma.Lex r R) P J
+      (fun i _ j _ hij ↦ disjoint_image_sigma_mk S i j hij)
+      (fun i _ j _ hij ↦ sigma_lex_cross_images r R S hchain i j hij)]
     exact Finset.sum_congr rfl fun i _ ↦ chainHeight_image_sigma_mk r R S hirr i
   have hmono : Monotone (fun J : Finset ι ↦ ⋃ i ∈ J, P i) := by
     intro J K hJK x hx

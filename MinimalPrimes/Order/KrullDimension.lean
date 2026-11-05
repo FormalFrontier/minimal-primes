@@ -1235,6 +1235,199 @@ theorem Order.coheight_toLex_prod
         (Set.chainHeight_eq_of_relEmbedding (Set.Ioi b)
           (RelEmbedding.prodLexMkLeft ((· < ·) : β → β → Prop) (lt_irrefl a)))
 
+private theorem Order.mem_toLex_pi_prefix_iff
+    {ι : Type u} {β : ι → Type v} [LinearOrder ι]
+    (f : ∀ i, β i) (s : ∀ i, Set (β i)) (i : ι) (g : Lex (∀ i, β i)) :
+    g ∈ (toLex : (∀ i, β i) → Lex (∀ i, β i)) ''
+        Set.pi Set.univ (fun j ↦ if j < i then {f j} else if j = i then s j else Set.univ) ↔
+      (∀ j, j < i → g j = f j) ∧ g i ∈ s i := by
+  rw [Set.mem_image_equiv, toLex_symm_eq, Set.mem_univ_pi]
+  constructor
+  · intro h
+    constructor
+    · intro j hji
+      simpa only [ite_eq_left hji, Set.mem_singleton_iff, Pi.ofLex_apply] using h j
+    · simpa only [lt_self_iff_false, ite_false, ite_true, Pi.ofLex_apply] using h i
+  · rintro ⟨hp, hi⟩ j
+    by_cases hji : j < i
+    · simpa only [ite_eq_left hji, Set.mem_singleton_iff, Pi.ofLex_apply] using hp j hji
+    · by_cases hje : j = i
+      · subst j
+        simpa only [lt_self_iff_false, ite_false, ite_true, Pi.ofLex_apply] using hi
+      · simp only [ite_eq_right hji, ite_eq_right hje, Set.mem_univ]
+
+private theorem Order.chainHeight_toLex_pi_prefix
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    [∀ i, Preorder (β i)] (f : ∀ i, β i) (s : ∀ i, Set (β i)) (i : ι) :
+    ((toLex : (∀ i, β i) → Lex (∀ i, β i)) '' Set.pi Set.univ
+      (fun j ↦ if j < i then {f j} else if j = i then s j else Set.univ)).chainHeight
+        (fun x y : Lex (∀ i, β i) ↦ x < y) =
+      (s i).chainHeight (fun x y : β i ↦ x < y) *
+        (∏ j ∈ Finset.univ with i < j,
+          (Set.univ : Set (β j)).chainHeight (fun x y : β j ↦ x < y)) := by
+  let t : ∀ j, Set (β j) :=
+    fun j ↦ if j < i then {f j} else if j = i then s j else Set.univ
+  have hti : t i = s i := by simp [t]
+  have htleft (j : ι) (hji : j < i) :
+      (t j).chainHeight (fun x y : β j ↦ x < y) = 1 := by
+    rw [show t j = {f j} by simp only [t, ite_eq_left hji],
+      ← Set.encard_eq_chainHeight_of_isChain _ IsChain.singleton, Set.encard_singleton]
+  have htright (j : ι) (hij : i < j) : t j = Set.univ := by
+    simp only [t, ite_eq_right (not_lt_of_gt hij), ite_eq_right (ne_of_gt hij)]
+  calc
+    _ = ∏ j, (t j).chainHeight (fun x y : β j ↦ x < y) :=
+      Set.chainHeight_toLex_pi t (by intro g _ j _ _ _; exact lt_irrefl (g j))
+    _ = (s i).chainHeight (fun x y : β i ↦ x < y) *
+        ∏ j ∈ Finset.univ.erase i, (t j).chainHeight (fun x y : β j ↦ x < y) := by
+      rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i), hti]
+    _ = _ := by
+      congr 1
+      calc
+        _ = ∏ j ∈ Finset.univ with i < j,
+            (t j).chainHeight (fun x y : β j ↦ x < y) := by
+          symm
+          apply Finset.prod_subset
+          · intro j hj
+            exact Finset.mem_erase.mpr ⟨(Finset.mem_filter.mp hj).2.ne', Finset.mem_univ j⟩
+          · intro j hj hjnot
+            apply htleft
+            have hnot : ¬ i < j :=
+              fun hij ↦ hjnot (Finset.mem_filter.mpr ⟨Finset.mem_univ j, hij⟩)
+            exact lt_of_le_of_ne (le_of_not_gt hnot) (Finset.mem_erase.mp hj).1
+        _ = _ := Finset.prod_congr rfl fun j hj ↦
+          congrArg (fun a : Set (β j) ↦ a.chainHeight (fun x y : β j ↦ x < y))
+            (htright j (Finset.mem_filter.mp hj).2)
+
+/-- The height of a point in a finite dependent lexicographic product is the sum
+of its coordinate heights weighted by the strict-chain vertex heights of all later
+fibres. The given linear index order determines priority; prefixes use equality.
+The target has the canonical equality-or-strict lexicographic partial order.
+All coordinate ranks and strict comparisons use the original fibre preorders. -/
+theorem Order.height_toLex_pi
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    [∀ i, Preorder (β i)] (f : ∀ i, β i) :
+    Order.height (toLex f) =
+      ∑ i, Order.height (f i) *
+        (∏ j ∈ Finset.univ with i < j,
+          (Set.univ : Set (β j)).chainHeight (fun x y : β j => x < y)) := by
+  let s : ∀ i, Set (β i) := fun i ↦ Set.Iio (f i)
+  let B (i : ι) : Set (Lex (∀ i, β i)) :=
+    (toLex : (∀ i, β i) → Lex (∀ i, β i)) ''
+      Set.pi Set.univ (fun j ↦ if j < i then {f j} else if j = i then s j else Set.univ)
+  have hB (i : ι) (g : Lex (∀ i, β i)) :
+      g ∈ B i ↔ (∀ j, j < i → g j = f j) ∧ g i < f i :=
+    Order.mem_toLex_pi_prefix_iff f s i g
+  -- A strict lexicographic comparison supplies its own first-change index.
+  have hcone : Set.Iio (toLex f) = ⋃ i ∈ (Finset.univ : Finset ι), B i := by
+    ext g
+    constructor
+    · rintro ⟨i, hp, hi⟩
+      exact Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr
+        ⟨Finset.mem_univ i, (hB i g).mpr ⟨hp, hi⟩⟩⟩
+    · intro hg
+      obtain ⟨i, hg⟩ := Set.mem_iUnion.mp hg
+      obtain ⟨_, hg⟩ := Set.mem_iUnion.mp hg
+      obtain ⟨hp, hi⟩ := (hB i g).mp hg
+      exact ⟨i, hp, hi⟩
+  have hd : (↑(Finset.univ : Finset ι) : Set ι).Pairwise
+      (fun i k ↦ Disjoint (B i) (B k)) := by
+    intro i _ k _ hik
+    apply Set.disjoint_left.mpr
+    intro g hgi hgk
+    obtain ⟨hpi, hi⟩ := (hB i g).mp hgi
+    obtain ⟨hpk, hk⟩ := (hB k g).mp hgk
+    rcases lt_or_gt_of_ne hik with hik | hki
+    · exact (ne_of_lt hi) (hpk i hik)
+    · exact (ne_of_lt hk) (hpi k hki)
+  have hcross : ∀ i ∈ (Finset.univ : Finset ι), ∀ k ∈ (Finset.univ : Finset ι),
+      i ≠ k → ∀ a ∈ B i, ∀ b ∈ B k, a < b ∨ b < a := by
+    intro i _ k _ hik a ha b hb
+    obtain ⟨hpa, hai⟩ := (hB i a).mp ha
+    obtain ⟨hpb, hbk⟩ := (hB k b).mp hb
+    rcases lt_or_gt_of_ne hik with hik | hki
+    · left
+      refine ⟨i, fun j hj ↦ (hpa j hj).trans (hpb j (hj.trans hik)).symm, ?_⟩
+      simpa only [hpb i hik] using hai
+    · right
+      refine ⟨k, fun j hj ↦ (hpb j hj).trans (hpa j (hj.trans hki)).symm, ?_⟩
+      simpa only [hpa k hki] using hbk
+  rw [Order.height_eq_chainHeight_Iio, hcone]
+  refine (Set.chainHeight_biUnion_finset_of_disjoint_of_cross
+    (fun x y : Lex (∀ i, β i) ↦ x < y) B Finset.univ hd hcross).trans ?_
+  apply Finset.sum_congr rfl
+  intro i _
+  calc
+    _ = (Set.Iio (f i)).chainHeight (fun x y : β i ↦ x < y) *
+        (∏ j ∈ Finset.univ with i < j,
+          (Set.univ : Set (β j)).chainHeight (fun x y : β j ↦ x < y)) :=
+      Order.chainHeight_toLex_pi_prefix f s i
+    _ = _ := by rw [← Order.height_eq_chainHeight_Iio]
+
+/-- The coheight of a point in a finite dependent lexicographic product is the sum
+of its coordinate coheights weighted by the strict-chain vertex heights of all later
+fibres. The suffix and priority are the same as for height, not reversed.
+The target has the canonical equality-or-strict lexicographic partial order.
+All coordinate ranks and strict comparisons use the original fibre preorders. -/
+theorem Order.coheight_toLex_pi
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    [∀ i, Preorder (β i)] (f : ∀ i, β i) :
+    Order.coheight (toLex f) =
+      ∑ i, Order.coheight (f i) *
+        (∏ j ∈ Finset.univ with i < j,
+          (Set.univ : Set (β j)).chainHeight (fun x y : β j => x < y)) := by
+  let s : ∀ i, Set (β i) := fun i ↦ Set.Ioi (f i)
+  let B (i : ι) : Set (Lex (∀ i, β i)) :=
+    (toLex : (∀ i, β i) → Lex (∀ i, β i)) ''
+      Set.pi Set.univ (fun j ↦ if j < i then {f j} else if j = i then s j else Set.univ)
+  have hB (i : ι) (g : Lex (∀ i, β i)) :
+      g ∈ B i ↔ (∀ j, j < i → g j = f j) ∧ f i < g i :=
+    Order.mem_toLex_pi_prefix_iff f s i g
+  have hcone : Set.Ioi (toLex f) = ⋃ i ∈ (Finset.univ : Finset ι), B i := by
+    ext g
+    constructor
+    · rintro ⟨i, hp, hi⟩
+      exact Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr
+        ⟨Finset.mem_univ i, (hB i g).mpr ⟨fun j hj ↦ (hp j hj).symm, hi⟩⟩⟩
+    · intro hg
+      obtain ⟨i, hg⟩ := Set.mem_iUnion.mp hg
+      obtain ⟨_, hg⟩ := Set.mem_iUnion.mp hg
+      obtain ⟨hp, hi⟩ := (hB i g).mp hg
+      exact ⟨i, fun j hj ↦ (hp j hj).symm, hi⟩
+  have hd : (↑(Finset.univ : Finset ι) : Set ι).Pairwise
+      (fun i k ↦ Disjoint (B i) (B k)) := by
+    intro i _ k _ hik
+    apply Set.disjoint_left.mpr
+    intro g hgi hgk
+    obtain ⟨hpi, hi⟩ := (hB i g).mp hgi
+    obtain ⟨hpk, hk⟩ := (hB k g).mp hgk
+    rcases lt_or_gt_of_ne hik with hik | hki
+    · exact (ne_of_gt hi) (hpk i hik)
+    · exact (ne_of_gt hk) (hpi k hki)
+  -- Upper blocks reverse cross-comparison direction, not the index priority or weights.
+  have hcross : ∀ i ∈ (Finset.univ : Finset ι), ∀ k ∈ (Finset.univ : Finset ι),
+      i ≠ k → ∀ a ∈ B i, ∀ b ∈ B k, a < b ∨ b < a := by
+    intro i _ k _ hik a ha b hb
+    obtain ⟨hpa, hai⟩ := (hB i a).mp ha
+    obtain ⟨hpb, hbk⟩ := (hB k b).mp hb
+    rcases lt_or_gt_of_ne hik with hik | hki
+    · right
+      refine ⟨i, fun j hj ↦ (hpb j (hj.trans hik)).trans (hpa j hj).symm, ?_⟩
+      simpa only [hpb i hik] using hai
+    · left
+      refine ⟨k, fun j hj ↦ (hpa j (hj.trans hki)).trans (hpb j hj).symm, ?_⟩
+      simpa only [hpa k hki] using hbk
+  rw [Order.coheight_eq_chainHeight_Ioi, hcone]
+  refine (Set.chainHeight_biUnion_finset_of_disjoint_of_cross
+    (fun x y : Lex (∀ i, β i) ↦ x < y) B Finset.univ hd hcross).trans ?_
+  apply Finset.sum_congr rfl
+  intro i _
+  calc
+    _ = (Set.Ioi (f i)).chainHeight (fun x y : β i ↦ x < y) *
+        (∏ j ∈ Finset.univ with i < j,
+          (Set.univ : Set (β j)).chainHeight (fun x y : β j ↦ x < y)) :=
+      Order.chainHeight_toLex_pi_prefix f s i
+    _ = _ := by rw [← Order.coheight_eq_chainHeight_Ioi]
+
 private theorem enat_withBot_succ_injective :
     Function.Injective (WithBot.succ : WithBot ℕ∞ → ℕ∞) := by
   intro a b h
