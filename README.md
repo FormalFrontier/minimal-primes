@@ -17,6 +17,26 @@ The pieces may overlap or be empty; neither relation laws nor finite heights or
 attainment are required. The proof restricts each comparable subset to its two
 intersections and uses `ENat` cardinality subadditivity.
 
+### Chain cardinalities of exclusive-piece unions
+
+For an arbitrary relation `r` on `α : Type u` and a family `s : ι → Set α` with
+independent `ι : Sort v`,
+[`Set.chainHeight_iUnion_of_not_rel`](MinimalPrimes/Order/ChainHeight.lean) gives
+`(⋃ i, s i).chainHeight r = ⨆ i, (s i).chainHeight r` when points in
+`s i \ s j` and `s j \ s i` cannot compare for every ordered pair `i,j`.
+For each pair, the no-cross condition concerns only its opposite exclusive pieces;
+all loops remain unrestricted. The family need not be directed, finite or nonempty,
+and no relation laws or attainment are assumed.
+The heights are `ENat` vertex cardinalities: the empty union and empty supremum are
+zero, a singleton has height one, and unbounded finite chain sizes give top.
+
+The proof shows that the traces of each chain on the pieces are inclusion-directed
+and applies the existing directed-union formula to those traces. It does not choose
+one piece containing the whole chain: nested finite initial segments of an infinite
+chain satisfy the hypothesis but no piece contains their union.
+The retained `Set.chainHeight_union_of_not_rel` is the Bool-family corollary, giving
+the two-piece maximum formula with the same exclusive-piece hypothesis.
+
 ### Chain cardinalities of disjoint sums
 
 For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
@@ -30,10 +50,8 @@ Neither result requires relation laws, nonemptiness, finiteness or attainment.
 The heights are `ENat` vertex cardinalities: two nonempty antichains have disjoint-sum
 height one, unlike lexicographic-sum height two. Empty factors contribute zero;
 unbounded finite heights are included without assuming an infinite or longest chain.
-The supporting `Set.chainHeight_union_of_not_rel` gives the maximum formula on one
-carrier whenever no point in `s \ t` compares in either direction with a point in `t \ s`.
-Comparisons involving the intersection and all diagonal loops are unrestricted. The proof
-bounds each chain inside one piece, reusing Mathlib's embeddings and image-height transport.
+The proof specializes the exclusive-piece maximum formula above, reusing Mathlib's
+relation embeddings and image-height transport to identify the two tagged-piece heights.
 
 ### Finite localization near a minimal prime
 
@@ -962,7 +980,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | Scott continuity for directed relation suprema on a fixed set, the empty-family false-relation baseline, ENat chain-cardinality suprema for inclusion-directed unions, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
@@ -1031,6 +1049,11 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 
 ## References
 
+- The exclusive-piece union formula generalizes the earlier Formal Frontier binary
+  no-cross result, reusing its directed-union theorem and Mathlib's chain-height,
+  chain-cardinality, intersection and indexed-supremum APIs. The binary theorem is
+  retained as the Bool-indexed corollary; see the
+  [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
 - Scott continuity of chain height in the relation uses Mathlib's Scott-continuity
   predicate and complete-lattice characterization (Christopher Hoskin), chain relation
   transport (Johannes Hölzl), finite chain witnesses, finite products (Kyle Miller),

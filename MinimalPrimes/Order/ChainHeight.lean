@@ -77,9 +77,12 @@ direction. The chain height of the tagged union is therefore the maximum of the 
 heights. `Set.chainHeight_sum` specializes this to the ordinary sum less-than relation induced
 by exactly the two given less-than structures. No relation laws are required.
 
-More generally, `Set.chainHeight_union_of_not_rel` gives the maximum formula for two sets
-on one carrier when points in their exclusive pieces `s \ t` and `t \ s` cannot compare in
-either direction. Comparisons involving the intersection and all loops are unrestricted.
+More generally, `Set.chainHeight_iUnion_of_not_rel` gives the supremum formula for an
+arbitrary family of sets on one carrier when points in opposite exclusive pieces cannot
+compare. Its index may be any sort, including an empty one, and the original family need not
+be inclusion-directed. For each pair, the no-cross condition concerns only its opposite
+exclusive pieces; all loops remain unrestricted. The binary `Set.chainHeight_union_of_not_rel`
+is its two-piece maximum specialization.
 
 ## Proof strategy
 
@@ -108,12 +111,15 @@ containment in one directed relation preserves the same comparable subset. Natur
 bounds handle unbounded finite heights without choosing an infinite or longest chain. The
 false-relation baseline accounts for empty indexed families and chains of size at most one.
 
-For disjoint sums and the no-cross union formula, any comparable subset of the union lies
-in one piece: a point outside the first piece forces every other point into the second.
-The empty subset needs no chosen point. Taking the defining supremum of cardinalities gives
-the upper maximum bound, and subset monotonicity gives both lower bounds. The stock factor
-relation embeddings and whole image-height transport identify the tagged-piece heights.
-This does not require a longest or infinite chain.
+For exclusive-piece unions, the intersections of any comparable subset with the pieces are
+inclusion-comparable: witnesses to failure of both inclusions would contradict the no-cross
+hypothesis. These traces form a directed family with the same union as the comparable subset,
+so the directed-union formula and subset monotonicity bound its cardinality. No single piece
+need contain the entire chain; nested finite initial segments of an infinite chain illustrate
+why this is essential. Taking the defining supremum gives the upper bound, while inclusion of
+each piece gives the lower bound. The binary maximum formula is the Bool-indexed specialization.
+The disjoint-sum formulas then use the stock factor relation embeddings and whole image-height
+transport to identify the tagged-piece heights. No longest or infinite chain is chosen.
 
 ## References
 
@@ -133,6 +139,9 @@ The Scott-continuity predicate and complete-lattice characterization are from
 (Christopher Hoskin). Restriction and relation monotonicity of comparable subsets use
 `IsChain.mono` and `IsChain.mono_rel` from `Mathlib.Order.Preorder.Chain` (Johannes Hölzl).
 Finiteness of comparison pairs uses `Mathlib.Basic.Finite.Prod` (Kyle Miller).
+The exclusive-piece union proof generalizes the earlier Formal Frontier binary no-cross
+formalization, composing its directed-union theorem with Mathlib's chain-cardinality,
+intersection and indexed-supremum APIs. The binary specialization uses the Bool supremum API.
 The sum formulas reuse `RelEmbedding.sumLexInl/Inr`, `RelEmbedding.sumLiftRelInl/Inr` and the
 whole `Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs. The disjoint-sum
 formula also uses the cross-tag negation lemmas from Lean's Sum relation API and `Sum.lt_def`
@@ -429,6 +438,44 @@ theorem chainHeight_iSup_of_directed
   · have : IsEmpty ι := ⟨fun i ↦ hi ⟨i⟩⟩
     simp only [iSup_of_empty, sup_bot_eq]
 
+/-- The chain height of a union is the supremum of the heights of its pieces when points
+in opposite exclusive pieces cannot compare. Quantification over all ordered pairs of pieces
+excludes both comparison directions. The relation is arbitrary, and the index may be empty. -/
+theorem chainHeight_iUnion_of_not_rel
+    {α : Type u} {ι : Sort v}
+    (s : ι → Set α) (r : α → α → Prop)
+    (h : ∀ i j, ∀ a ∈ s i \ s j, ∀ b ∈ s j \ s i, ¬ r a b) :
+    (⋃ i, s i).chainHeight r = ⨆ i, (s i).chainHeight r := by
+  classical
+  apply le_antisymm
+  · rw [Set.chainHeight_eq_iSup]
+    refine iSup_le fun c ↦ ?_
+    have hdir : Directed (· ⊆ ·) (fun i ↦ c.1 ∩ s i) := by
+      intro i j
+      by_cases hij : c.1 ∩ s i ⊆ c.1 ∩ s j
+      · exact ⟨j, hij, Set.Subset.rfl⟩
+      · refine ⟨i, Set.Subset.rfl, ?_⟩
+        by_contra hji
+        obtain ⟨a, ha, haj⟩ := Set.not_subset.mp hij
+        obtain ⟨b, hb, hbi⟩ := Set.not_subset.mp hji
+        have hasj : a ∉ s j := fun hs ↦ haj ⟨ha.1, hs⟩
+        have hbsi : b ∉ s i := fun hs ↦ hbi ⟨hb.1, hs⟩
+        have hab : a ≠ b := fun hab ↦ hbsi (hab ▸ ha.2)
+        exact (c.2.2 ha.1 hb.1 hab).elim
+          (h i j a ⟨ha.2, hasj⟩ b ⟨hb.2, hbsi⟩)
+          (h j i b ⟨hb.2, hbsi⟩ a ⟨ha.2, hasj⟩)
+    have hcover : (⋃ i, c.1 ∩ s i) = c.1 := by
+      rw [← Set.inter_iUnion, Set.inter_eq_left.mpr c.2.1]
+    calc
+      c.1.encard = c.1.chainHeight r := Set.encard_eq_chainHeight_of_isChain c.1 c.2.2
+      _ = (⋃ i, c.1 ∩ s i).chainHeight r := congrArg (fun t ↦ t.chainHeight r) hcover.symm
+      _ = ⨆ i, (c.1 ∩ s i).chainHeight r :=
+        chainHeight_iUnion_of_directed (fun i ↦ c.1 ∩ s i) r hdir
+      _ ≤ ⨆ i, (s i).chainHeight r :=
+        iSup_mono fun i ↦ Set.chainHeight_mono r (c.1 ∩ s i) (s i) Set.inter_subset_right
+  · refine iSup_le fun i ↦ ?_
+    exact Set.chainHeight_mono r (s i) (⋃ i, s i) (Set.subset_iUnion s i)
+
 /-- Chain height takes the maximum on a union when points in its two exclusive pieces
 cannot compare across those pieces. Comparisons involving the intersection and all loops
 are unrestricted. -/
@@ -436,28 +483,14 @@ theorem chainHeight_union_of_not_rel
     {α : Type u} (r : α → α → Prop) (s t : Set α)
     (h : ∀ a ∈ s \ t, ∀ b ∈ t \ s, ¬ r a b ∧ ¬ r b a) :
     (s ∪ t).chainHeight r = max (s.chainHeight r) (t.chainHeight r) := by
-  classical
-  apply le_antisymm
-  · rw [Set.chainHeight_eq_iSup]
-    refine iSup_le fun c ↦ ?_
-    by_cases hcs : c.1 ⊆ s
-    · exact (Set.encard_le_chainHeight_of_isChain s c.1 hcs c.2.2).trans
-        (le_max_left _ _)
-    · obtain ⟨a, hac, has⟩ := Set.not_subset.mp hcs
-      have hat : a ∈ t := (c.2.1 hac).resolve_left has
-      have hct : c.1 ⊆ t := by
-        intro b hbc
-        by_cases hbt : b ∈ t
-        · exact hbt
-        · have hbs : b ∈ s := (c.2.1 hbc).resolve_right hbt
-          have hba : b ≠ a := fun hba ↦ has (hba ▸ hbs)
-          obtain ⟨hab, hba'⟩ := h b ⟨hbs, hbt⟩ a ⟨hat, has⟩
-          exact ((c.2.2 hbc hac hba).elim hab hba').elim
-      exact (Set.encard_le_chainHeight_of_isChain t c.1 hct c.2.2).trans
-        (le_max_right _ _)
-  · exact max_le
-      (Set.chainHeight_mono r s (s ∪ t) Set.subset_union_left)
-      (Set.chainHeight_mono r t (s ∪ t) Set.subset_union_right)
+  simpa only [← Set.union_eq_iUnion, iSup_bool_eq, Bool.cond_true, Bool.cond_false] using
+    chainHeight_iUnion_of_not_rel (fun b : Bool ↦ cond b s t) r (by
+      intro i j a ha b hb
+      cases i <;> cases j
+      · exact (ha.2 ha.1).elim
+      · exact (h b hb a ha).2
+      · exact (h a ha b hb).1
+      · exact (ha.2 ha.1).elim)
 
 /-- The chain height of the union of the two tagged images under the disjoint sum relation
 is the maximum of the factor chain heights. The relations are arbitrary, and either set or
