@@ -1107,7 +1107,7 @@ inclusion, and an ambient irreducible closed `Z` belongs to its range exactly wh
 `closure ((Z : Set X) ∩ Set.range f) = (Z : Set X)`. These properties apply to
 noninjective maps and identify the chart orders used in the finite-cover bound.
 
-### Topological dimension on closed covers and components
+### Topological dimension on closed covers, components and point closures
 
 The [closed-cover leaf](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) proves
 `topologicalKrullDim_eq_iSup_of_isClosedEmbedding_cover`: the dimension is the
@@ -1126,6 +1126,14 @@ The index is the membership subtype of Mathlib's canonical set of components; ea
 component carries its ordinary induced subspace topology. No local finiteness,
 Noetherianity, separation or sobriety assumption is imposed. The empty space has
 dimension `⊥`, and the supremum can be unbounded without being attained.
+
+For any `X : Type u` with `[TopologicalSpace X] [QuasiSober X]`, the same module proves
+`topologicalKrullDim_eq_iSup_closure_singleton`:
+`topologicalKrullDim X = ⨆ x : X, topologicalKrullDim (closure ({x} : Set X))`.
+The index is every original point; each closure uses the original topology and its
+induced subspace topology. No T0 separation, Noetherianity, nonemptiness or local
+finiteness is assumed. The `WithBot ℕ∞` supremum is bottom for the empty space and
+includes infinite and unbounded dimensions without requiring attainment.
 
 The same module proves `topologicalKrullDim_eq_iSup_connectedComponents`: for arbitrary
 `X : Type u` with its given topology, its dimension equals

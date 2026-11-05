@@ -222,6 +222,24 @@ theorem topologicalKrullDim_eq_iSup_of_locallyFinite_isClosed_cover
     obtain ⟨i, hi⟩ := Set.mem_iUnion.mp hx
     exact ⟨i, ⟨x, hi⟩, rfl⟩
 
+/-- The topological Krull dimension of a quasi-sober space is the supremum of the
+dimensions of the closures of all its points.
+
+The closures are taken in the original topology, and each closure carries its induced
+subspace topology. The supremum is in `WithBot ℕ∞`: the empty space gives `⊥`, and
+unbounded dimensions are included without requiring attainment by a point closure.
+Quasi-sobriety is the generic-point existence property from Mathlib's
+`Mathlib.Topology.Sober`. -/
+theorem topologicalKrullDim_eq_iSup_closure_singleton
+    (X : Type u) [TopologicalSpace X] [QuasiSober X] :
+    topologicalKrullDim X = ⨆ x : X, topologicalKrullDim (closure ({x} : Set X)) := by
+  refine topologicalKrullDim_eq_iSup_of_irreducibleCloseds_subset_range
+    (Y := fun x : X => closure ({x} : Set X)) (fun _ => Subtype.val)
+    (fun _ => isClosed_closure.isClosedEmbedding_subtypeVal) fun Z => ?_
+  refine ⟨Z.isIrreducible.genericPoint, ?_⟩
+  simpa only [Subtype.range_coe, Z.isIrreducible.closure_genericPoint Z.isClosed]
+    using (Set.Subset.refl (Z : Set X))
+
 /-- The topological Krull dimension of a space is the supremum of the dimensions of
 its canonical irreducible components, with their induced subspace topologies.
 
