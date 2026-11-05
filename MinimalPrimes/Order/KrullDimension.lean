@@ -1032,3 +1032,94 @@ theorem Order.krullDim_toLex_sigma
       subst j
       exact ⟨⟨a, ha⟩⟩
     _ = _ := Finset.sum_congr rfl fun i _ ↦ Order.succ_krullDim_eq_chainHeight _
+
+/-- The dimension of a subset of a finite union is bounded by the supremum over
+nonempty subfamilies of the sum of their dimensions plus their cardinality minus one.
+The subtraction is in `ℕ` before casting to `WithBot ℕ∞`. All membership subtypes
+inherit the given ambient preorder. Empty families and all-empty covers give bottom;
+the pieces may overlap and need not have finite dimension. -/
+theorem Order.krullDim_le_iSup_of_subset_biUnion_finset
+    {α : Type u} {ι : Type v} [Preorder α]
+    (I : Finset ι) (s : ι → Set α) (t : Set α)
+    (hcov : t ⊆ ⋃ i ∈ I, s i) :
+    Order.krullDim t ≤
+      ⨆ J ∈ I.powerset, ⨆ (_ : J.Nonempty),
+        (∑ i ∈ J, Order.krullDim (s i)) + ((J.card - 1 : ℕ) : WithBot ℕ∞) := by
+  classical
+  let B (K : Finset ι) : WithBot ℕ∞ :=
+    ⨆ J ∈ K.powerset, ⨆ (_ : J.Nonempty),
+      (∑ i ∈ J, Order.krullDim (s i)) + ((J.card - 1 : ℕ) : WithBot ℕ∞)
+  change Order.krullDim t ≤ B I
+  -- Insertion separates the singleton, old subfamilies and enlarged subfamilies.
+  have hstep (i : ι) (K : Finset ι) (hi : i ∉ K) :
+      Order.krullDim (s i) ⊔ B K ⊔ (Order.krullDim (s i) + B K + 1) ≤ B (insert i K) := by
+    let d : ι → WithBot ℕ∞ := fun j ↦ Order.krullDim (s j)
+    let f : Finset ι → WithBot ℕ∞ := fun J ↦
+      ⨆ (_ : J.Nonempty), (∑ j ∈ J, d j) + ((J.card - 1 : ℕ) : WithBot ℕ∞)
+    let R : WithBot ℕ∞ := ⨆ J ∈ (insert i K).powerset, f J
+    change d i ⊔ (⨆ J ∈ K.powerset, f J) ⊔
+      (d i + (⨆ J ∈ K.powerset, f J) + 1) ≤ R
+    simp only [← Finset.sup_eq_iSup K.powerset f]
+    refine sup_le (sup_le ?_ ?_) ?_
+    · have hsingle : ({i} : Finset ι) ∈ (insert i K).powerset :=
+        Finset.mem_powerset.mpr
+          (Finset.singleton_subset_iff.mpr (Finset.mem_insert_self i K))
+      calc
+        d i = f {i} := by simp [f]
+        _ ≤ R := le_iSup_of_le ({i} : Finset ι) (le_iSup_of_le hsingle le_rfl)
+    · refine Finset.sup_le fun J hJ ↦ ?_
+      have hsub : J ⊆ K := Finset.mem_powerset.mp hJ
+      have hmem : J ∈ (insert i K).powerset :=
+        Finset.mem_powerset.mpr fun j hj ↦ Finset.mem_insert_of_mem (hsub hj)
+      exact le_iSup_of_le J (le_iSup_of_le hmem le_rfl)
+    · let g : WithBot ℕ∞ → WithBot ℕ∞ := fun x ↦ d i + x + 1
+      have hmono : Monotone g := by
+        intro x y hxy
+        exact add_le_add (add_le_add le_rfl hxy) le_rfl
+      have hbot : g ⊥ = ⊥ := by simp [g]
+      change g (K.powerset.sup f) ≤ R
+      rw [Finset.apply_sup_eq_sup_comp_of_linearOrder
+        (s := K.powerset) (f := f) g hmono hbot]
+      refine Finset.sup_le fun J hJmem ↦ ?_
+      change g (f J) ≤ R
+      by_cases hJ : J.Nonempty
+      · have hsub : J ⊆ K := Finset.mem_powerset.mp hJmem
+        have hiJ : i ∉ J := fun hij ↦ hi (hsub hij)
+        have hmem : insert i J ∈ (insert i K).powerset :=
+          Finset.mem_powerset.mpr (Finset.insert_subset_insert i hsub)
+        have hcard : J.card - 1 + 1 = J.card :=
+          Nat.sub_add_cancel (Finset.one_le_card.mpr hJ)
+        have hcast : ((J.card - 1 : ℕ) : WithBot ℕ∞) + 1 =
+            (J.card : WithBot ℕ∞) := by
+          simpa only [Nat.cast_add, Nat.cast_one] using
+            congrArg (fun n : ℕ ↦ (n : WithBot ℕ∞)) hcard
+        have hterm : f (insert i J) = g (f J) := by
+          dsimp only [f, g]
+          rw [iSup_pos (Finset.insert_nonempty i J), iSup_pos hJ,
+            Finset.sum_insert hiJ, Finset.card_insert_of_notMem hiJ,
+            Nat.add_sub_cancel_right]
+          simp only [add_assoc, hcast]
+        rw [← hterm]
+        exact le_iSup_of_le (insert i J) (le_iSup_of_le hmem le_rfl)
+      · have hfbot : f J = ⊥ := iSup_neg hJ
+        rw [hfbot, hbot]
+        exact bot_le
+  have hU (K : Finset ι) : Order.krullDim (⋃ i ∈ K, s i : Set α) ≤ B K := by
+    induction K using Finset.induction_on with
+    | empty =>
+      have hbot : B ∅ = ⊥ := by
+        dsimp only [B]
+        rw [Finset.powerset_empty, Finset.iSup_singleton]
+        simp
+      have hunion : (⋃ i ∈ (∅ : Finset ι), s i : Set α) = ∅ := by simp
+      rw [hunion, hbot]
+      exact Order.krullDim_eq_bot.le
+    | @insert i K hi ih =>
+      rw [Finset.set_biUnion_insert]
+      calc
+        _ ≤ Order.krullDim (s i) ⊔ B K ⊔ (Order.krullDim (s i) + B K + 1) :=
+          (Order.krullDim_union_le _ _).trans
+            (sup_le_sup (sup_le_sup le_rfl ih) (add_le_add (add_le_add le_rfl ih) le_rfl))
+        _ ≤ B (insert i K) := hstep i K hi
+  exact (Order.krullDim_le_of_strictMono
+    (fun x : t ↦ (⟨x.1, hcov x.2⟩ : ⋃ i ∈ I, s i)) (fun _ _ h ↦ h)).trans (hU I)

@@ -89,6 +89,30 @@ exact dimension formula `Order.krullDim_toLex_sum` for lexicographic sums.
 These interfaces build on Mathlib's subtype orders, Krull dimension, strict-chain
 height and extended-natural arithmetic.
 
+### Krull dimension under finite covers
+
+For one given preorder on `α : Type u`, an independent index `ι : Type v`,
+`I : Finset ι`, a family `s : ι → Set α`, and `t ⊆ ⋃ i ∈ I, s i`,
+[`Order.krullDim_le_iSup_of_subset_biUnion_finset`](MinimalPrimes/Order/KrullDimension.lean)
+states
+
+```lean
+Order.krullDim t ≤
+  ⨆ J ∈ I.powerset, ⨆ (_ : J.Nonempty),
+    (∑ i ∈ J, Order.krullDim (s i)) + ((J.card - 1 : ℕ) : WithBot ℕ∞)
+```
+
+All membership subtypes inherit the given preorder. The pieces may overlap or be
+empty; there is no finiteness, antisymmetry, closure or attainment assumption on the
+ambient order. Subtraction takes place in the natural numbers before casting.
+Restricting to nonempty subfamilies makes the bound bottom for an empty family or
+an all-empty cover, while singleton subfamilies preserve a piece of top dimension.
+The three singleton pieces of a three-point total order give the sharp term two
+from the full subfamily. A literal finite union is the reflexive-inclusion application.
+The finite chain-height sum bound is already supplied by Mathlib's
+`Finset.apply_union_le_sum` applied to `Set.chainHeight_empty` and
+`Set.chainHeight_union_le`, followed by `Set.chainHeight_mono` for subsets.
+
 ### Chain cardinalities of disjoint sums
 
 For arbitrary relations `rα`, `rβ` on independently universed types and arbitrary
