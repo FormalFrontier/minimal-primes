@@ -1022,9 +1022,15 @@ The index and coefficient universes are independent; improper filters, empty ind
 and trivial monoids are included. These are zero-annihilator criteria, not full
 multiplicative cancellation criteria. The generic API is a Mathlib-upstream candidate.
 
-### Topological dimension on open covers
+### Topological dimension under inducing maps and open covers
 
-The [open-cover leaf](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) proves
+The [inducing-map and open-cover module](MinimalPrimes/Topology/KrullDimension/OpenCover.lean)
+proves `Topology.IsInducing.topologicalKrullDim_eq`: an inducing surjection between
+independently universed spaces with their given topologies preserves dimension in
+`WithBot ℕ∞`. The map need not be injective, and no separation, sobriety, finiteness
+or nonemptiness assumption is needed.
+
+The same module proves
 `topologicalKrullDim_eq_iSup_of_isOpenEmbedding_cover`: the dimension of a space is
 the supremum of the dimensions of any jointly surjective family of open-embedding
 charts, with independent universes for the space, index type and chart domains.
@@ -1300,7 +1306,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
 | [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; connected-component fibre formula; irreducible containment and the existing map's range and height. |
-| [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
+| [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension under inducing maps and on open covers. |
 
 ## Conventions and limitations
 

@@ -7,10 +7,15 @@ module
 public import Mathlib.Topology.KrullDimension
 
 /-!
-# Topological Krull dimension and open covers
+# Topological Krull dimension under inducing maps and open covers
 
-The topological Krull dimension of a space is the supremum of the dimensions of a jointly
-surjective family of open embeddings into it. The ambient space, index type and chart
+This module proves that an inducing surjection preserves topological Krull dimension.
+The source and target retain their given topologies and have independent universes;
+the map need not be injective.
+
+It also proves that the topological Krull dimension of a space is the supremum of the
+dimensions of a jointly surjective family of open embeddings into it. The ambient space,
+index type and chart
 domains have independent universes. In particular, the dimension is the supremum of the
 dimensions of the open subspaces in any open cover, with their induced topologies.
 
@@ -20,14 +25,31 @@ the supremum need not be attained by a member of the cover.
 
 ## References
 
-* Mathlib's `Mathlib.Topology.KrullDimension` for topological Krull dimension and
-  open-embedding coheight invariance.
+* Mathlib's `Mathlib.Topology.KrullDimension` for topological Krull dimension,
+  monotonicity under inducing maps, and open-embedding coheight invariance.
+* Mathlib's inducing-map composition and surjective-function section APIs.
 * Mathlib's `Mathlib.Order.KrullDimension` for the empty-safe supremum-of-coheights formula.
 -/
 
 @[expose] public section
 
 universe u v w
+
+/-- An inducing surjection preserves topological Krull dimension.
+
+Both spaces retain their given topologies. No injectivity, separation, sobriety,
+Noetherianity, finiteness or nonemptiness hypothesis is needed. The equality is in
+`WithBot ℕ∞`, including the empty and infinite cases. -/
+theorem Topology.IsInducing.topologicalKrullDim_eq
+    {X : Type u} {Y : Type v} [TopologicalSpace X] [TopologicalSpace Y]
+    {f : X → Y} (hf : Topology.IsInducing f) (hsurj : Function.Surjective f) :
+    topologicalKrullDim X = topologicalKrullDim Y := by
+  refine le_antisymm hf.topologicalKrullDim_le ?_
+  have hs : Topology.IsInducing (Function.surjInv hsurj) := by
+    apply hf.of_comp_iff.mp
+    rw [Function.comp_surjInv]
+    exact Topology.IsInducing.id
+  exact hs.topologicalKrullDim_le
 
 /-- A space's topological Krull dimension is the supremum of the dimensions of the domains
 of any jointly surjective family of open embeddings into it.
