@@ -4,11 +4,12 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.Topology.Connected.Clopen
 public import Mathlib.Topology.KrullDimension
 public import Mathlib.Topology.LocallyFinite
 
 /-!
-# Topological Krull dimension, closed covers and irreducible components
+# Topological Krull dimension, closed covers and components
 
 The topological Krull dimension of a space is the supremum of the dimensions of a jointly
 surjective family of closed embeddings whose images form a locally finite family. The
@@ -19,6 +20,12 @@ The dimension also equals the supremum of the dimensions of the canonical irredu
 components, each with its induced subspace topology. The component family need not be
 locally finite: Mathlib's whole-set extension theorem places every irreducible closed
 set in some maximal irreducible component, and each component is closed.
+
+The dimension also equals the supremum of the dimensions of the fibres of the canonical
+map `ConnectedComponents.mk : X → ConnectedComponents X`. Each fibre consists of original
+points of `X` and carries its induced subspace topology. These connected components form
+a partition, unlike maximal irreducible components, which may intersect. No local
+connectedness or discreteness of the component quotient is assumed.
 
 The supporting containment theorem applies to any irreducible set, without assuming
 that it is closed. For finite families, local finiteness follows from
@@ -36,6 +43,9 @@ that a member attain the supremum.
 
 ## References
 
+* Mathlib's `Mathlib.Topology.Connected.Clopen` and `Mathlib.Topology.Connected.Basic`
+  for the canonical connected-component quotient, its singleton fibres, closedness of
+  connected components and containment of preconnected sets.
 * Mathlib's `Mathlib.Topology.Irreducible` for canonical irreducible components, their
   closedness and extension of whole irreducible sets to maximal components, and
   `Mathlib.Topology.LocallyFinite` for locally finite families.
@@ -230,3 +240,32 @@ theorem topologicalKrullDim_eq_iSup_irreducibleComponents
   obtain ⟨C, hC, hZC⟩ :=
     exists_mem_irreducibleComponents_subset_of_isIrreducible (Z : Set X) Z.isIrreducible
   exact ⟨⟨C, hC⟩, by simpa only [Subtype.range_coe] using hZC⟩
+
+
+/-- The topological Krull dimension of a space equals the supremum of the dimensions of
+the fibres of its canonical map to connected components.
+
+Each fibre is a membership subspace of the original space, with the topology induced
+from its given topology. The supremum is in `WithBot ℕ∞`: the empty space gives `⊥`,
+and infinite families and unbounded dimensions are included without attainment.
+No local finiteness, local connectedness, discrete component quotient, separation or
+nonemptiness assumption is needed. The quotient and its map are those of Mathlib's
+`Mathlib.Topology.Connected.Clopen`. -/
+theorem topologicalKrullDim_eq_iSup_connectedComponents
+    (X : Type u) [TopologicalSpace X] :
+    topologicalKrullDim X =
+      ⨆ C : ConnectedComponents X,
+        topologicalKrullDim
+          ((ConnectedComponents.mk : X → ConnectedComponents X) ⁻¹' {C}) := by
+  refine topologicalKrullDim_eq_iSup_of_irreducibleCloseds_subset_range
+    (Y := fun C : ConnectedComponents X =>
+      ((ConnectedComponents.mk : X → ConnectedComponents X) ⁻¹' {C}))
+    (fun _ => Subtype.val) (fun C => ?_) fun Z => ?_
+  · obtain ⟨x, rfl⟩ := ConnectedComponents.surjective_coe C
+    apply IsClosed.isClosedEmbedding_subtypeVal
+    simpa only [connectedComponents_preimage_singleton] using
+      (isClosed_connectedComponent (x := x))
+  · obtain ⟨x, hx⟩ := Z.isIrreducible.nonempty
+    refine ⟨ConnectedComponents.mk x, ?_⟩
+    simpa only [Subtype.range_coe, connectedComponents_preimage_singleton] using
+      Z.isIrreducible.isConnected.isPreconnected.subset_connectedComponent hx

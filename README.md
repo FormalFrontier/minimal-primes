@@ -1010,7 +1010,7 @@ Both equalities use `WithBot ℕ∞`, including bottom for an empty-index cover 
 empty space and infinite or unbounded dimensions. No separation, sobriety,
 Noetherianity, quasi-compactness, finiteness or nonemptiness assumption is needed.
 
-### Topological dimension on closed covers and irreducible components
+### Topological dimension on closed covers and components
 
 The [closed-cover leaf](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) proves
 `topologicalKrullDim_eq_iSup_of_isClosedEmbedding_cover`: the dimension is the
@@ -1029,6 +1029,16 @@ The index is the membership subtype of Mathlib's canonical set of components; ea
 component carries its ordinary induced subspace topology. No local finiteness,
 Noetherianity, separation or sobriety assumption is imposed. The empty space has
 dimension `⊥`, and the supremum can be unbounded without being attained.
+
+The same module proves `topologicalKrullDim_eq_iSup_connectedComponents`: for arbitrary
+`X : Type u` with its given topology, its dimension equals
+`⨆ C : ConnectedComponents X,
+  topologicalKrullDim ((ConnectedComponents.mk : X → ConnectedComponents X) ⁻¹' {C})`.
+The index is Mathlib's canonical quotient of connected components. Each fibre is a
+membership subspace of the original `X`, with its induced topology, not a subspace
+of the quotient. Connected components partition the points, unlike irreducible
+components, which may intersect. No local finiteness, local connectedness or discrete
+quotient is assumed; empty spaces give `⊥`, and unbounded suprema need not be attained.
 
 The supporting containment theorem applies to any irreducible set, not necessarily
 closed. The characteristic range theorem for the existing `IrreducibleCloseds.map`
@@ -1265,7 +1275,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter`](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean) | Stone homeomorphism for arbitrary dependent products of semifields, basis transport and dense coordinate primes. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
-| [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; irreducible containment and the existing map's range and height. |
+| [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; connected-component fibre formula; irreducible containment and the existing map's range and height. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations
