@@ -5,15 +5,17 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Data.Prod.Lex
+public import Mathlib.Data.Sigma.Lex
 public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.Height
 public import Mathlib.Order.ScottContinuity.Complete
 import Mathlib.Basic.Finite.Prod
 import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.Order.CompleteLattice.Finset
 
 /-!
-# Chain heights of unions, lexicographic products and sums
+# Chain heights of unions, lexicographic products and dependent sums
 
 `Set.chainHeight` is the supremum in `ENat` of the cardinalities of subsets whose distinct
 points are pairwise comparable for a given relation. It counts vertices, not steps, dimensions
@@ -22,6 +24,7 @@ relation.
 
 The chain height of a union is at most the sum of the chain heights of its pieces, with no
 relation laws required. The pieces may overlap or be empty, and infinite heights are allowed.
+For disjoint pieces whose cross pairs compare in either direction, the bound is an equality.
 
 For the relation `Prod.Lex rα rβ`, comparison uses `rα` in the first coordinate or equality of
 first coordinates together with `rβ` in the second. The chain height of a product of sets is the
@@ -38,6 +41,16 @@ Transport by `toLex` gives the corresponding formulas for the canonical less-tha
 `α ×ₗ β` and `α ⊕ₗ β`. The sum formula requires only the given less-than structures; the product
 formula additionally requires first irreflexivity. Neither formula requires antisymmetry or
 transitivity. The two factor types may lie in independent universes.
+
+For `Sigma.Lex r R`, an arbitrary subset has height equal to the supremum of finite sums of
+its fiber heights when its active indices are pairwise comparable for `r` and `r` is
+irreflexive on those indices. Index and fiber universes are independent. No transitivity,
+global index order, finiteness, countability or nonemptiness assumption is needed. Inactive
+indices, including those carrying loops, are irrelevant. An active index loop can compare
+distinct fiber points even when their fiber relation is false, so active irreflexivity matters.
+The formula is
+`S.chainHeight (Sigma.Lex r R) = ⨆ J : Finset ι, ∑ i ∈ J,
+((Sigma.mk i) ⁻¹' S).chainHeight (R i)`.
 
 Empty sets have chain height zero. Thus empty factors are absorbing for the product, including
 `0 * ⊤ = 0 = ⊤ * 0`, but contribute zero to the sum. A singleton has height one for any relation,
@@ -96,10 +109,16 @@ For unions, intersect a comparable subset with the two pieces. Each restriction 
 comparable, and their union is the original subset. Cardinality subadditivity and the two
 piece-height bounds give the upper bound without any relation laws.
 
-For lexicographic sums, the union bound and relation-embedding transport give the sum of the
-factor heights as an upper bound. Conversely, the tagged union of two factor chains is a chain
-because every cross pair compares. Taking the two suprema gives the addition formula without
-choosing a longest or infinite chain.
+For disjoint cross-comparable unions, two subset chains have a chain union whose cardinality
+is the sum of their cardinalities. Taking the two suprema gives equality in the union bound;
+empty chains supply the nonempty internal witness types even for empty pieces. The binary
+lexicographic sum then uses this union formula and stock relation-embedding transport.
+
+For dependent lexicographic sums, the tagged fibers are disjoint and cover the given subset.
+On an active fiber, index irreflexivity makes `Sigma.mk` a relation embedding; inactive fibers
+are empty. Finite induction applies the same union formula to finite partial unions. These
+partial unions are inclusion-directed, so the existing directed-union formula supplies the
+supremum of finite sums, without choosing points, a longest chain or an infinite chain.
 
 For directed unions, every finite positive chain-cardinality witness fits in one piece.
 A point of the witness supplies the local nonempty range needed by the finite-containment
@@ -145,12 +164,18 @@ intersection and indexed-supremum APIs. The binary specialization uses the Bool 
 The sum formulas reuse `RelEmbedding.sumLexInl/Inr`, `RelEmbedding.sumLiftRelInl/Inr` and the
 whole `Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs. The disjoint-sum
 formula also uses the cross-tag negation lemmas from Lean's Sum relation API and `Sum.lt_def`
-for the ordinary-sum specialization.
+for the ordinary-sum specialization. The dependent-sum relation is Mathlib's `Sigma.Lex`
+from `Mathlib.Data.Sigma.Lex` (Yaël Dillies); the disjoint cross-comparable union statement
+generalizes the earlier Formal Frontier binary lexicographic-sum core. Finite partial unions
+use `Finset.set_biUnion_insert` and `Set.iUnion_eq_iUnion_finset` from
+`Mathlib.Order.CompleteLattice.Finset` (Mario Carneiro and contributors), together with
+`Finset.isDirected_le` from `Mathlib.Data.Finset.Basic`
+(Leonardo de Moura, Jeremy Avigad, Minchao Wu and Mario Carneiro).
 -/
 
 @[expose] public section
 
-universe u v
+universe u v w
 
 namespace Set
 
@@ -312,6 +337,26 @@ theorem chainHeight_union_le
         (Set.encard_le_chainHeight_of_isChain t _ Set.inter_subset_right
           (c.2.2.mono Set.inter_subset_left))
 
+/-- Chain heights add for disjoint sets whose cross pairs are comparable in either direction.
+The relation is arbitrary; no transitivity, irreflexivity or nonemptiness is required. -/
+theorem chainHeight_union_of_disjoint_of_cross
+    {X : Type w} (q : X → X → Prop) (s t : Set X)
+    (hd : Disjoint s t) (hcross : ∀ a ∈ s, ∀ b ∈ t, q a b ∨ q b a) :
+    (s ∪ t).chainHeight q = s.chainHeight q + t.chainHeight q := by
+  apply le_antisymm (chainHeight_union_le q s t)
+  -- Empty chains inhabit the witness types, including when either piece is empty.
+  have : Nonempty {a : Set X // a ⊆ s ∧ IsChain q a} :=
+    ⟨⟨∅, Set.empty_subset s, IsChain.empty⟩⟩
+  have : Nonempty {b : Set X // b ⊆ t ∧ IsChain q b} :=
+    ⟨⟨∅, Set.empty_subset t, IsChain.empty⟩⟩
+  rw [Set.chainHeight_eq_iSup s q, Set.chainHeight_eq_iSup t q]
+  refine ENat.iSup_add_iSup_le fun a b ↦ ?_
+  rw [← Set.encard_union_eq (hd.mono a.2.1 b.2.1)]
+  refine Set.encard_le_chainHeight_of_isChain _ _
+    (Set.union_subset_union a.2.1 b.2.1) ?_
+  exact isChain_union.mpr ⟨a.2.2, b.2.2,
+    fun x hx y hy _ ↦ hcross x (a.2.1 hx) y (b.2.1 hy)⟩
+
 /-- Chain heights add for the union of the two tagged images under the lexicographic sum
 relation. The relations are arbitrary: neither irreflexivity nor transitivity is required, and
 either set or ambient type may be empty. -/
@@ -320,34 +365,16 @@ theorem chainHeight_sum_lex
     (s : Set α) (t : Set β) :
     ((Sum.inl : α → α ⊕ β) '' s ∪ (Sum.inr : β → α ⊕ β) '' t).chainHeight
         (Sum.Lex rα rβ) = s.chainHeight rα + t.chainHeight rβ := by
-  have hcard (a : Set α) (b : Set β) :
-      ((Sum.inl : α → α ⊕ β) '' a ∪ (Sum.inr : β → α ⊕ β) '' b).encard =
-        a.encard + b.encard := by
-    rw [Set.encard_union_eq Set.disjoint_image_inl_image_inr,
-      Sum.inl_injective.encard_image, Sum.inr_injective.encard_image]
-  apply le_antisymm
-  · calc
-      _ ≤ ((Sum.inl : α → α ⊕ β) '' s).chainHeight (Sum.Lex rα rβ) +
-          ((Sum.inr : β → α ⊕ β) '' t).chainHeight (Sum.Lex rα rβ) :=
-        chainHeight_union_le (Sum.Lex rα rβ) _ _
-      _ = _ := congrArg₂ (· + ·)
-        (Set.chainHeight_eq_of_relEmbedding s (RelEmbedding.sumLexInl rα rβ))
-        (Set.chainHeight_eq_of_relEmbedding t (RelEmbedding.sumLexInr rα rβ))
-  · -- The empty chains inhabit the supremum indices even when the factors are empty.
-    have : Nonempty {a : Set α // a ⊆ s ∧ IsChain rα a} :=
-      ⟨⟨∅, Set.empty_subset s, IsChain.empty⟩⟩
-    have : Nonempty {b : Set β // b ⊆ t ∧ IsChain rβ b} :=
-      ⟨⟨∅, Set.empty_subset t, IsChain.empty⟩⟩
-    rw [Set.chainHeight_eq_iSup s rα, Set.chainHeight_eq_iSup t rβ]
-    refine ENat.iSup_add_iSup_le fun a b ↦ ?_
-    rw [← hcard a.1 b.1]
-    refine Set.encard_le_chainHeight_of_isChain _ _
-      (Set.union_subset_union (Set.image_mono a.2.1) (Set.image_mono b.2.1)) ?_
-    refine isChain_union.mpr
-      ⟨a.2.2.image (RelEmbedding.sumLexInl rα rβ),
-        b.2.2.image (RelEmbedding.sumLexInr rα rβ), ?_⟩
-    rintro _ ⟨x, _, rfl⟩ _ ⟨y, _, rfl⟩ _
-    exact Or.inl (Sum.Lex.sep x y)
+  calc
+    _ = ((Sum.inl : α → α ⊕ β) '' s).chainHeight (Sum.Lex rα rβ) +
+        ((Sum.inr : β → α ⊕ β) '' t).chainHeight (Sum.Lex rα rβ) := by
+      apply chainHeight_union_of_disjoint_of_cross _ _ _
+        Set.disjoint_image_inl_image_inr
+      rintro _ ⟨x, _, rfl⟩ _ ⟨y, _, rfl⟩
+      exact Or.inl (Sum.Lex.sep x y)
+    _ = _ := congrArg₂ (· + ·)
+      (Set.chainHeight_eq_of_relEmbedding s (RelEmbedding.sumLexInl rα rβ))
+      (Set.chainHeight_eq_of_relEmbedding t (RelEmbedding.sumLexInr rα rβ))
 
 /-- Chain heights add for the image of the tagged union in the lexicographic sum type synonym.
 The less-than relation on the sum is the canonical `Sum.Lex.LT` induced by the given less-than
@@ -364,6 +391,143 @@ theorem chainHeight_toLex_sum
         (Sum.Lex (fun x y : α => x < y) (fun x y : β => x < y)) :=
       chainHeight_eq_of_relIso _ (Sum.Lex.toLexRelIsoLT (α := α) (β := β))
     _ = _ := chainHeight_sum_lex _ _ s t
+
+private theorem chainHeight_biUnion_finset_of_disjoint_of_cross
+    {X : Type w} {κ : Type u} (q : X → X → Prop) (P : κ → Set X)
+    (hd : Pairwise fun i j ↦ Disjoint (P i) (P j))
+    (hcross : ∀ i j, i ≠ j → ∀ a ∈ P i, ∀ b ∈ P j, q a b ∨ q b a)
+    (J : Finset κ) :
+    (⋃ i ∈ J, P i).chainHeight q = ∑ i ∈ J, (P i).chainHeight q := by
+  classical
+  induction J using Finset.induction_on with
+  | empty => simp
+  | @insert i J hi ih =>
+    have hdisj : Disjoint (P i) (⋃ j ∈ J, P j) := by
+      refine Set.disjoint_left.mpr ?_
+      intro x hxi hxJ
+      obtain ⟨j, hxj⟩ := Set.mem_iUnion.mp hxJ
+      obtain ⟨hj, hxj⟩ := Set.mem_iUnion.mp hxj
+      have hij : i ≠ j := by
+        intro hij
+        subst j
+        exact hi hj
+      exact Set.disjoint_left.mp (hd hij) hxi hxj
+    have hcomp : ∀ a ∈ P i, ∀ b ∈ ⋃ j ∈ J, P j, q a b ∨ q b a := by
+      intro a ha b hb
+      obtain ⟨j, hbj⟩ := Set.mem_iUnion.mp hb
+      obtain ⟨hj, hbj⟩ := Set.mem_iUnion.mp hbj
+      have hij : i ≠ j := by
+        intro hij
+        subst j
+        exact hi hj
+      exact hcross i j hij a ha b hbj
+    rw [Finset.set_biUnion_insert, Finset.sum_insert hi,
+      chainHeight_union_of_disjoint_of_cross q _ _ hdisj hcomp, ih]
+
+private theorem chainHeight_image_sigma_mk
+    {ι : Type u} {α : ι → Type v}
+    (r : ι → ι → Prop) (R : ∀ i, α i → α i → Prop)
+    (S : Set (Σ i, α i))
+    (hirr : ∀ i ∈ Sigma.fst '' S, ¬ r i i) (i : ι) :
+    (Sigma.mk i '' ((Sigma.mk i) ⁻¹' S)).chainHeight (Sigma.Lex r R) =
+      ((Sigma.mk i) ⁻¹' S).chainHeight (R i) := by
+  classical
+  by_cases hi : i ∈ Sigma.fst '' S
+  · let e : R i ↪r Sigma.Lex r R :=
+      { toFun := Sigma.mk i
+        inj' := sigma_mk_injective
+        map_rel_iff' := by
+          intro a b
+          constructor
+          · intro hab
+            rcases Sigma.lex_iff.mp hab with hii | ⟨h, hR⟩
+            · exact (hirr i hi hii).elim
+            · exact hR
+          · intro hab
+            exact Sigma.Lex.right a b hab }
+    exact chainHeight_eq_of_relEmbedding ((Sigma.mk i) ⁻¹' S) e
+  · have hF : (Sigma.mk i) ⁻¹' S = ∅ := by
+      ext a
+      constructor
+      · intro ha
+        exact (hi ⟨⟨i, a⟩, ha, rfl⟩).elim
+      · intro ha
+        exact ha.elim
+    simp only [hF, Set.image_empty, Set.chainHeight_empty]
+
+private theorem sigma_eq_iUnion_image_preimage
+    {ι : Type u} {α : ι → Type v} (S : Set (Σ i, α i)) :
+    S = ⋃ i, Sigma.mk i '' ((Sigma.mk i) ⁻¹' S) := by
+  ext x
+  rcases x with ⟨i, a⟩
+  constructor
+  · intro hx
+    exact Set.mem_iUnion.mpr ⟨i, ⟨a, hx, rfl⟩⟩
+  · intro hx
+    rcases Set.mem_iUnion.mp hx with ⟨j, b, hb, hba⟩
+    exact hba ▸ hb
+
+private theorem disjoint_image_sigma_mk
+    {ι : Type u} {α : ι → Type v} (S : Set (Σ i, α i))
+    (i j : ι) (hij : i ≠ j) :
+    Disjoint (Sigma.mk i '' ((Sigma.mk i) ⁻¹' S))
+      (Sigma.mk j '' ((Sigma.mk j) ⁻¹' S)) := by
+  refine Set.disjoint_left.mpr ?_
+  intro x hx hy
+  rcases hx with ⟨a, _, hax⟩
+  rcases hy with ⟨b, _, hbx⟩
+  exact hij (congrArg Sigma.fst (hax.trans hbx.symm))
+
+private theorem sigma_lex_cross_images
+    {ι : Type u} {α : ι → Type v}
+    (r : ι → ι → Prop) (R : ∀ i, α i → α i → Prop)
+    (S : Set (Σ i, α i))
+    (hchain : IsChain r (Sigma.fst '' S)) (i j : ι) (hij : i ≠ j) :
+    ∀ x ∈ Sigma.mk i '' ((Sigma.mk i) ⁻¹' S),
+      ∀ y ∈ Sigma.mk j '' ((Sigma.mk j) ⁻¹' S),
+        Sigma.Lex r R x y ∨ Sigma.Lex r R y x := by
+  rintro x ⟨a, ha, rfl⟩ y ⟨b, hb, rfl⟩
+  have hi : i ∈ Sigma.fst '' S := ⟨⟨i, a⟩, ha, rfl⟩
+  have hj : j ∈ Sigma.fst '' S := ⟨⟨j, b⟩, hb, rfl⟩
+  rcases hchain hi hj hij with h | h
+  · exact Or.inl (Sigma.Lex.left a b h)
+  · exact Or.inr (Sigma.Lex.left b a h)
+
+
+/-- The chain height of a subset of a dependent lexicographic sum is the supremum of the
+finite sums of its fiber heights. Only the active indices must be pairwise comparable and
+irreflexive for the index relation. The fiber relations are arbitrary, the index and fiber
+universes are independent, and empty fibers contribute zero. A height of top need not be
+attained by any chain. -/
+theorem chainHeight_sigma_lex
+    {ι : Type u} {α : ι → Type v}
+    (r : ι → ι → Prop) (R : ∀ i, α i → α i → Prop) (S : Set (Σ i, α i))
+    (hchain : IsChain r (Sigma.fst '' S))
+    (hirr : ∀ i ∈ Sigma.fst '' S, ¬ r i i) :
+    S.chainHeight (Sigma.Lex r R) =
+      ⨆ J : Finset ι, ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (R i) := by
+  classical
+  let P (i : ι) : Set (Σ i, α i) := Sigma.mk i '' ((Sigma.mk i) ⁻¹' S)
+  have hfinite (J : Finset ι) :
+      (⋃ i ∈ J, P i).chainHeight (Sigma.Lex r R) =
+        ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (R i) := by
+    rw [chainHeight_biUnion_finset_of_disjoint_of_cross (Sigma.Lex r R) P
+      (fun i j hij ↦ disjoint_image_sigma_mk S i j hij)
+      (sigma_lex_cross_images r R S hchain) J]
+    exact Finset.sum_congr rfl fun i _ ↦ chainHeight_image_sigma_mk r R S hirr i
+  have hmono : Monotone (fun J : Finset ι ↦ ⋃ i ∈ J, P i) := by
+    intro J K hJK x hx
+    obtain ⟨i, hxi⟩ := Set.mem_iUnion.mp hx
+    obtain ⟨hi, hxi⟩ := Set.mem_iUnion.mp hxi
+    exact Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨hJK hi, hxi⟩⟩
+  calc
+    _ = (⋃ i, P i).chainHeight (Sigma.Lex r R) :=
+      congrArg (fun t ↦ t.chainHeight (Sigma.Lex r R)) (sigma_eq_iUnion_image_preimage S)
+    _ = (⋃ J : Finset ι, ⋃ i ∈ J, P i).chainHeight (Sigma.Lex r R) := by
+      rw [Set.iUnion_eq_iUnion_finset P]
+    _ = ⨆ J : Finset ι, (⋃ i ∈ J, P i).chainHeight (Sigma.Lex r R) :=
+      chainHeight_iUnion_of_directed _ _ hmono.directed_le
+    _ = _ := iSup_congr hfinite
 
 /-- On a fixed subset, chain height is Scott continuous in the relation ordered by pointwise
 implication. Scott continuity preserves suprema of nonempty directed sets of relations; it

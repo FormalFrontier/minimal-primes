@@ -76,6 +76,16 @@ highlights:
       - declaration: Order.krullDim_toLex_sum
         file: MinimalPrimes/Order/KrullDimension.lean
 
+  - title: Chain cardinalities of dependent lexicographic sums
+    statement: >-
+      For arbitrary subsets of independently universed dependent sums with raw relations,
+      chain height is the supremum of finite sums of fiber heights, assuming only pairwise
+      comparability and irreflexivity of the active indices. Empty fibers and infinite heights
+      are allowed, with no transitivity, global order, finiteness or attainment hypothesis.
+    declarations:
+      - declaration: Set.chainHeight_sigma_lex
+        file: MinimalPrimes/Order/ChainHeight.lean
+
 sources:
   - title: Foundations of Algebraic Geometry
     authors: [Ravi Vakil]
@@ -201,4 +211,7 @@ acknowledgements: >-
   principal-ideal, associated-prime and finite-height prime-chain results. The
   principal-prime height proofs use Mathlib's maximal-power factorization,
   prime-ideal height criterion and regular-element height lower bound.
+  The dependent lexicographic chain-height formula uses Mathlib's stock Sigma relation,
+  chain-height, set-cardinality and finite-subunion APIs and generalizes the earlier
+  Formal Frontier binary lexicographic-sum union core.
   AI agents developed the Lean code and examples.

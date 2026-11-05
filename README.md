@@ -17,6 +17,12 @@ The pieces may overlap or be empty; neither relation laws nor finite heights or
 attainment are required. The proof restricts each comparable subset to its two
 intersections and uses `ENat` cardinality subadditivity.
 
+For disjoint pieces with `∀ a ∈ s, ∀ b ∈ t, r a b ∨ r b a`,
+[`Set.chainHeight_union_of_disjoint_of_cross`](MinimalPrimes/Order/ChainHeight.lean)
+gives equality: `(s ∪ t).chainHeight r = s.chainHeight r + t.chainHeight r`.
+Cross comparisons need not have a consistent direction. The binary lexicographic-sum
+formula below reuses this common-ambient union result.
+
 ### Chain cardinalities of exclusive-piece unions
 
 For an arbitrary relation `r` on `α : Type u` and a family `s : ι → Set α` with
@@ -143,10 +149,38 @@ less-than relation on `α ⊕ₗ β`, using only the given `LT` records on both 
 The heights count vertices in `ENat`: two singleton blocks, or two nonempty
 antichains, give height two. The disjoint relation `Sum.LiftRel`, used by ordinary
 Sum less-than, is different. Empty factors contribute zero, including beside top.
-The upper bound uses the general union inequality and Mathlib's relation-embedding
-transport. The lower bound glues factor chains by the cross comparison; neither
-argument sorts chains or assumes their heights are attained. Unbounded finite
+The proof applies the disjoint cross-comparable union formula and Mathlib's
+relation-embedding transport. Its union core glues subset chains by cross comparison,
+without sorting chains or assuming their heights are attained. Unbounded finite
 chain cardinalities are included.
+
+### Chain cardinalities of dependent lexicographic sums
+
+For independent universes `ι : Type u` and `α : ι → Type v`, raw relations
+`r : ι → ι → Prop` and `R : ∀ i, α i → α i → Prop`, and any
+`S : Set (Σ i, α i)`,
+[`Set.chainHeight_sigma_lex`](MinimalPrimes/Order/ChainHeight.lean) proves
+
+```lean
+S.chainHeight (Sigma.Lex r R) =
+  ⨆ J : Finset ι, ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (R i)
+```
+
+The assumptions are exactly `IsChain r (Sigma.fst '' S)` and
+`∀ i ∈ Sigma.fst '' S, ¬ r i i`: distinct active indices compare in either
+direction, and active indices have no loops. No transitivity, global index order,
+finiteness, decidable equality, nonemptiness or countability is required. Directed
+cycles and bidirectional comparisons on distinct indices are allowed. Inactive
+indices may have loops, and empty fibers contribute zero. Dropping active
+irreflexivity would let an index loop compare fiber points regardless of `R i`.
+
+Heights count vertices in `ENat`. The empty finite support is available even for
+an empty index type. The finite-support supremum can be top without a maximizing
+support. Separately, a single fiber can have height top with no infinite chain.
+The formula assumes neither form of attainment. The proof transports each active
+fiber's height through `Sigma.mk`, applies the disjoint union formula by finite
+induction, and uses the existing inclusion-directed union theorem for the union of
+all finite partial unions.
 
 ### Krull dimension of lexicographic sums
 
@@ -1037,7 +1071,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.IrreducibleComponents`](MinimalPrimes/IrreducibleComponents.lean) | Factor equivalence with order-dual components of a principal zero locus. |
 | [`MinimalPrimes.AssociatedRestrictScalars`](MinimalPrimes/AssociatedRestrictScalars.lean) | Colon contraction and associated-prime transport. |
 | [`MinimalPrimes.AssociatedPrincipal`](MinimalPrimes/AssociatedPrincipal.lean) | Base-ring and quotient-spectrum comparisons; exact annihilators. |
-| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for lexicographic tagged sums, and canonical less-than `toLex` transport. |
+| [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for disjoint cross-comparable unions and lexicographic tagged sums, finite-sum suprema for dependent lexicographic sums over active index chains, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
 | [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
@@ -1125,8 +1159,10 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
   contributors), set-cardinality and finite-union cardinality lemmas, and ENat
   multiplication and addition of suprema. The sum formula also uses Lean's Sum
   relation API (Mario Carneiro and Yury G. Kudryashov) and Mathlib's canonical
-  lexicographic sum (Yaël Dillies); see the
-  [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
+  lexicographic sum (Yaël Dillies). The dependent-sum formula uses Mathlib's stock
+  `Sigma.Lex` (Yaël Dillies), set-fiber and finite-subunion APIs, and the earlier
+  Formal Frontier binary union core generalized to disjoint cross-comparable sets;
+  see the [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
   propagation of zero powers and finite-set order bounds; see the
