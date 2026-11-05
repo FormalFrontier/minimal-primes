@@ -312,6 +312,38 @@ three and its tagged lexicographic sum has dimension four.
 The vertex-height input is the existing whole `Set.chainHeight_toLex_prod`
 formula, together with the finite-cut dimension comparisons above.
 
+### Krull dimension of finite dependent lexicographic products
+
+For a finite linearly ordered index `ι : Type u`, independently universed given
+preorders `β : ι → Type v`, and subsets `s i`,
+[`Order.krullDim_toLex_pi`](MinimalPrimes/Order/KrullDimension.lean) states
+
+```lean
+Order.krullDim (toLex '' Set.pi Set.univ s) =
+  WithBot.map (fun h : ℕ∞ => h - 1)
+    (∏ i, (Order.krullDim (s i) + 1 : WithBot ℕ∞))
+```
+
+The original dependent functions, their `toLex` image and all inherited membership
+orders are retained. Product and addition take place in `WithBot ℕ∞`; only the
+mapped decrement is in `ℕ∞`. An empty index gives dimension zero. An empty factor
+gives bottom even beside top: although `0 * ⊥ = 0`, every shifted factor is nonzero.
+A singleton index preserves dimension, including bottom and top. No fibre finiteness,
+nonemptiness, antisymmetry, finite dimension or attainment is assumed.
+The whole `Set.chainHeight_toLex_pi` formula supplies the product of vertex heights;
+`Order.succ_krullDim_eq_chainHeight` relates those heights to the given dimensions.
+
+The canonical order is supplied by
+[`Pi.Lex.partialOrderOfLT`](MinimalPrimes/Order/PiLex.lean). More generally, it needs
+only a linearly ordered index and given fibre less-than relations with `IsStrictOrder`.
+It uses Mathlib's `partialOrderOfSO`, retaining the stock strict lexicographic relation;
+its weak comparison is equality or strict comparison. The stored-LT and stored-LE
+lemmas expose both relations, and `Pi.Lex.partialOrderOfLT_eq` identifies the whole
+record with Mathlib's construction under the original fibre PartialOrder hypotheses.
+Prefixes use equality, not preorder equivalence: distinct equivalent fibre elements
+need not retain their weak comparisons, even at a singleton index. Thus dimension
+agreement does not assert an order isomorphism with a nonantisymmetric fibre.
+
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,

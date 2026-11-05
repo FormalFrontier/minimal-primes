@@ -83,6 +83,30 @@ highlights:
       - declaration: Order.krullDim_toLex_sum
         file: MinimalPrimes/Order/KrullDimension.lean
 
+  - title: Krull dimension of finite dependent lexicographic products
+    statement: >-
+      For arbitrary subsets of independently universed given preorders over a finite
+      linearly ordered index, lexicographic dimension is the WithBot map of ENat
+      decrement applied to the product of the shifted fibre dimensions. Product and
+      addition are in WithBot ENat, with only the decrement in ENat. Empty index,
+      empty fibres and infinite dimensions are included. The canonical partial order
+      is equality or strict lexicographic comparison with equality prefixes; it needs
+      only strict less-than relations on the fibres and agrees as a whole record with
+      Mathlib's construction when the fibres have partial orders.
+    declarations:
+      - declaration: Order.krullDim_toLex_pi
+        file: MinimalPrimes/Order/KrullDimension.lean
+      - declaration: Pi.Lex.isStrictOrderOfLT
+        file: MinimalPrimes/Order/PiLex.lean
+      - declaration: Pi.Lex.partialOrderOfLT
+        file: MinimalPrimes/Order/PiLex.lean
+      - declaration: Pi.Lex.partialOrderOfLT_lt
+        file: MinimalPrimes/Order/PiLex.lean
+      - declaration: Pi.Lex.partialOrderOfLT_le_iff
+        file: MinimalPrimes/Order/PiLex.lean
+      - declaration: Pi.Lex.partialOrderOfLT_eq
+        file: MinimalPrimes/Order/PiLex.lean
+
   - title: Chain cardinalities of dependent lexicographic sums
     statement: >-
       For arbitrary subsets of independently universed dependent sums with raw relations,
@@ -182,6 +206,8 @@ status:
   main_results:
     - declaration: ENat.WithBot.succ_sum_powerset_nonempty
       file: MinimalPrimes/Data/ENat/BigOperators.lean
+    - declaration: Order.krullDim_toLex_pi
+      file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.krullDim_toLex_sigma
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: PrimeSpectrum.piHomeomorphUltrafilter
@@ -231,6 +257,10 @@ acknowledgements: >-
   The finite-support Sigma dimension formula consumes that whole height formula and the
   earlier Formal Frontier dimension/height finite cuts, with Mathlib's bottom-aware
   successor and finite-sum arithmetic.
+  The strict lexicographic order generalizes Chris Hughes's PiLex formalization,
+  using partialOrderOfSO by Jeremy Avigad, Mario Carneiro and Yury Kudryashov.
+  Its finite dependent-product dimension formula consumes the whole dependent
+  lexicographic height formula and the bottom-aware successor comparison.
   The scalar successor identity reuses Mathlib's whole finite-product expansion
   Finset.prod_add_one, finite-sum single-point separation and WithBot coercion APIs.
   AI agents developed the Lean code and examples.

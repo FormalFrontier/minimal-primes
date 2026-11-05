@@ -10,6 +10,7 @@ public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.KrullDimension
 public import MinimalPrimes.Order.ChainHeight
+public import MinimalPrimes.Order.PiLex
 
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.BigOperators.WithTop
@@ -93,6 +94,16 @@ The dimension of the lexicographic image of a set product is
 require equality, even for nonantisymmetric preorders. Empty factors give bottom;
 a singleton factor preserves the other dimension, including infinite dimension.
 
+For a finite linearly ordered dependent family, the dimension of its lexicographic
+image is `WithBot.map (fun h : ℕ∞ => h - 1) (∏ i, (κ(s i) + 1))`.
+The product and addition are in `WithBot ℕ∞`, and only the decrement is in `ℕ∞`.
+An empty index gives dimension zero. Although multiplication in `WithBot ℕ∞`
+satisfies `0 * ⊥ = 0`, each factor `κ(s i) + 1` is nonzero, so an empty fibre gives
+bottom even beside infinite dimension. Prefix ties require equality. The target
+carries the canonical strict-lex partial order, whose weak comparison is equality
+or strict lexicographic comparison; for nonantisymmetric fibres it need not preserve
+their weak equivalences. A singleton index still preserves dimension.
+
 ## References
 
 The lexicographic sum uses Mathlib's `Sum.Lex` order and `toLex` type synonym.
@@ -101,6 +112,9 @@ Its vertex-height counterpart is `Set.chainHeight_toLex_sum` in
 ambient-set to inherited-subtype height comparison. The lexicographic product uses
 Mathlib's `Prod.Lex` preorder and the multiplicative vertex-height formula
 `Set.chainHeight_toLex_prod` in `MinimalPrimes.Order.ChainHeight`.
+For dependent functions, comparison uses `Pi.Lex` from `Mathlib.Order.PiLex`
+(Chris Hughes), and the vertex-height formula is `Set.chainHeight_toLex_pi` in
+`MinimalPrimes.Order.ChainHeight`.
 
 The dependent-sum dimension formula uses Mathlib's `Sigma.Lex` preorder (Yaël Dillies)
 and the whole `Set.chainHeight_sigma_lex` formula in `MinimalPrimes.Order.ChainHeight`,
@@ -942,6 +956,66 @@ private theorem coe_enat_withBot_succ (d : WithBot ℕ∞) (hd : d ≠ ⊥) :
   cases d with
   | bot => exact (hd rfl).elim
   | coe n => simp [WithBot.succ_coe, Order.succ_eq_add_one, WithBot.coe_add]
+
+private theorem succ_map_sub_one_prod_add_one
+    {ι : Type u} [Fintype ι] (d : ι → WithBot ℕ∞) :
+    WithBot.succ (WithBot.map (fun h : ℕ∞ => h - 1) (∏ i, (d i + 1))) =
+      ∏ i, WithBot.succ (d i) := by
+  classical
+  have hshift (i : ι) : d i + 1 ≠ 0 := by
+    cases d i with
+    | bot => simp
+    | coe n =>
+      change ((n + 1 : ℕ∞) : WithBot ℕ∞) ≠ ((0 : ℕ∞) : WithBot ℕ∞)
+      exact fun h ↦ (ne_of_gt (add_pos_of_right zero_lt_one n))
+        (WithBot.coe_injective h)
+  by_cases hbot : ∃ i, d i = ⊥
+  · obtain ⟨i, hi⟩ := hbot
+    -- Every shifted factor avoids zero, so bottom survives the product.
+    have hrest : (∏ j ∈ Finset.univ.erase i, (d j + 1)) ≠ 0 :=
+      Finset.prod_ne_zero_iff.mpr fun j _ ↦ hshift j
+    have hprod : (∏ j, (d j + 1)) = ⊥ := by
+      rw [← Finset.prod_erase_mul _ _ (Finset.mem_univ i), hi,
+        WithBot.bot_add, WithBot.mul_bot hrest]
+    have hsucc : (∏ j, WithBot.succ (d j)) = 0 :=
+      Finset.prod_eq_zero (Finset.mem_univ i) (by simp [hi])
+    simp only [hprod, WithBot.map_bot, WithBot.succ_bot, hsucc, bot_eq_zero]
+  · have hne (i : ι) : d i ≠ ⊥ := fun hi ↦ hbot ⟨i, hi⟩
+    have hprod : ((∏ i, WithBot.succ (d i) : ℕ∞) : WithBot ℕ∞) =
+        ∏ i, (d i + 1) := by
+      apply Finset.prod_hom_rel
+        (r := fun (a : ℕ∞) (b : WithBot ℕ∞) ↦ (a : WithBot ℕ∞) = b) rfl
+      intro i a b hab
+      rw [WithBot.coe_mul, coe_enat_withBot_succ (d i) (hne i), hab]
+    have hpos : 1 ≤ ∏ i, WithBot.succ (d i) := by
+      apply Order.one_le_iff_ne_zero.mpr
+      apply Finset.prod_ne_zero_iff.mpr
+      intro i _ hi
+      exact hne i ((WithBot.succ_eq_bot (d i)).mp hi)
+    rw [← hprod, WithBot.map_coe, WithBot.succ_coe, Order.succ_eq_add_one]
+    exact tsub_add_cancel_of_le hpos
+
+/-- The dimension of a finite dependent lexicographic image is the mapped decrement
+of the product of its shifted fibre dimensions. The product and addition are in
+`WithBot ℕ∞`; subtraction is only in `ℕ∞`, and the map preserves bottom.
+Each shifted factor is nonzero, so an empty fibre gives bottom despite `0 * ⊥ = 0`.
+An empty index gives zero, and a singleton index preserves dimension.
+All membership subtypes inherit their ambient orders. The target has the canonical
+strict-lex partial order, with equality prefixes and weak comparison given by equality
+or strict comparison, not preservation of nonantisymmetric fibre weak equivalences. -/
+theorem Order.krullDim_toLex_pi
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    [∀ i, Preorder (β i)] (s : ∀ i, Set (β i)) :
+    Order.krullDim ((toLex : (∀ i, β i) → Lex (∀ i, β i)) '' Set.pi Set.univ s) =
+      WithBot.map (fun h : ℕ∞ => h - 1)
+        (∏ i, (Order.krullDim (s i) + 1 : WithBot ℕ∞)) := by
+  apply enat_withBot_succ_injective
+  rw [Order.succ_krullDim_eq_chainHeight, succ_map_sub_one_prod_add_one]
+  calc
+    _ = ∏ i, (s i).chainHeight (fun a b : β i ↦ a < b) :=
+      Set.chainHeight_toLex_pi s (by intro f _ i _ _ _; exact lt_irrefl (f i))
+    _ = ∏ i, WithBot.succ (Order.krullDim (s i)) :=
+      Finset.prod_congr rfl fun i _ ↦ (Order.succ_krullDim_eq_chainHeight (s i)).symm
 
 private theorem succ_card_sub_one_add_sum
     {ι : Type u} (J : Finset ι) (hJ : J.Nonempty) (d : ι → WithBot ℕ∞)
