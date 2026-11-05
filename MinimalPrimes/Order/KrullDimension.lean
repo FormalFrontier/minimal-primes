@@ -1030,6 +1030,129 @@ theorem Order.succ_krullDim_eq_chainHeight
       rw [WithBot.succ_coe, Order.succ_eq_add_one]
       exact hH.symm
 
+/-- The height of a point is the strict-chain vertex height of its strict lower segment. -/
+theorem Order.height_eq_chainHeight_Iio
+    {α : Type u} [Preorder α] (a : α) :
+    Order.height a = (Set.Iio a).chainHeight ((· < ·) : α → α → Prop) := by
+  have hheight (x : Set.Iio a) : Order.height x = Order.height (x : α) :=
+    Order.height_eq_of_strictMono (fun y : Set.Iio a ↦ (y : α)) (fun _ _ h ↦ h)
+      (fun x y hy ↦ ⟨⟨y, hy.trans x.property⟩, hy, rfl⟩) x
+  apply eq_of_forall_ge_iff
+  intro d
+  cases d with
+  | top => simp
+  | coe n =>
+    cases n with
+    | zero =>
+      simp only [ENat.natCast_zero, nonpos_iff_eq_zero, Order.height_eq_zero,
+        Set.chainHeight_eq_zero_iff, Set.eq_empty_iff_forall_notMem,
+        Set.mem_Iio, isMin_iff_forall_not_lt]
+    | succ n =>
+      change Order.height a ≤ ((n + 1 : ℕ) : ℕ∞) ↔ _
+      rw [Order.height_le_coe_iff]
+      simp only [Nat.cast_succ, ENat.lt_natCast_add_one_iff]
+      rw [← Order.krullDim_le_iff_chainHeight_le (Set.Iio a) n,
+        Order.krullDim_eq_iSup_height, iSup_le_iff]
+      simp only [WithBot.coe_le_coe, hheight]
+      exact ⟨fun h x ↦ h x.val x.property, fun h x hx ↦ h ⟨x, hx⟩⟩
+
+/-- The coheight of a point is the strict-chain vertex height of its strict upper segment. -/
+theorem Order.coheight_eq_chainHeight_Ioi
+    {α : Type u} [Preorder α] (a : α) :
+    Order.coheight a = (Set.Ioi a).chainHeight ((· < ·) : α → α → Prop) := by
+  exact (Order.height_eq_chainHeight_Iio (α := αᵒᵈ) a).trans
+    (Set.chainHeight_flip (Set.Ioi a) ((· < ·) : α → α → Prop))
+
+/-- The height of a pair in the lexicographic product of preorders is the first
+coordinate height times the strict-chain vertex height of the whole second factor,
+plus the second coordinate height. Arithmetic is in `ℕ∞`, including `0 * ⊤ = 0`;
+ties in the first coordinate require equality. -/
+theorem Order.height_toLex_prod
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (a : α) (b : β) :
+    Order.height (toLex (a, b)) =
+      Order.height a * (Set.univ : Set β).chainHeight ((· < ·) : β → β → Prop) +
+        Order.height b := by
+  rw [Order.height_eq_chainHeight_Iio, Order.height_eq_chainHeight_Iio a,
+    Order.height_eq_chainHeight_Iio b]
+  have hsegment : Set.Iio (toLex (a, b)) =
+      (toLex : α × β → α ×ₗ β) ''
+        ((Set.Iio a ×ˢ Set.univ) ∪ ({a} ×ˢ Set.Iio b)) := by
+    ext x
+    simp only [Set.mem_Iio, Prod.Lex.lt_iff, ofLex_toLex, Set.mem_image_equiv,
+      toLex_symm_eq, Set.mem_union, Set.mem_prod, Set.mem_univ, and_true,
+      Set.mem_singleton_iff]
+  rw [hsegment]
+  calc
+    _ = ((Set.Iio a ×ˢ Set.univ) ∪ ({a} ×ˢ Set.Iio b)).chainHeight
+        (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) :=
+      Set.chainHeight_eq_of_relIso _
+        (RelIso.ofOnFun ((· < ·) : α ×ₗ β → α ×ₗ β → Prop) toLex)
+    _ = (Set.Iio a ×ˢ (Set.univ : Set β)).chainHeight
+          (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) +
+        ({a} ×ˢ Set.Iio b).chainHeight
+          (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) := by
+      apply Set.chainHeight_union_of_disjoint_of_cross
+      · refine Set.disjoint_left.mpr ?_
+        intro p hp hq
+        exact (ne_of_lt hp.1) (Set.mem_singleton_iff.mp hq.1)
+      · intro p hp q hq
+        left
+        apply Prod.lex_iff.mpr
+        left
+        simpa only [Set.mem_Iio, Set.mem_singleton_iff.mp hq.1] using hp.1
+    _ = _ := by
+      rw [Set.chainHeight_prod_lex _ _ _ _ (fun c _ ↦ lt_irrefl c),
+        Set.singleton_prod]
+      exact congrArg (_ + ·)
+        (Set.chainHeight_eq_of_relEmbedding (Set.Iio b)
+          (RelEmbedding.prodLexMkLeft ((· < ·) : β → β → Prop) (lt_irrefl a)))
+
+/-- The coheight of a pair in the lexicographic product of preorders uses the same
+whole-second-factor strict-chain vertex height as `Order.height_toLex_prod`.
+Arithmetic is in `ℕ∞`, including infinite coheights and `0 * ⊤ = 0`;
+ties in the first coordinate require equality. -/
+theorem Order.coheight_toLex_prod
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (a : α) (b : β) :
+    Order.coheight (toLex (a, b)) =
+      Order.coheight a * (Set.univ : Set β).chainHeight ((· < ·) : β → β → Prop) +
+        Order.coheight b := by
+  rw [Order.coheight_eq_chainHeight_Ioi, Order.coheight_eq_chainHeight_Ioi a,
+    Order.coheight_eq_chainHeight_Ioi b]
+  have hsegment : Set.Ioi (toLex (a, b)) =
+      (toLex : α × β → α ×ₗ β) ''
+        ((Set.Ioi a ×ˢ Set.univ) ∪ ({a} ×ˢ Set.Ioi b)) := by
+    ext x
+    simp only [Set.mem_Ioi, Prod.Lex.lt_iff, ofLex_toLex, Set.mem_image_equiv,
+      toLex_symm_eq, Set.mem_union, Set.mem_prod, Set.mem_univ, and_true,
+      Set.mem_singleton_iff, eq_comm]
+  rw [hsegment]
+  calc
+    _ = ((Set.Ioi a ×ˢ Set.univ) ∪ ({a} ×ˢ Set.Ioi b)).chainHeight
+        (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) :=
+      Set.chainHeight_eq_of_relIso _
+        (RelIso.ofOnFun ((· < ·) : α ×ₗ β → α ×ₗ β → Prop) toLex)
+    _ = (Set.Ioi a ×ˢ (Set.univ : Set β)).chainHeight
+          (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) +
+        ({a} ×ˢ Set.Ioi b).chainHeight
+          (Prod.Lex ((· < ·) : α → α → Prop) ((· < ·) : β → β → Prop)) := by
+      apply Set.chainHeight_union_of_disjoint_of_cross
+      · refine Set.disjoint_left.mpr ?_
+        intro p hp hq
+        exact (ne_of_gt hp.1) (Set.mem_singleton_iff.mp hq.1)
+      · intro p hp q hq
+        right
+        apply Prod.lex_iff.mpr
+        left
+        simpa only [Set.mem_Ioi, Set.mem_singleton_iff.mp hq.1] using hp.1
+    _ = _ := by
+      rw [Set.chainHeight_prod_lex _ _ _ _ (fun c _ ↦ lt_irrefl c),
+        Set.singleton_prod]
+      exact congrArg (_ + ·)
+        (Set.chainHeight_eq_of_relEmbedding (Set.Ioi b)
+          (RelEmbedding.prodLexMkLeft ((· < ·) : β → β → Prop) (lt_irrefl a)))
+
 private theorem enat_withBot_succ_injective :
     Function.Injective (WithBot.succ : WithBot ℕ∞ → ℕ∞) := by
   intro a b h

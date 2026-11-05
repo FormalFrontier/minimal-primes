@@ -333,6 +333,46 @@ three and its tagged lexicographic sum has dimension four.
 The vertex-height input is the existing whole `Set.chainHeight_toLex_prod`
 formula, together with the finite-cut dimension comparisons above.
 
+### Point heights and coheights of binary lexicographic products
+
+For independently universed given preorders `α : Type u`, `β : Type v` and points
+`a : α`, `b : β`, put `Hβ = (Set.univ : Set β).chainHeight (· < ·)`. The formulas
+[`Order.height_toLex_prod` and `Order.coheight_toLex_prod`](MinimalPrimes/Order/KrullDimension.lean)
+are
+
+```text
+height (toLex (a, b))   = height a   * Hβ + height b
+coheight (toLex (a, b)) = coheight a * Hβ + coheight b
+```
+
+All arithmetic is in `ℕ∞`. Both use the same whole-second-factor strict-chain
+**vertex cardinality**, not its Krull dimension, the rank of `b`, or the cardinality
+of `β`. The target retains Mathlib's binary `Prod.Lex` preorder on `α ×ₗ β`:
+`toLex (a, b) ≤ toLex (a', b')` means `a < a'` or `a = a' ∧ b ≤ b'`;
+strict comparison replaces the second `≤` by `<`. Distinct weakly equivalent
+first coordinates therefore give incomparable fibres. Within a fixed first
+coordinate, distinct weakly equivalent second points remain mutually weakly
+comparable. This is the binary preorder, not the equality-or-strict partial order
+on dependent functions or the pointwise product order.
+
+The supporting identities `Order.height_eq_chainHeight_Iio` and
+`Order.coheight_eq_chainHeight_Ioi` identify point height and coheight with the
+strict-chain vertex heights of the original strict lower and upper segments.
+They use the given preorder's strict relation, without decomposing a closed
+segment into its strict segment and an endpoint, which fails for general preorders.
+There is no linearity, antisymmetry, finiteness, decidable equality, global
+nonemptiness, bottom/top, finite-height or attainment hypothesis. The supplied
+points inhabit both factors; empty strict segments have height zero, and
+`0 * ⊤ = 0`. Infinite values include unbounded finite chains without a longest
+or infinite chain.
+
+The [middle-point client](MinimalPrimesTest/Order/KrullDimension.lean) gives both
+height four and coheight four at `toLex ((1 : Fin 3), (1 : Fin 3))`, whereas the
+pointwise pair has both ranks two. Here `Hβ = 3`, not the second-factor dimension
+two. The proofs combine the strict-segment identities with the existing whole
+lexicographic product, disjoint-union, singleton-slice and direction-reversal
+chain-height APIs.
+
 ### Krull dimension of finite dependent lexicographic products
 
 For a finite linearly ordered index `ι : Type u`, independently universed given
@@ -1262,7 +1302,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.Data.ENat.BigOperators`](MinimalPrimes/Data/ENat/BigOperators.lean) | Bottom-aware successors of nonempty-subset product expansions, including empty indices and arbitrary bottom/top values. |
 | [`MinimalPrimes.Order.ChainHeight`](MinimalPrimes/Order/ChainHeight.lean) | ENat chain-cardinality suprema for exclusive-piece incomparable families and inclusion-directed unions, maximum for disjoint tagged sums, Scott continuity for directed relation suprema with the empty-family false-relation baseline, multiplication for lexicographic set products under local first irreflexivity, law-free addition for disjoint cross-comparable unions and lexicographic tagged sums, finite-sum suprema for dependent lexicographic sums over active index chains, and canonical less-than `toLex` transport. |
 | [`MinimalPrimes.Order.FiniteHeightChain`](MinimalPrimes/Order/FiniteHeightChain.lean) | Well-founded lower intervals at finite ambient height. |
-| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
+| [`MinimalPrimes.Order.KrullDimension`](MinimalPrimes/Order/KrullDimension.lean) | `WithBot ℕ∞` dimension suprema for directed and upper/lower-set unions, pointwise product formulas, strict-segment point ranks and weighted binary lexicographic height/coheight formulas, boundary-deletion bounds and finite-bound characterizations; reverse comparison in dimension at most two. |
 | [`MinimalPrimes.Order.Filter.Basic`](MinimalPrimes/Order/Filter/Basic.lean) | Sort-general section reflection and comparison of filters on fibres with distinct values. |
 | [`MinimalPrimes.Order.Filter.Product`](MinimalPrimes/Order/Filter/Product.lean) | Section-setoid comparison on nontrivial fibres and algebra on dependent reduced products. |
 | [`MinimalPrimes.Order.Filter.Product.CompTendsto`](MinimalPrimes/Order/Filter/Product/CompTendsto.lean) | Dependent index pullback, full injectivity criterion, equivalence-index surjectivity and two-way reindexing equivalence. |
@@ -1356,6 +1396,11 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
   The dependent-sum dimension formula reuses this whole height core and the earlier
   Formal Frontier finite-cut dimension comparisons, together with Mathlib's
   bottom-aware successor, subtype and finite-sum APIs.
+- Binary lexicographic point ranks use Mathlib's given `Prod.Lex` preorder,
+  point-height and coheight APIs, strict-chain height and `Set.chainHeight_flip`,
+  together with this library's whole product and disjoint cross-comparable union
+  formulas. Strict-segment ranks retain the original preorder and its inherited
+  interval orders; see the [order module](MinimalPrimes/Order/KrullDimension.lean).
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
   propagation of zero powers and finite-set order bounds; see the

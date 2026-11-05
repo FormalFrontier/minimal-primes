@@ -202,12 +202,41 @@ status:
     The finite-product successor identity uses WithBot ℕ∞ products and sums over
     nonempty subsets, with equality in ℕ∞ and no index equality, nonempty-index,
     nonbottom or finite-value hypothesis.
+    For arbitrary given preorders α : Type u and β : Type v in independent universes
+    and points a : α, b : β, the canonical binary Prod.Lex preorder satisfies
+    height (toLex (a,b)) = height a * Hβ + height b and
+    coheight (toLex (a,b)) = coheight a * Hβ + coheight b in ℕ∞, with the same
+    Hβ = (Set.univ : Set β).chainHeight (· < ·), the whole second factor's strict-chain
+    vertex cardinality. This coefficient is not its Krull dimension, the rank of b,
+    or its carrier cardinality. Weak comparison is first-coordinate strict comparison
+    or first-coordinate equality followed by second-coordinate weak comparison; strict
+    comparison uses second-coordinate strict comparison instead. Distinct weakly equivalent
+    first coordinates give incomparable fibres, while fixed-first fibres retain distinct
+    weakly equivalent second points and their mutual weak comparisons. This is not the
+    dependent-function equality-or-strict partial order or the pointwise product order.
+    The point-rank bridges identify height a and coheight a with the strict-chain vertex
+    heights of the original Iio a and Ioi a for the given strict relation, without a
+    closed-segment decomposition that fails for general preorders. There are no linearity,
+    antisymmetry, global nonemptiness, decidable-equality, bottom/top, finiteness,
+    finite-height or attainment premises. The given points inhabit the factors; empty
+    strict segments have height zero, 0 * ⊤ = 0, and unbounded finite chains need not
+    attain infinite height. The middle point of Fin 3 ×ₗ Fin 3 has both height and
+    coheight four, rather than the pointwise values two; its second-factor weight is
+    three, not dimension two.
     For a supplied section of a finite dependent family of given preorders, height
     and coheight in the original pointwise product equal the sums of coordinate
     ranks in ENat. Empty indices and infinite or unattained ranks are included,
     without antisymmetry, fibre inhabitation or finite-height hypotheses.
   sorry_count: 0
   main_results:
+    - declaration: Order.height_eq_chainHeight_Iio
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.coheight_eq_chainHeight_Ioi
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.height_toLex_prod
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.coheight_toLex_prod
+      file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.height_pi
       file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: Order.coheight_pi
@@ -271,6 +300,9 @@ acknowledgements: >-
   lexicographic height formula and the bottom-aware successor comparison.
   The scalar successor identity reuses Mathlib's whole finite-product expansion
   Finset.prod_add_one, finite-sum single-point separation and WithBot coercion APIs.
+  Binary lexicographic point ranks use Mathlib's Prod.Lex preorder, point-rank,
+  inherited-interval and chain-height APIs, including Set.chainHeight_flip, with the
+  earlier Formal Frontier lexicographic product and disjoint cross-comparable union formulas.
   The finite pointwise rank formulas compose the binary rank identities with
   Mathlib's order-isomorphism rank invariance, canonical finite-Pi splitting and
   reindexing, and finite-sum APIs.

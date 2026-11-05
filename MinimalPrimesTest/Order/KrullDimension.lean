@@ -9,10 +9,13 @@ import Mathlib.Data.Set.Sigma
 import Mathlib.Tactic.NormNum
 
 /-!
-# Dependent lexicographic dimension clients
+# Lexicographic dimension and point-rank clients
 
 The family application uses the stock Sigma set. The sparse numerical example
 has an infinite ambient index with an empty middle fiber excluded from the sum.
+The middle point of `Fin 3 ×ₗ Fin 3` has height and coheight four, rather than the
+pointwise values two: each first-coordinate step has weight three, the whole
+second factor's strict-chain vertex height, not its dimension two.
 -/
 
 open scoped BigOperators
@@ -65,3 +68,19 @@ private theorem krullDim_toLex_sigma_sparse :
   change Order.krullDim ((toLex : (Σ _ : ℕ, Unit) → (Σₗ _ : ℕ, Unit)) '' S) = 1
   rw [Order.krullDim_toLex_sigma S hI hc, hindex,
     Finset.sum_eq_zero hfiber, add_zero]
+
+private theorem lex_middle_point_ranks :
+    Order.height (toLex ((1 : Fin 3), (1 : Fin 3))) = 4 ∧
+      Order.coheight (toLex ((1 : Fin 3), (1 : Fin 3))) = 4 := by
+  have hwhole : (Set.univ : Set (Fin 3)).chainHeight (· < ·) = 3 := by
+    rw [← Set.encard_eq_chainHeight_of_isChain _ (fun _ _ _ _ h ↦ lt_or_gt_of_ne h)]
+    simp [ENat.card_eq_coe_fintype_card]
+  have hheight : Order.height (1 : Fin 3) = 1 := by
+    rw [Order.height_eq_chainHeight_Iio,
+      show Set.Iio (1 : Fin 3) = {0} from Set.ext (by decide),
+      ← Set.encard_eq_chainHeight_of_isChain _ IsChain.singleton, Set.encard_singleton]
+  have hcoheight : Order.coheight (1 : Fin 3) = 1 := by
+    rw [Order.coheight_eq_chainHeight_Ioi,
+      show Set.Ioi (1 : Fin 3) = {2} from Set.ext (by decide),
+      ← Set.encard_eq_chainHeight_of_isChain _ IsChain.singleton, Set.encard_singleton]
+  norm_num [Order.height_toLex_prod, Order.coheight_toLex_prod, hwhole, hheight, hcoheight]
