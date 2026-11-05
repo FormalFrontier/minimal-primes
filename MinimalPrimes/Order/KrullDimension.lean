@@ -577,6 +577,100 @@ theorem Order.coheight_prod
     (OrderIso.refl _ : (α × β)ᵒᵈ ≃o αᵒᵈ × βᵒᵈ) (a, b)).symm.trans
       (Order.height_prod (α := αᵒᵈ) (β := βᵒᵈ) a b)
 
+private theorem Order.pi_fin_ranks :
+    ∀ (n : ℕ) (β : Fin n → Type v) [∀ i, Preorder (β i)] (f : ∀ i, β i),
+      Order.height f = ∑ i, Order.height (f i) ∧
+        Order.coheight f = ∑ i, Order.coheight (f i) := by
+  intro n
+  induction n with
+  | zero =>
+    intro β _ f
+    constructor
+    · rw [Fin.sum_univ_zero]
+      apply Order.height_eq_zero.mpr
+      intro g hg i
+      exact Fin.elim0 i
+    · rw [Fin.sum_univ_zero]
+      apply Order.coheight_eq_zero.mpr
+      intro g hg i
+      exact Fin.elim0 i
+  | succ n ih =>
+    intro β _ f
+    obtain ⟨hh, hc⟩ := ih (fun i => β i.succ) (Fin.tail f)
+    have hsplit : (Fin.consOrderIso β).symm f = (f 0, Fin.tail f) := by
+      apply (Fin.consOrderIso β).injective
+      rw [OrderIso.apply_symm_apply]
+      ext i
+      rw [Fin.consOrderIso_apply]
+      exact congrFun (Fin.cons_self_tail f).symm i
+    constructor
+    · calc
+        Order.height f = Order.height ((Fin.consOrderIso β).symm f) :=
+          (Order.height_orderIso (Fin.consOrderIso β).symm f).symm
+        _ = Order.height (f 0) + Order.height (Fin.tail f) := by
+          rw [hsplit, Order.height_prod]
+        _ = ∑ i, Order.height (f i) := by
+          rw [Fin.sum_univ_succ, hh]
+          rfl
+    · calc
+        Order.coheight f = Order.coheight ((Fin.consOrderIso β).symm f) :=
+          (Order.coheight_orderIso (Fin.consOrderIso β).symm f).symm
+        _ = Order.coheight (f 0) + Order.coheight (Fin.tail f) := by
+          rw [hsplit, Order.coheight_prod]
+        _ = ∑ i, Order.coheight (f i) := by
+          rw [Fin.sum_univ_succ, hc]
+          rfl
+
+private theorem Order.pi_ranks
+    {ι : Type u} [Fintype ι] {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) :
+    Order.height f = ∑ i, Order.height (f i) ∧
+      Order.coheight f = ∑ i, Order.coheight (f i) := by
+  let e := (Fintype.equivFin ι).symm
+  let r := Equiv.piCongrLeft β e
+  have hr : Monotone r := by
+    intro a b hab i
+    obtain ⟨j, rfl⟩ := e.surjective i
+    simpa only [r, Equiv.piCongrLeft_apply_apply] using hab j
+  have hs : Monotone r.symm := by
+    intro a b hab j
+    simpa only [r, Equiv.piCongrLeft_symm_apply] using hab (e j)
+  let o := r.toOrderIso hr hs
+  obtain ⟨hh, hc⟩ := Order.pi_fin_ranks (Fintype.card ι) (fun j => β (e j)) (o.symm f)
+  constructor
+  · calc
+      Order.height f = Order.height (o.symm f) :=
+        (Order.height_orderIso o.symm f).symm
+      _ = ∑ j, Order.height (o.symm f j) := hh
+      _ = ∑ i, Order.height (f i) := by
+        change (∑ j, Order.height (f (e j))) = _
+        exact e.sum_comp (fun i => Order.height (f i))
+  · calc
+      Order.coheight f = Order.coheight (o.symm f) :=
+        (Order.coheight_orderIso o.symm f).symm
+      _ = ∑ j, Order.coheight (o.symm f j) := hc
+      _ = ∑ i, Order.coheight (f i) := by
+        change (∑ j, Order.coheight (f (e j))) = _
+        exact e.sum_comp (fun i => Order.coheight (f i))
+
+/-- The height of a point in a finite dependent product of preorders is the sum of
+its coordinate heights. -/
+theorem Order.height_pi
+    {ι : Type u} [Fintype ι]
+    {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) :
+    Order.height f = ∑ i, Order.height (f i) := by
+  exact (Order.pi_ranks f).1
+
+/-- The coheight of a point in a finite dependent product of preorders is the sum of
+its coordinate coheights. -/
+theorem Order.coheight_pi
+    {ι : Type u} [Fintype ι]
+    {β : ι → Type v} [∀ i, Preorder (β i)]
+    (f : ∀ i, β i) :
+    Order.coheight f = ∑ i, Order.coheight (f i) := by
+  exact (Order.pi_ranks f).2
+
 /-- The dimension of a pointwise product of preorders is the sum of the factor
 dimensions in `WithBot ℕ∞`. An empty factor gives bottom even when the other
 factor has infinite dimension. -/

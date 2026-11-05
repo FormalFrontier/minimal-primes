@@ -18,6 +18,27 @@ the subset products and their sum are in `WithBot ℕ∞`. Empty `J` and arbitra
 bottom and top values are included, with no decidable-equality premise on `ι`.
 The proof reuses Mathlib's whole finite-product expansion `Finset.prod_add_one`.
 
+### Ranks of finite dependent pointwise products
+
+For a finite index `ι : Type u`, independently universed given preorders
+`β : ι → Type v`, and a section `f : ∀ i, β i`,
+[`Order.height_pi` and `Order.coheight_pi`](MinimalPrimes/Order/KrullDimension.lean)
+state
+
+```lean
+Order.height f = ∑ i, Order.height (f i)
+Order.coheight f = ∑ i, Order.coheight (f i)
+```
+
+These are equalities in `ℕ∞` for the original pointwise product preorder and the
+original fibre preorders, including infinite ranks and unbounded finite chain
+lengths with no attaining chain. No antisymmetry, fibre inhabitation, finite-height
+or attainment hypothesis is required. An empty index gives both ranks zero;
+the top of the pointwise `Fin 2 → Fin 2` square has height two, not lexicographic
+rank three. The proofs compose the binary rank identities with Mathlib's
+order-isomorphism rank invariance, canonical finite-Pi head/tail splitting and
+reindexing, and finite-sum formulas.
+
 ### Chain cardinalities of unions
 
 For an arbitrary relation `r` and subsets `s`, `t` of any type,
@@ -880,7 +901,10 @@ and the linked module documentation for statements, examples, proof ideas and Ma
   assumption is required, and irreducible elements need not be prime.
 - **Height and dimension of pointwise products**
   ([module](MinimalPrimes/Order/KrullDimension.lean)). In arbitrary preorders,
-  pair heights and coheights are the sums of their coordinate values in `ℕ∞`.
+  `Order.height_pi` and `Order.coheight_pi` express the ranks of a section of a
+  finite dependent product as sums of its coordinate ranks in `ℕ∞`, including
+  infinite ranks and rank zero for an empty index. The binary formulas are
+  `Order.height_prod` and `Order.coheight_prod`.
   `Order.krullDim_prod` and `Order.krullDim_pi` give the dimension of binary
   and finite dependent products as the sum of the factor dimensions in `WithBot ℕ∞`.
   Empty factors give bottom even alongside infinite dimension; an empty-index

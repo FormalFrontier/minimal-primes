@@ -13,6 +13,7 @@ public import MinimalPrimesTest.NatSix
 public import MinimalPrimesTest.ResidueFieldPiUltrafilter
 public import MinimalPrimesTest.Order.FiniteHeightChain
 public import MinimalPrimesTest.Order.KrullDimension
+public import MinimalPrimesTest.Order.PiRanks
 public import MinimalPrimesTest.Order.Filter.Basic
 public import MinimalPrimesTest.Order.Filter.Germ.Center
 public import MinimalPrimesTest.Order.Filter.Germ.Map

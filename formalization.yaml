@@ -44,6 +44,9 @@ project:
     For arbitrary finite sets and WithBot ℕ∞ values, the bottom-aware successor of
     the nonempty-subset product sum equals the product of successors in ℕ∞,
     including empty indices and arbitrary bottom and top values.
+    For finite dependent families of preorders in independent universes, the height
+    and coheight of a supplied section are the sums of its coordinate ranks in ENat,
+    for the original pointwise order, including empty indices and infinite ranks.
   authors: [Formal Frontier Agents]
   license: Apache-2.0
 
@@ -70,18 +73,24 @@ highlights:
     declarations:
       - declaration: Filter.Product.nontrivial_iff
         file: MinimalPrimes/Order/Filter/Product/Nontrivial.lean
-  - title: Krull dimension of lexicographic sums
+  - title: Krull dimension and chain cardinalities of lexicographic sums
     statement: >-
       For arbitrary subsets of independently universed dependent preorders whose active
       indices form a finite strict chain, the stock lexicographic Sigma dimension is the
       active-index dimension plus the sum of active fiber dimensions. Empty support and
       infinite fiber dimensions are included. For two arbitrary preorder subsets, the
       tagged lexicographic union has the maximum of their dimensions and their sum plus one.
+      For arbitrary subsets of independently universed dependent sums with raw relations,
+      chain height is the supremum of finite sums of fiber heights, assuming only pairwise
+      comparability and irreflexivity of the active indices. Empty fibers and infinite heights
+      are allowed, with no transitivity, global order, finiteness or attainment hypothesis.
     declarations:
       - declaration: Order.krullDim_toLex_sigma
         file: MinimalPrimes/Order/KrullDimension.lean
       - declaration: Order.krullDim_toLex_sum
         file: MinimalPrimes/Order/KrullDimension.lean
+      - declaration: Set.chainHeight_sigma_lex
+        file: MinimalPrimes/Order/ChainHeight.lean
 
   - title: Krull dimension of finite dependent lexicographic products
     statement: >-
@@ -107,15 +116,6 @@ highlights:
       - declaration: Pi.Lex.partialOrderOfLT_eq
         file: MinimalPrimes/Order/PiLex.lean
 
-  - title: Chain cardinalities of dependent lexicographic sums
-    statement: >-
-      For arbitrary subsets of independently universed dependent sums with raw relations,
-      chain height is the supremum of finite sums of fiber heights, assuming only pairwise
-      comparability and irreflexivity of the active indices. Empty fibers and infinite heights
-      are allowed, with no transitivity, global order, finiteness or attainment hypothesis.
-    declarations:
-      - declaration: Set.chainHeight_sigma_lex
-        file: MinimalPrimes/Order/ChainHeight.lean
 
 sources:
   - title: Foundations of Algebraic Geometry
@@ -202,8 +202,16 @@ status:
     The finite-product successor identity uses WithBot ℕ∞ products and sums over
     nonempty subsets, with equality in ℕ∞ and no index equality, nonempty-index,
     nonbottom or finite-value hypothesis.
+    For a supplied section of a finite dependent family of given preorders, height
+    and coheight in the original pointwise product equal the sums of coordinate
+    ranks in ENat. Empty indices and infinite or unattained ranks are included,
+    without antisymmetry, fibre inhabitation or finite-height hypotheses.
   sorry_count: 0
   main_results:
+    - declaration: Order.height_pi
+      file: MinimalPrimes/Order/KrullDimension.lean
+    - declaration: Order.coheight_pi
+      file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: ENat.WithBot.succ_sum_powerset_nonempty
       file: MinimalPrimes/Data/ENat/BigOperators.lean
     - declaration: Order.krullDim_toLex_pi
@@ -263,4 +271,7 @@ acknowledgements: >-
   lexicographic height formula and the bottom-aware successor comparison.
   The scalar successor identity reuses Mathlib's whole finite-product expansion
   Finset.prod_add_one, finite-sum single-point separation and WithBot coercion APIs.
+  The finite pointwise rank formulas compose the binary rank identities with
+  Mathlib's order-isomorphism rank invariance, canonical finite-Pi splitting and
+  reindexing, and finite-sum APIs.
   AI agents developed the Lean code and examples.
