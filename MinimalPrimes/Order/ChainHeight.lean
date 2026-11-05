@@ -9,10 +9,15 @@ public import Mathlib.Data.Sigma.Lex
 public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.Height
+public import Mathlib.Order.PiLex
 public import Mathlib.Order.ScottContinuity.Complete
+import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Basic.Finite.Prod
+import Mathlib.Data.Finset.Sort
 import Mathlib.Data.Set.Card.Arithmetic
+import Mathlib.Data.Set.Prod
 import Mathlib.Order.CompleteLattice.Finset
+import Mathlib.Order.Fin.Tuple
 
 /-!
 # Chain heights of unions, lexicographic products and dependent sums
@@ -30,6 +35,14 @@ For the relation `Prod.Lex rα rβ`, comparison uses `rα` in the first coordina
 first coordinates together with `rβ` in the second. The chain height of a product of sets is the
 product of their chain heights when `rα` is irreflexive on the first set. No condition is required
 on `rβ`, which may have loops. Loops of `rα` outside the first set are irrelevant.
+
+For a finite linearly ordered index and dependent supports `s i`, the height of
+`Set.pi Set.univ s` under `Pi.Lex (<) q` is the product of the fibre heights, provided that
+coordinates preceding a nonsubsingleton support have no loops along supported functions.
+This condition is vacuous for an empty product support. The last varying support and trailing
+singleton supports may have loops, but an earlier singleton support still needs the condition
+when a later support varies. Prefix comparison uses equality, not preorder equivalence.
+The index and fibre universes are independent, and the fibres need no order laws or finiteness.
 
 For `Sum.Lex rα rβ`, comparison within each tag uses the corresponding factor relation, and
 every left-tagged point precedes every right-tagged point. The chain height of the union of the
@@ -105,6 +118,14 @@ its fibres. The first projection is a comparable subset, and local first irrefle
 each fibre a comparable subset for the second relation. This argument never sorts a chain or
 assumes either relation is transitive.
 
+For finite dependent products, the stock `Fin.consEquiv` and `Fin.pi_lex_lt_cons_cons` identify
+the relation and supports with a binary lexicographic product. Induction then reuses the binary
+height theorem with its subsingleton-tail case. The empty support is handled before choosing a
+supported function. An order-preserving `Fintype.orderIsoFinOfCardEq` and `Equiv.piCongrLeft`
+transport this formula to any finite linear index, including the empty index, whose product
+has height one. The canonical `toLex` image formula requires only less-than structures on the
+fibres.
+
 For unions, intersect a comparable subset with the two pieces. Each restriction remains
 comparable, and their union is the original subset. Cardinality subadditivity and the two
 piece-height bounds give the upper bound without any relation laws.
@@ -164,7 +185,18 @@ intersection and indexed-supremum APIs. The binary specialization uses the Bool 
 The sum formulas reuse `RelEmbedding.sumLexInl/Inr`, `RelEmbedding.sumLiftRelInl/Inr` and the
 whole `Set.chainHeight_eq_of_relEmbedding` transport from those Mathlib APIs. The disjoint-sum
 formula also uses the cross-tag negation lemmas from Lean's Sum relation API and `Sum.lt_def`
-for the ordinary-sum specialization. The dependent-sum relation is Mathlib's `Sigma.Lex`
+for the ordinary-sum specialization.
+The dependent-product proof uses `Mathlib.Order.PiLex` (Chris Hughes),
+`Mathlib.Order.Fin.Tuple` (Floris van Doorn, Yury Kudryashov, Sébastien Gouëzel and Chris Hughes),
+`Fin.consEquiv` from `Mathlib.Data.Fin.Tuple.Basic` (the same authors and Antoine Chambert-Loir),
+and the ordered finite reindexing API from `Mathlib.Data.Finset.Sort` (Mario Carneiro).
+Dependent function and support transport use `Equiv.piCongrLeft` from
+`Mathlib.Logic.Equiv.Basic` (Mario Carneiro and contributors). The Pi-support preimage API is from
+`Mathlib.Data.Set.Prod` (Mario Carneiro, Johannes Hölzl and Patrick Massot).
+Finite-product induction uses `Mathlib.Algebra.BigOperators.Fin`
+(Yury Kudryashov and Anne Baanen).
+
+The dependent-sum relation is Mathlib's `Sigma.Lex`
 from `Mathlib.Data.Sigma.Lex` (Yaël Dillies); the disjoint cross-comparable union statement
 generalizes the earlier Formal Frontier binary lexicographic-sum core. Finite partial unions
 use `Finset.set_biUnion_insert` and `Set.iUnion_eq_iUnion_finset` from
@@ -317,6 +349,235 @@ theorem chainHeight_toLex_prod
       chainHeight_eq_of_relIso (s ×ˢ t)
         (RelIso.ofOnFun (fun x y : α ×ₗ β => x < y) toLex)
     _ = _ := chainHeight_prod_lex _ _ s t (fun a _ => irrefl a)
+
+/-- Relations that agree on distinct points of a set have the same chain height on that set.
+The relations may differ on the diagonal and outside the set. -/
+theorem chainHeight_congr_rel
+    {α : Type u} (s : Set α) {r r' : α → α → Prop}
+    (h : s.Pairwise (fun a b ↦ r a b ↔ r' a b)) :
+    s.chainHeight r = s.chainHeight r' := by
+  have hc (t : Set α) (hts : t ⊆ s) : IsChain r t ↔ IsChain r' t := by
+    constructor
+    · intro ht
+      refine Set.Pairwise.imp_on ht ?_
+      intro a ha b hb hab
+      exact Or.imp (h (hts ha) (hts hb) hab).mp
+        (h (hts hb) (hts ha) hab.symm).mp
+    · intro ht
+      refine Set.Pairwise.imp_on ht ?_
+      intro a ha b hb hab
+      exact Or.imp (h (hts ha) (hts hb) hab).mpr
+        (h (hts hb) (hts ha) hab.symm).mpr
+  apply le_antisymm
+  · rw [Set.chainHeight_eq_iSup s r]
+    exact iSup_le fun t ↦ Set.encard_le_chainHeight_of_isChain s t.1 t.2.1
+      ((hc t.1 t.2.1).mp t.2.2)
+  · rw [Set.chainHeight_eq_iSup s r']
+    exact iSup_le fun t ↦ Set.encard_le_chainHeight_of_isChain s t.1 t.2.1
+      ((hc t.1 t.2.1).mpr t.2.2)
+
+/-- Chain heights multiply for a lexicographic product when every first-coordinate loop
+in the first support forces the second support to be subsingleton. -/
+theorem chainHeight_prod_lex_of_refl_imp_subsingleton
+    {α : Type u} {β : Type v} (rα : α → α → Prop) (rβ : β → β → Prop)
+    (s : Set α) (t : Set β) (hs : ∀ a ∈ s, rα a a → t.Subsingleton) :
+    (s ×ˢ t).chainHeight (Prod.Lex rα rβ) = s.chainHeight rα * t.chainHeight rβ := by
+  let rα' : α → α → Prop := fun a b ↦ rα a b ∧ a ≠ b
+  have hα : s.chainHeight rα' = s.chainHeight rα := by
+    apply chainHeight_congr_rel s
+    intro a _ b _ hab
+    exact ⟨fun h ↦ h.1, fun h ↦ ⟨h, hab⟩⟩
+  calc
+    (s ×ˢ t).chainHeight (Prod.Lex rα rβ) =
+        (s ×ˢ t).chainHeight (Prod.Lex rα' rβ) := by
+      apply chainHeight_congr_rel (s ×ˢ t)
+      intro x hx y hy hxy
+      constructor
+      · intro h
+        rcases Prod.lex_iff.mp h with h | ⟨ha, hb⟩
+        · refine Prod.lex_iff.mpr (Or.inl ⟨h, ?_⟩)
+          intro ha
+          have hloop : rα x.1 x.1 := by simpa only [← ha] using h
+          exact hxy (Prod.ext ha (hs x.1 hx.1 hloop hx.2 hy.2))
+        · exact Prod.lex_iff.mpr (Or.inr ⟨ha, hb⟩)
+      · intro h
+        rcases Prod.lex_iff.mp h with h | ⟨ha, hb⟩
+        · exact Prod.lex_iff.mpr (Or.inl h.1)
+        · exact Prod.lex_iff.mpr (Or.inr ⟨ha, hb⟩)
+    _ = s.chainHeight rα' * t.chainHeight rβ :=
+      chainHeight_prod_lex rα' rβ s t (fun a _ h ↦ h.2 rfl)
+    _ = s.chainHeight rα * t.chainHeight rβ := by rw [hα]
+
+section PiLex
+
+private theorem fin_cons_mem_univ_pi
+    {n : ℕ} {β : Fin (n + 1) → Type v} (s : ∀ i, Set (β i))
+    (a : β 0) (f : ∀ i : Fin n, β i.succ) :
+    Fin.cons a f ∈ Set.pi Set.univ s ↔
+      a ∈ s 0 ∧ f ∈ Set.pi Set.univ (fun i : Fin n => s i.succ) := by
+  simp only [Set.mem_pi, Set.mem_univ, true_implies, Fin.forall_fin_succ,
+    Fin.cons_zero, Fin.cons_succ]
+
+private theorem chainHeight_pi_lex_fin_cons
+    {n : ℕ} {β : Fin (n + 1) → Type v}
+    (q : ∀ {i}, β i → β i → Prop) (s : ∀ i, Set (β i)) :
+    (Set.pi Set.univ s).chainHeight (Pi.Lex (fun i j => i < j) (@q)) =
+      (s 0 ×ˢ Set.pi Set.univ (fun i : Fin n => s i.succ)).chainHeight
+        (Prod.Lex (@q 0)
+          (Pi.Lex (fun i j : Fin n => i < j) (@fun i : Fin n => @q i.succ))) := by
+  let e : Prod.Lex (@q 0)
+        (Pi.Lex (fun i j : Fin n => i < j) (@fun i : Fin n => @q i.succ)) ≃r
+      Pi.Lex (fun i j : Fin (n + 1) => i < j) (@q) :=
+    { toEquiv := Fin.consEquiv β
+      map_rel_iff' := by
+        intro x y
+        exact (Fin.pi_lex_lt_cons_cons q).trans Prod.lex_iff.symm }
+  have hsupport : e '' (s 0 ×ˢ Set.pi Set.univ (fun i : Fin n => s i.succ)) =
+      Set.pi Set.univ s := by
+    change (Fin.consEquiv β) '' _ = _
+    rw [Equiv.image_eq_preimage_symm]
+    ext f
+    change (f 0 ∈ s 0 ∧ Fin.tail f ∈
+      Set.pi Set.univ (fun i : Fin n => s i.succ)) ↔ f ∈ Set.pi Set.univ s
+    rw [← fin_cons_mem_univ_pi s, Fin.cons_self_tail]
+  rw [← hsupport]
+  exact chainHeight_eq_of_relIso _ e
+
+private theorem chainHeight_fin_pi_lex (n : ℕ) :
+    ∀ (β : Fin n → Type v) (q : ∀ {i}, β i → β i → Prop) (s : ∀ i, Set (β i)),
+      (∀ f ∈ Set.pi Set.univ s, ∀ i j : Fin n,
+        i < j → ¬ (s j).Subsingleton → ¬ q (f i) (f i)) →
+      (Set.pi Set.univ s).chainHeight (Pi.Lex (fun i j => i < j) (@q)) =
+        ∏ i, (s i).chainHeight (@q i) := by
+  induction n with
+  | zero =>
+      intro β q s _
+      have hsupport : Set.pi Set.univ s = {fun i : Fin 0 => Fin.elim0 i} :=
+        Set.subsingleton_of_subsingleton.eq_singleton_of_mem (fun i _ => Fin.elim0 i)
+      rw [hsupport, ← Set.encard_eq_chainHeight_of_isChain _ IsChain.singleton]
+      simp only [Set.encard_singleton, Fin.prod_univ_zero]
+  | succ n ih =>
+      intro β q s hs
+      classical
+      by_cases hsupport : (Set.pi Set.univ s).Nonempty
+      · obtain ⟨f, hf⟩ := hsupport
+        have htail : ∀ g ∈ Set.pi Set.univ (fun i : Fin n => s i.succ),
+            ∀ i j : Fin n, i < j → ¬ (s j.succ).Subsingleton → ¬ q (g i) (g i) := by
+          intro g hg i j hij hj
+          have hcons : Fin.cons (f 0) g ∈ Set.pi Set.univ s :=
+            (fin_cons_mem_univ_pi s _ _).mpr ⟨hf 0 (Set.mem_univ _), hg⟩
+          simpa only [Fin.cons_succ] using
+            hs (Fin.cons (f 0) g) hcons i.succ j.succ (Fin.strictMono_succ hij) hj
+        have hhead : ∀ a ∈ s 0, q a a →
+            (Set.pi Set.univ (fun i : Fin n => s i.succ)).Subsingleton := by
+          intro a ha hqa
+          apply Set.subsingleton_univ_pi
+          intro j
+          by_contra hj
+          have hcons : Fin.cons a (Fin.tail f) ∈ Set.pi Set.univ s :=
+            (fin_cons_mem_univ_pi s _ _).mpr
+              ⟨ha, fun i _ => hf i.succ (Set.mem_univ _)⟩
+          exact hs (Fin.cons a (Fin.tail f)) hcons 0 j.succ (Fin.succ_pos j) hj
+            (by simpa only [Fin.cons_zero] using hqa)
+        calc
+          _ = (s 0 ×ˢ Set.pi Set.univ (fun i : Fin n => s i.succ)).chainHeight
+              (Prod.Lex (@q 0)
+                (Pi.Lex (fun i j : Fin n => i < j) (@fun i : Fin n => @q i.succ))) :=
+            chainHeight_pi_lex_fin_cons q s
+          _ = (s 0).chainHeight (@q 0) *
+              (Set.pi Set.univ (fun i : Fin n => s i.succ)).chainHeight
+                (Pi.Lex (fun i j : Fin n => i < j) (@fun i : Fin n => @q i.succ)) :=
+            chainHeight_prod_lex_of_refl_imp_subsingleton _ _ _ _ hhead
+          _ = (s 0).chainHeight (@q 0) * ∏ i : Fin n, (s i.succ).chainHeight (@q i.succ) := by
+            rw [ih (fun i => β i.succ) (@fun i : Fin n => @q i.succ)
+              (fun i => s i.succ) htail]
+          _ = _ :=
+            (Fin.prod_univ_succ (fun i : Fin (n + 1) => (s i).chainHeight (@q i))).symm
+      · have hempty : Set.pi Set.univ s = ∅ := Set.not_nonempty_iff_eq_empty.mp hsupport
+        obtain ⟨i, hi⟩ := Set.univ_pi_eq_empty_iff.mp hempty
+        rw [hempty, Set.chainHeight_empty]
+        exact (Finset.prod_eq_zero (Finset.mem_univ i)
+          ((Set.chainHeight_eq_zero_iff (s i) (@q i)).mpr hi)).symm
+
+private theorem chainHeight_pi_lex_reindex
+    {ι : Type u} {κ : Type w} {β : ι → Type v}
+    {rι : ι → ι → Prop} {rκ : κ → κ → Prop}
+    (e : rκ ≃r rι) (q : ∀ {i}, β i → β i → Prop) (s : ∀ i, Set (β i)) :
+    (Set.pi Set.univ (fun i : κ => s (e i))).chainHeight
+        (Pi.Lex rκ (@fun i : κ => @q (e i))) =
+      (Set.pi Set.univ s).chainHeight (Pi.Lex rι (@q)) := by
+  let E : Pi.Lex rι (@q) ≃r Pi.Lex rκ (@fun i : κ => @q (e i)) :=
+    { toEquiv := (Equiv.piCongrLeft β e.toEquiv).symm
+      map_rel_iff' := by
+        intro f g
+        change (∃ i : κ, (∀ j, rκ j i → f (e j) = g (e j)) ∧
+          q (f (e i)) (g (e i))) ↔ Pi.Lex rι (@q) f g
+        constructor
+        · rintro ⟨i, hpre, hq⟩
+          refine ⟨e i, ?_, hq⟩
+          intro j hji
+          obtain ⟨k, rfl⟩ := e.surjective j
+          exact hpre k (e.map_rel_iff.mp hji)
+        · rintro ⟨i, hpre, hq⟩
+          obtain ⟨k, rfl⟩ := e.surjective i
+          exact ⟨k, fun j hji => hpre (e j) (e.map_rel_iff.mpr hji), hq⟩ }
+  have hsupport : E '' Set.pi Set.univ s = Set.pi Set.univ (fun i : κ => s (e i)) := by
+    change (Equiv.piCongrLeft β e.toEquiv).symm '' _ = _
+    rw [Equiv.image_symm_eq_preimage]
+    exact Equiv.piCongrLeft_preimage_univ_pi e.toEquiv s
+  rw [← hsupport]
+  exact chainHeight_eq_of_relIso _ E
+
+/-- Chain heights multiply for a finite dependent lexicographic product if coordinates
+preceding a nonsubsingleton support have no loops along supported functions. -/
+theorem chainHeight_pi_lex
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    (q : ∀ {i}, β i → β i → Prop) (s : ∀ i, Set (β i))
+    (hs : ∀ f ∈ Set.pi Set.univ s, ∀ i j : ι,
+      i < j → ¬ (s j).Subsingleton → ¬ q (f i) (f i)) :
+    (Set.pi Set.univ s).chainHeight (Pi.Lex (fun i j : ι => i < j) (@q)) =
+      ∏ i, (s i).chainHeight (@q i) := by
+  let e := Fintype.orderIsoFinOfCardEq ι rfl
+  have hs' : ∀ f ∈ Set.pi Set.univ (fun i : Fin (Fintype.card ι) => s (e i)),
+      ∀ i j : Fin (Fintype.card ι), i < j → ¬ (s (e j)).Subsingleton →
+        ¬ q (f i) (f i) := by
+    intro f hf i j hij hj
+    have hf' : Equiv.piCongrLeft β e.toEquiv f ∈ Set.pi Set.univ s := by
+      change f ∈ Equiv.piCongrLeft β e.toEquiv ⁻¹' Set.pi Set.univ s
+      rw [Equiv.piCongrLeft_preimage_univ_pi]
+      exact hf
+    have hfi : Equiv.piCongrLeft β e.toEquiv f (e i) = f i :=
+      Equiv.piCongrLeft_apply_apply β e.toEquiv f i
+    simpa only [hfi] using
+      hs (Equiv.piCongrLeft β e.toEquiv f) hf' (e i) (e j) (e.lt_iff_lt.mpr hij) hj
+  calc
+    _ = (Set.pi Set.univ (fun i : Fin (Fintype.card ι) => s (e i))).chainHeight
+        (Pi.Lex (fun i j : Fin (Fintype.card ι) => i < j)
+          (@fun i : Fin (Fintype.card ι) => @q (e i))) :=
+      (chainHeight_pi_lex_reindex e.toRelIsoLT q s).symm
+    _ = ∏ i : Fin (Fintype.card ι), (s (e i)).chainHeight (@q (e i)) :=
+      chainHeight_fin_pi_lex _ _ _ _ hs'
+    _ = _ := e.toEquiv.prod_comp (fun i => (s i).chainHeight (@q i))
+
+/-- Chain heights multiply for the `toLex` image of a finite dependent product, with the
+canonical less-than relation, if coordinates preceding a nonsubsingleton support have no loops
+along supported functions. Only less-than structures are required on the fibres. -/
+theorem chainHeight_toLex_pi
+    {ι : Type u} {β : ι → Type v} [Fintype ι] [LinearOrder ι]
+    [∀ i, LT (β i)] (s : ∀ i, Set (β i))
+    (hs : ∀ f ∈ Set.pi Set.univ s, ∀ i j : ι,
+      i < j → ¬ (s j).Subsingleton → ¬ (f i < f i)) :
+    ((toLex : (∀ i, β i) → Lex (∀ i, β i)) '' Set.pi Set.univ s).chainHeight
+        (fun x y : Lex (∀ i, β i) => x < y) =
+      ∏ i, (s i).chainHeight (fun x y : β i => x < y) := by
+  calc
+    _ = (Set.pi Set.univ s).chainHeight
+        (Pi.Lex (fun i j : ι => i < j) (fun {i} (x y : β i) => x < y)) :=
+      chainHeight_eq_of_relIso _
+        (RelIso.ofOnFun (fun x y : Lex (∀ i, β i) => x < y) toLex)
+    _ = _ := chainHeight_pi_lex (fun {i} (x y : β i) => x < y) s hs
+
+end PiLex
 
 /-- The chain height of a union is at most the sum of the chain heights of its pieces.
 The relation is arbitrary, the pieces may overlap, and either piece or the ambient type
