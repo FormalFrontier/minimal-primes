@@ -978,9 +978,9 @@ Both equalities use `WithBot ℕ∞`, including bottom for an empty-index cover 
 empty space and infinite or unbounded dimensions. No separation, sobriety,
 Noetherianity, quasi-compactness, finiteness or nonemptiness assumption is needed.
 
-### Topological dimension on locally finite closed covers
+### Topological dimension on closed covers and irreducible components
 
-The [closed-cover leaf](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) states
+The [closed-cover leaf](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) proves
 `topologicalKrullDim_eq_iSup_of_isClosedEmbedding_cover`: the dimension is the
 supremum of the dimensions of the given domains of a jointly surjective family of
 closed embeddings, provided the original indexed family of images is locally finite.
@@ -990,9 +990,18 @@ membership subtypes with their induced topologies. Both equalities are in
 `WithBot ℕ∞`, including empty covers and unbounded dimensions, without separation,
 sobriety, Noetherianity, quasi-compactness, nonemptiness or attainment assumptions.
 
+The same module proves `topologicalKrullDim_eq_iSup_irreducibleComponents`: for any
+given topological space `X`, its dimension equals
+`⨆ C : irreducibleComponents X, topologicalKrullDim (C : Set X)`.
+The index is the membership subtype of Mathlib's canonical set of components; each
+component carries its ordinary induced subspace topology. No local finiteness,
+Noetherianity, separation or sobriety assumption is imposed. The empty space has
+dimension `⊥`, and the supremum can be unbounded without being attained.
+
 The supporting containment theorem applies to any irreducible set, not necessarily
 closed. The characteristic range theorem for the existing `IrreducibleCloseds.map`
-and closed-embedding height invariance use the canonical inclusion orders.
+and closed-embedding height invariance use the canonical inclusion orders. Mathlib
+supplies canonical components, their closedness and whole-irreducible-set extension.
 
 ## Using the library
 
@@ -1224,7 +1233,7 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PiUltrafilter`](MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean) | Stone homeomorphism for arbitrary dependent products of semifields, basis transport and dense coordinate primes. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.ZeroDimensional`](MinimalPrimes/RingTheory/Spectrum/Prime/ZeroDimensional.lean) | Clopen basis, separation equivalences and the preconnected field criterion. |
 | [`MinimalPrimes.RingTheory.Spectrum.Prime.PositivePowerRange`](MinimalPrimes/RingTheory/Spectrum/Prime/PositivePowerRange.lean) | Injectivity and topological embedding of spectrum pullback from the positive-power criterion. |
-| [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers; irreducible containment and the existing map's range and height. |
+| [`MinimalPrimes.Topology.KrullDimension.ClosedCover`](MinimalPrimes/Topology/KrullDimension/ClosedCover.lean) | Topological dimension on locally finite closed-embedding covers and canonical irreducible components; irreducible containment and the existing map's range and height. |
 | [`MinimalPrimes.Topology.KrullDimension.OpenCover`](MinimalPrimes/Topology/KrullDimension/OpenCover.lean) | Topological dimension on open covers. |
 
 ## Conventions and limitations
