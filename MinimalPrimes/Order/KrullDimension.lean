@@ -5,12 +5,15 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Sigma.Order
 public import Mathlib.Data.Sum.Order
 public import Mathlib.Order.Directed
 public import Mathlib.Order.KrullDimension
 public import MinimalPrimes.Order.ChainHeight
 
 import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Algebra.BigOperators.WithTop
+import Mathlib.Data.ENat.BigOperators
 import Mathlib.Algebra.Order.Monoid.WithTop
 import Mathlib.Data.ENat.Basic
 import Mathlib.Data.List.Sort
@@ -37,6 +40,13 @@ pieces retain the ambient preorder, and the index type and carrier have independ
 universes. The equalities include empty unions, whose dimension is bottom, and
 infinite suprema that are not attained by a piece. They concern order dimension,
 not the topological dimension of an arbitrary subspace.
+
+For a dependent lexicographic sum, a finite strict chain of active indices gives
+the index-set dimension plus the sum of the active fiber dimensions. The ambient
+index and fiber universes are independent, and all subtype orders are inherited.
+Empty support gives bottom; top fiber dimensions require no attaining chain.
+The proof reuses the whole dependent-sum chain-height formula and the original
+finite-cut comparisons, with bottom-aware successor and finite-sum arithmetic.
 
 The same supremum formula holds for inclusion-directed unions of arbitrary subsets.
 Here too all subtypes inherit the given ambient preorder, with no antisymmetry,
@@ -91,6 +101,12 @@ Its vertex-height counterpart is `Set.chainHeight_toLex_sum` in
 ambient-set to inherited-subtype height comparison. The lexicographic product uses
 Mathlib's `Prod.Lex` preorder and the multiplicative vertex-height formula
 `Set.chainHeight_toLex_prod` in `MinimalPrimes.Order.ChainHeight`.
+
+The dependent-sum dimension formula uses Mathlib's `Sigma.Lex` preorder (Yaël Dillies)
+and the whole `Set.chainHeight_sigma_lex` formula in `MinimalPrimes.Order.ChainHeight`,
+which builds on the earlier Formal Frontier disjoint-union height core. Its dimension
+conversion reuses the original finite-cut comparisons below, with Mathlib's set-cardinality,
+bottom-aware successor and finite-sum APIs. No new chain construction is needed.
 
 Mathlib's `Order.KrullDimension` supplies the dimension bound, order-dual invariance,
 height and coheight, and their relations to `IsMin` and `IsMax`. Its `Order.RelSeries`
@@ -882,3 +898,137 @@ theorem Order.krullDim_union_le
   exact Set.chainHeight_union_le (fun a b : α ↦ a < b) s t
 
 end DimensionComparison
+
+/-- The bottom-aware successor of order dimension is strict-chain vertex height.
+Empty sets have dimension bottom and height zero; top records unbounded finite chains. -/
+theorem Order.succ_krullDim_eq_chainHeight
+    {α : Type u} [Preorder α] (s : Set α) :
+    WithBot.succ (Order.krullDim s) = s.chainHeight (fun a b : α ↦ a < b) := by
+  cases hd : Order.krullDim s with
+  | bot =>
+    have hs : s = ∅ := Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp hd)
+    simp [hs]
+  | coe d =>
+    cases d with
+    | top =>
+      rw [chainHeight_eq_top_of_krullDim_eq_top s hd]
+      change Order.succ (⊤ : ℕ∞) = ⊤
+      simp
+    | coe n =>
+      have hH : s.chainHeight (fun a b : α ↦ a < b) = (n + 1 : ℕ∞) :=
+        le_antisymm ((Order.krullDim_le_iff_chainHeight_le s n).mp hd.le)
+          ((Order.le_krullDim_iff_le_chainHeight s n).mp hd.ge)
+      change WithBot.succ ((n : ℕ∞) : WithBot ℕ∞) = _
+      rw [WithBot.succ_coe, Order.succ_eq_add_one]
+      exact hH.symm
+
+private theorem enat_withBot_succ_injective :
+    Function.Injective (WithBot.succ : WithBot ℕ∞ → ℕ∞) := by
+  intro a b h
+  cases a with
+  | bot =>
+    exact ((WithBot.succ_eq_bot b).mp (by simpa using h.symm)).symm
+  | coe a =>
+    cases b with
+    | bot =>
+      simp at h
+    | coe b =>
+      apply congrArg (fun n : ℕ∞ ↦ (n : WithBot ℕ∞))
+      apply ENat.add_left_injective_of_ne_top (by simp : (1 : ℕ∞) ≠ ⊤)
+      simpa only [WithBot.succ_coe, Order.succ_eq_add_one] using h
+
+private theorem coe_enat_withBot_succ (d : WithBot ℕ∞) (hd : d ≠ ⊥) :
+    ((WithBot.succ d : ℕ∞) : WithBot ℕ∞) = d + 1 := by
+  cases d with
+  | bot => exact (hd rfl).elim
+  | coe n => simp [WithBot.succ_coe, Order.succ_eq_add_one, WithBot.coe_add]
+
+private theorem succ_card_sub_one_add_sum
+    {ι : Type u} (J : Finset ι) (hJ : J.Nonempty) (d : ι → WithBot ℕ∞)
+    (hd : ∀ i ∈ J, d i ≠ ⊥) :
+    WithBot.succ (((J.card - 1 : ℕ) : WithBot ℕ∞) + ∑ i ∈ J, d i) =
+      ∑ i ∈ J, WithBot.succ (d i) := by
+  have hsum : ∑ i ∈ J, d i ≠ ⊥ := by
+    intro h
+    obtain ⟨i, hi, hbot⟩ := WithBot.sum_eq_bot_iff.mp h
+    exact hd i hi hbot
+  have hcard : J.card - 1 + 1 = J.card := Nat.sub_add_cancel hJ.card_pos
+  apply WithBot.coe_injective
+  calc
+    ((WithBot.succ (((J.card - 1 : ℕ) : WithBot ℕ∞) + ∑ i ∈ J, d i) : ℕ∞) :
+        WithBot ℕ∞) =
+        ((J.card - 1 : ℕ) : WithBot ℕ∞) + ∑ i ∈ J, d i + 1 :=
+      coe_enat_withBot_succ _ (by simp [WithBot.add_eq_bot, hsum])
+    _ = (∑ i ∈ J, d i) + (J.card : WithBot ℕ∞) := by
+      rw [add_right_comm, ← Nat.cast_one (R := WithBot ℕ∞), ← Nat.cast_add, hcard]
+      exact add_comm _ _
+    _ = ∑ i ∈ J, (d i + 1) := by simp [Finset.sum_add_distrib]
+    _ = ∑ i ∈ J, ((WithBot.succ (d i) : ℕ∞) : WithBot ℕ∞) :=
+      Finset.sum_congr rfl fun i hi ↦ (coe_enat_withBot_succ (d i) (hd i hi)).symm
+    _ = ((∑ i ∈ J, WithBot.succ (d i) : ℕ∞) : WithBot ℕ∞) :=
+      (WithBot.coe_sum _ _).symm
+
+/-- For a subset of a dependent lexicographic sum whose active indices form a finite
+strict chain, the order dimension is the dimension of the active index set plus the
+sum of the dimensions of its fibers in `WithBot ℕ∞`. Every membership subtype inherits
+the given preorder. Empty fibers are excluded from the sum; empty support gives bottom.
+The index and fiber universes are independent, and infinite fiber dimensions need not
+be attained by a chain. -/
+theorem Order.krullDim_toLex_sigma
+    {ι : Type u} {α : ι → Type v} [Preorder ι] [∀ i, Preorder (α i)]
+    (S : Set (Σ i, α i)) (hI : (Sigma.fst '' S).Finite)
+    (hchain : IsChain (· < ·) (Sigma.fst '' S)) :
+    Order.krullDim ((toLex : (Σ i, α i) → (Σₗ i, α i)) '' S) =
+      Order.krullDim (Sigma.fst '' S) +
+        ∑ i ∈ hI.toFinset, Order.krullDim ((Sigma.mk i) ⁻¹' S) := by
+  classical
+  have hheight :
+      ((toLex : (Σ i, α i) → (Σₗ i, α i)) '' S).chainHeight (· < ·) =
+        ∑ i ∈ hI.toFinset, ((Sigma.mk i) ⁻¹' S).chainHeight (· < ·) := by
+    calc
+      _ = S.chainHeight (Sigma.Lex (· < ·) (fun _ a b ↦ a < b)) :=
+        Set.chainHeight_eq_of_relIso S
+          (RelIso.ofOnFun ((· < ·) : (Σₗ i, α i) → (Σₗ i, α i) → Prop) toLex)
+      _ = ⨆ J : Finset ι, ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (· < ·) :=
+        Set.chainHeight_sigma_lex _ _ S hchain (fun i _ ↦ lt_irrefl i)
+      _ = _ := by
+        apply le_antisymm
+        · refine iSup_le fun J ↦ Finset.sum_le_sum_of_ne_zero fun i _ hi ↦ ?_
+          apply hI.mem_toFinset.mpr
+          have hne : ((Sigma.mk i) ⁻¹' S).Nonempty :=
+            Set.nonempty_iff_ne_empty.mpr ((Set.chainHeight_eq_zero_iff _ _).not.mp hi)
+          obtain ⟨a, ha⟩ := hne
+          exact ⟨⟨i, a⟩, ha, rfl⟩
+        · exact le_iSup (fun J : Finset ι ↦
+            ∑ i ∈ J, ((Sigma.mk i) ⁻¹' S).chainHeight (· < ·)) hI.toFinset
+  by_cases hS : S = ∅
+  · subst S
+    simp [Order.krullDim_eq_bot]
+  have hne : hI.toFinset.Nonempty := by
+    obtain ⟨a, ha⟩ := Set.nonempty_iff_ne_empty.mpr hS
+    exact ⟨a.1, hI.mem_toFinset.mpr ⟨a, ha, rfl⟩⟩
+  have hcard : hI.toFinset.card - 1 + 1 = hI.toFinset.card :=
+    Nat.sub_add_cancel hne.card_pos
+  have hIH : (Sigma.fst '' S).chainHeight (· < ·) = (hI.toFinset.card : ℕ∞) := by
+    rw [← Set.encard_eq_chainHeight_of_isChain _ hchain,
+      hI.encard_eq_coe_toFinset_card]
+  have hIdim : Order.krullDim (Sigma.fst '' S) =
+      ((hI.toFinset.card - 1 : ℕ) : WithBot ℕ∞) := by
+    apply le_antisymm
+    · apply (Order.krullDim_le_iff_chainHeight_le _ (hI.toFinset.card - 1)).mpr
+      rw [hIH, ← Nat.cast_one (R := ℕ∞), ← Nat.cast_add, hcard]
+    · apply (Order.le_krullDim_iff_le_chainHeight _ (hI.toFinset.card - 1)).mpr
+      rw [hIH, ← Nat.cast_one (R := ℕ∞), ← Nat.cast_add, hcard]
+  apply enat_withBot_succ_injective
+  rw [Order.succ_krullDim_eq_chainHeight, hheight, hIdim]
+  symm
+  calc
+    _ = ∑ i ∈ hI.toFinset, WithBot.succ (Order.krullDim ((Sigma.mk i) ⁻¹' S)) := by
+      apply succ_card_sub_one_add_sum hI.toFinset hne
+      intro i hi
+      apply Order.krullDim_ne_bot_iff.mpr
+      obtain ⟨⟨j, a⟩, ha, hji⟩ := hI.mem_toFinset.mp hi
+      dsimp at hji
+      subst j
+      exact ⟨⟨a, ha⟩⟩
+    _ = _ := Finset.sum_congr rfl fun i _ ↦ Order.succ_krullDim_eq_chainHeight _

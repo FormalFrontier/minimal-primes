@@ -69,10 +69,14 @@ highlights:
         file: MinimalPrimes/Order/Filter/Product/Nontrivial.lean
   - title: Krull dimension of lexicographic sums
     statement: >-
-      For arbitrary subsets of independently universed preorders, the dimension
-      of their tagged lexicographic union is the maximum of the two factor
-      dimensions and their sum plus one, including empty and infinite cases.
+      For arbitrary subsets of independently universed dependent preorders whose active
+      indices form a finite strict chain, the stock lexicographic Sigma dimension is the
+      active-index dimension plus the sum of active fiber dimensions. Empty support and
+      infinite fiber dimensions are included. For two arbitrary preorder subsets, the
+      tagged lexicographic union has the maximum of their dimensions and their sum plus one.
     declarations:
+      - declaration: Order.krullDim_toLex_sigma
+        file: MinimalPrimes/Order/KrullDimension.lean
       - declaration: Order.krullDim_toLex_sum
         file: MinimalPrimes/Order/KrullDimension.lean
 
@@ -170,6 +174,8 @@ status:
     codomain, including bottom for the zero ring and top for infinite dimension.
   sorry_count: 0
   main_results:
+    - declaration: Order.krullDim_toLex_sigma
+      file: MinimalPrimes/Order/KrullDimension.lean
     - declaration: PrimeSpectrum.piHomeomorphUltrafilter
       file: MinimalPrimes/RingTheory/Spectrum/Prime/PiUltrafilter.lean
     - declaration: Ideal.minimalPrimes_span_singleton_eq_normalizedFactors
@@ -214,4 +220,7 @@ acknowledgements: >-
   The dependent lexicographic chain-height formula uses Mathlib's stock Sigma relation,
   chain-height, set-cardinality and finite-subunion APIs and generalizes the earlier
   Formal Frontier binary lexicographic-sum union core.
+  The finite-support Sigma dimension formula consumes that whole height formula and the
+  earlier Formal Frontier dimension/height finite cuts, with Mathlib's bottom-aware
+  successor and finite-sum arithmetic.
   AI agents developed the Lean code and examples.

@@ -210,6 +210,35 @@ fiber's height through `Sigma.mk`, applies the disjoint union formula by finite
 induction, and uses the existing inclusion-directed union theorem for the union of
 all finite partial unions.
 
+### Krull dimension of dependent lexicographic sums
+
+For independently universed given preorders `ι : Type u` and `α : ι → Type v`,
+[`Order.krullDim_toLex_sigma`](MinimalPrimes/Order/KrullDimension.lean) applies to any
+`S : Set (Σ i, α i)` whose active image `I = Sigma.fst '' S` is finite and a
+strict chain for the given index preorder. It states
+
+```lean
+Order.krullDim (toLex '' S) = Order.krullDim I +
+  ∑ i ∈ hI.toFinset, Order.krullDim ((Sigma.mk i) ⁻¹' S)
+```
+
+Here `hI : I.Finite`; `I` is only prose notation for the ordinary image.
+The left subtype inherits the stock Sigma lexicographic preorder, and all index
+and fiber subtypes inherit their given preorders. The ambient index can be infinite;
+no antisymmetry, global fiber inhabitation, finite dimension or attainment is assumed.
+The family form follows by taking `S = Set.univ.sigma s`.
+
+The equation lies in `WithBot ℕ∞`. Empty support gives bottom plus an empty sum.
+Inactive empty fibers are excluded: support `{0, 2}` in ℕ with singleton fibers
+has dimension one, not the dimension of the ambient interval. A singleton active
+support gives exactly its fiber dimension, including top. Distinct equivalent
+preorder points supply no strict step, and top needs no longest or infinite chain.
+The proof consumes the whole dependent-sum height formula above, collapses its
+finite-partial-sum supremum, and uses the original dimension/height finite cuts
+and stock successor and finite-sum arithmetic, not another chain construction.
+`Order.succ_krullDim_eq_chainHeight` records the bottom-aware normalization:
+`WithBot.succ (Order.krullDim s) = s.chainHeight (· < ·)`.
+
 ### Krull dimension of lexicographic sums
 
 For arbitrary subsets `s`, `t` of independently universed preorders,
@@ -1191,6 +1220,9 @@ The allowed transitive axioms are `propext`, `Classical.choice` and `Quot.sound`
   `Sigma.Lex` (Yaël Dillies), set-fiber and finite-subunion APIs, and the earlier
   Formal Frontier binary union core generalized to disjoint cross-comparable sets;
   see the [module references and proof strategy](MinimalPrimes/Order/ChainHeight.lean).
+  The dependent-sum dimension formula reuses this whole height core and the earlier
+  Formal Frontier finite-cut dimension comparisons, together with Mathlib's
+  bottom-aware successor, subtype and finite-sum APIs.
 - The finite-member nilpotence criteria compose the dependent-product and
   constant-germ uniform-exponent APIs with Mathlib's `nilpotencyClass`, upward
   propagation of zero powers and finite-set order bounds; see the
