@@ -21,7 +21,7 @@ import Mathlib.Order.Minimal
 import Mathlib.Order.UpperLower.Basic
 
 /-!
-# Krull dimension of products, lexicographic sums, covers and boundary deletion
+# Krull dimension of products, lexicographic orders, covers and boundary deletion
 
 In pointwise product preorders, the height and coheight of a pair are the sums of
 the coordinate heights and coheights. The order dimension of a binary product is
@@ -78,12 +78,19 @@ of the two factor dimensions and their sum plus one. The two separate terms pres
 the other factor when one set is empty, including when its dimension is infinite.
 All three membership subtypes retain the given preorders.
 
+The dimension of the lexicographic image of a set product is
+`κ(s) * κ(t) + κ(s) + κ(t)` in `WithBot ℕ∞`. Ties in the first coordinate
+require equality, even for nonantisymmetric preorders. Empty factors give bottom;
+a singleton factor preserves the other dimension, including infinite dimension.
+
 ## References
 
 The lexicographic sum uses Mathlib's `Sum.Lex` order and `toLex` type synonym.
 Its vertex-height counterpart is `Set.chainHeight_toLex_sum` in
 `MinimalPrimes.Order.ChainHeight`; `Set.chainHeight_coe_univ_lt` is Mathlib's
-ambient-set to inherited-subtype height comparison.
+ambient-set to inherited-subtype height comparison. The lexicographic product uses
+Mathlib's `Prod.Lex` preorder and the multiplicative vertex-height formula
+`Set.chainHeight_toLex_prod` in `MinimalPrimes.Order.ChainHeight`.
 
 Mathlib's `Order.KrullDimension` supplies the dimension bound, order-dual invariance,
 height and coheight, and their relations to `IsMin` and `IsMax`. Its `Order.RelSeries`
@@ -754,3 +761,75 @@ theorem Order.krullDim_toLex_sum
             Order.krullDim_toLex_sum_of_eq_nat s t n m hs' ht'
 
 end LexicographicSum
+
+section LexicographicProduct
+
+/-- The order dimension of the lexicographic image of a set product is
+`κ(s) * κ(t) + κ(s) + κ(t)` in `WithBot ℕ∞`. All membership subtypes inherit
+the given preorders, and ties in the first coordinate require equality.
+An empty factor gives bottom, even beside infinite dimension; a singleton factor
+preserves the other dimension. Infinite dimension need not be attained by a chain. -/
+theorem Order.krullDim_toLex_prod
+    {α : Type u} {β : Type v} [Preorder α] [Preorder β]
+    (s : Set α) (t : Set β) :
+    Order.krullDim ((toLex : α × β → α ×ₗ β) '' (s ×ˢ t)) =
+      Order.krullDim s * Order.krullDim t +
+        Order.krullDim s + Order.krullDim t := by
+  rcases s.eq_empty_or_nonempty with rfl | hs
+  · simp [Order.krullDim_eq_bot]
+  rcases t.eq_empty_or_nonempty with rfl | ht
+  · simp [Order.krullDim_eq_bot]
+  let L : Set (α ×ₗ β) := (toLex : α × β → α ×ₗ β) '' (s ×ˢ t)
+  have hheight := Set.chainHeight_toLex_prod s t
+  change L.chainHeight (fun a b ↦ a < b) =
+    s.chainHeight (fun a b ↦ a < b) * t.chainHeight (fun a b ↦ a < b) at hheight
+  have hsbot : Order.krullDim s ≠ ⊥ := fun h ↦
+    hs.ne_empty (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp h))
+  have htbot : Order.krullDim t ≠ ⊥ := fun h ↦
+    ht.ne_empty (Set.isEmpty_coe_sort.mp (Order.krullDim_eq_bot_iff.mp h))
+  have hsH : s.chainHeight (fun a b : α ↦ a < b) ≠ 0 :=
+    ne_of_gt (lt_of_lt_of_le zero_lt_one ((Set.one_le_chainHeight_iff s _).mpr hs))
+  have htH : t.chainHeight (fun a b : β ↦ a < b) ≠ 0 :=
+    ne_of_gt (lt_of_lt_of_le zero_lt_one ((Set.one_le_chainHeight_iff t _).mpr ht))
+  have htop (h : Order.krullDim s = ⊤ ∨ Order.krullDim t = ⊤) :
+      Order.krullDim L = ⊤ := by
+    have hL : L.chainHeight (fun a b ↦ a < b) = ⊤ := by
+      rw [hheight]
+      rcases h with h | h
+      · rw [chainHeight_eq_top_of_krullDim_eq_top s h, ENat.top_mul htH]
+      · rw [chainHeight_eq_top_of_krullDim_eq_top t h, ENat.mul_top hsH]
+    refine ENat.WithBot.eq_top_iff_forall_ge.mpr fun n ↦ ?_
+    exact (Order.le_krullDim_iff_le_chainHeight L n).mpr (by simp [hL])
+  change Order.krullDim L = _
+  cases hs_dim : Order.krullDim s with
+  | bot => exact (hsbot hs_dim).elim
+  | coe d =>
+    cases ht_dim : Order.krullDim t with
+    | bot => exact (htbot ht_dim).elim
+    | coe e =>
+      rw [← WithBot.coe_mul, ← WithBot.coe_add, ← WithBot.coe_add]
+      cases d with
+      | top => simpa using htop (Or.inl hs_dim)
+      | coe n =>
+        cases e with
+        | top => simpa using htop (Or.inr ht_dim)
+        | coe m =>
+          have hs_height : s.chainHeight (fun a b : α ↦ a < b) = (n + 1 : ℕ∞) :=
+            le_antisymm ((Order.krullDim_le_iff_chainHeight_le s n).mp hs_dim.le)
+              ((Order.le_krullDim_iff_le_chainHeight s n).mp hs_dim.ge)
+          have ht_height : t.chainHeight (fun a b : β ↦ a < b) = (m + 1 : ℕ∞) :=
+            le_antisymm ((Order.krullDim_le_iff_chainHeight_le t m).mp ht_dim.le)
+              ((Order.le_krullDim_iff_le_chainHeight t m).mp ht_dim.ge)
+          have hL : L.chainHeight (fun a b ↦ a < b) =
+              ((n * m + n + m : ℕ) : ℕ∞) + 1 := by
+            rw [hheight, hs_height, ht_height]
+            simp only [Nat.cast_add, Nat.cast_mul, add_mul, mul_add,
+              one_mul, mul_one, add_assoc, add_left_comm, add_comm]
+          have hdim : Order.krullDim L =
+              (((n * m + n + m : ℕ) : ℕ∞) : WithBot ℕ∞) :=
+            le_antisymm
+              ((Order.krullDim_le_iff_chainHeight_le L (n * m + n + m)).mpr hL.le)
+              ((Order.le_krullDim_iff_le_chainHeight L (n * m + n + m)).mpr hL.ge)
+          simpa only [Nat.cast_add, Nat.cast_mul] using hdim
+
+end LexicographicProduct

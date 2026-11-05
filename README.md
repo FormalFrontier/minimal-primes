@@ -165,6 +165,28 @@ zero. Infinite dimension includes unbounded finite chain lengths without a
 longest or infinite chain. The proof uses the whole lexicographic height formula
 and the finite-cut comparisons above, rather than another chain construction.
 
+### Krull dimension of lexicographic products
+
+For arbitrary subsets `s`, `t` of independently universed preorders,
+[`Order.krullDim_toLex_prod`](MinimalPrimes/Order/KrullDimension.lean) states
+`κ(toLex '' (s ×ˢ t)) = κ(s) * κ(t) + κ(s) + κ(t)` in `WithBot ℕ∞`.
+The carrier is the membership subtype of that image in `α ×ₗ β`, with the
+`Prod.Lex` preorder of the given factor preorders. Ties in the first coordinate
+require equality, not preorder equivalence. No antisymmetry, nonemptiness,
+finiteness or attainment is assumed.
+
+An empty factor gives bottom even beside top. In the stock arithmetic,
+`⊥ * 0 = 0`, but the explicit bottom summand still absorbs the whole polynomial.
+A singleton factor preserves the other dimension, including bottom and top;
+top with dimension zero gives top despite its zero multiplication term.
+Two distinct equivalent first coordinates with three-point chain fibres give
+two incomparable fibres and dimension two. Infinite dimension includes
+unbounded finite chains without a longest or infinite chain.
+`Fin 2 ×ₗ Fin 3` has dimension five, whereas its pointwise product has dimension
+three and its tagged lexicographic sum has dimension four.
+The vertex-height input is the existing whole `Set.chainHeight_toLex_prod`
+formula, together with the finite-cut dimension comparisons above.
+
 ### Semimodules, annihilators and faithful actions on dependent reduced products
 
 For independent families `R i`, `M i` of semirings and additive commutative monoids,
